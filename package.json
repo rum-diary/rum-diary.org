@@ -1,0 +1,16 @@
+{
+  "name": "speed-trap-record",
+  "version": "0.0.0",
+  "description": "Data recorder for speed-trap",
+  "scripts": {
+    "start": "node server/start.js"
+  },
+  "author": "Shane Tomlinson <shane@shanetomlinson.com>",
+  "license": "MPL 2.0",
+  "dependencies": {
+    "express": "3.4.7",
+    "nunjucks": "1.0.1",
+    "cors": "~2.1.1",
+    "useragent": "~2.0.7"
+  }
+}
