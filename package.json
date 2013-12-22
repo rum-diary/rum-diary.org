@@ -10,7 +10,8 @@
   "dependencies": {
     "express": "3.4.7",
     "nunjucks": "1.0.1",
-    "cors": "~2.1.1",
-    "useragent": "~2.0.7"
+    "cors": "2.1.1",
+    "useragent": "2.0.7",
+    "spdy": "1.17.10"
   }
 }

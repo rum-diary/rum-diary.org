@@ -5,14 +5,19 @@
 const express = require('express');
 const nunjucks = require('nunjucks');
 const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const useragent = require('useragent');
+const spdy = require('spdy');
 
 const db = require('./db/json');
 
+const VIEWS_PATH = path.join(__dirname, 'views');
+const CERT_PATH = path.join(__dirname, '..', '..', 'ssl');
+
 var app = express();
 
-nunjucks.configure(path.join(__dirname, 'views'), {
+nunjucks.configure(VIEWS_PATH, {
   autoescape: true,
   express: app
 });
@@ -86,5 +91,15 @@ function findAverageLoadTime(loadTimes) {
   }, 0) / count;
 }
 
+var spdyOptions = {
+  key: fs.readFileSync(path.join(CERT_PATH, 'fridayhackers.key')),
+  cert: fs.readFileSync(path.join(CERT_PATH, 'fridayhackers.bundle')),
+  ssl: true,
+  plain: true
+};
 
-app.listen(3000);
+var PORT = 443;
+spdy.createServer(spdyOptions, app).listen(PORT, function() {
+  console.log('listening on port', PORT);
+});
+
