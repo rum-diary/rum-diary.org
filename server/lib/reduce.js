@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const moment = require('moment');
+
 function getPathDateInfo(returnedData, path, date) {
   if ( ! (path in returnedData)) {
     returnedData[path] = {};
@@ -16,7 +18,7 @@ function getPathDateInfo(returnedData, path, date) {
 
 function incrementPageHit(returnedData, path, date) {
   var pathDateInfo = getPathDateInfo(returnedData, path, date);
-  if ( ! ("count" in pathDateInfo)) {
+  if ( ! ('count' in pathDateInfo)) {
     pathDateInfo.count = 0;
   }
   pathDateInfo.count++;
