@@ -32,8 +32,6 @@ spdyServer.use(express.logger({
     }
   }
 }));
-spdyServer.use(express.static(config.get('static_dir')));
-
 
 spdyServer.get('/', function(req, res) {
   res.render('index.html', {
@@ -46,17 +44,18 @@ spdyServer.post('/navigation', function(req, res) {
   // don't wanna me hanging around for a response.
   res.send(200, { success: true });
 
-  logger.info('ip', req.ip);
   logger.info('referrer', req.get('referrer'));
+
   var data = req.body;
-  data.referrer = req.get('referrer');
   data.ip = req.get('ip');
+  data.path = req.path;
+
+  data.referrer = req.get('referrer');
   try {
     data.hostname = url.parse(data.referrer).hostname
   } catch(e) {}
 
   var ua = useragent.parse(req.get('user-agent'));
-
   data.os = ua.os;
   data.browser = {
     family: ua.family,
@@ -67,10 +66,6 @@ spdyServer.post('/navigation', function(req, res) {
   db.save(data, function() {});
 });
 
-
-spdyServer.get('/include.js', function(req, res) {
-  res.sendFile
-});
 
 /*
 spdyServer.get('/navigation', function(req, res) {
@@ -117,6 +112,9 @@ function findLoadTimes(data) {
   });
   return loadTimes;
 }
+
+spdyServer.use(express.static(config.get('static_dir')));
+
 
 function findAverageLoadTime(loadTimes) {
   var count = 0;

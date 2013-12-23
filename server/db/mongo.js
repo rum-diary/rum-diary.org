@@ -2,50 +2,63 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const moment = require('moment');
 const mongoose = require('mongoose');
+const mongooseTimestamps = require('mongoose-timestamp');
 const Schema = mongoose.Schema;
 
 const logger = require('../lib/logger');
 
 var PageLoad;
 
-exports.save = function(item, done) {
-  connect(function(err) {
-    if (err) return;
-
+exports.save = function (item, done) {
+  connect(function (err) {
+    if (err) return done(err);
     var pageLoad = createPageLoad(item);
     pageLoad.save(done);
   });
 };
 
-exports.get = function(done) {
-  connect(function(err) {
-    if (err) return;
+exports.get = function (searchBy, done) {
+  if ( ! done && typeof searchBy === "function") {
+    done = searchBy;
+    searchBy = {};
+  }
 
-    PageLoad.find(done);
-  });
+  // default to a 30 day search unless overridden.
+  if ( ! searchBy.updatedAt) {
+    searchBy.updatedAt = {
+      $gte: moment().subtract('days', 30).toDate()
+    };
+  }
+
+  connect(function (err) {
+    if (err) return;
+      logger.info("searching: %s", JSON.stringify(searchBy));
+      PageLoad.find(searchBy, function (err, models) {
+        if (err) {
+          logger.error("Error while retreiving models: %s", String(err));
+          return done(err);
+        }
+
+        done(null, models);
+      });
+    }
+  );
 };
 
-exports.getByHostname = function(hostname, done) {
-  connect(function(err) {
-    if (err) return;
-
-    PageLoad.find({ hostname: hostname }, function(err, models) {
-      if (err) return logger.error("getByHostname error: %s", String(err));
-
-      done(null, models);
-    });
-  });
+exports.getByHostname = function (hostname, done) {
+  exports.get({ hostname: hostname }, done);
 };
 
-exports.clear = function(done) {
-  connect(function(err) {
-    if (err) return;
+exports.clear = function (done) {
+  connect(function (err) {
+    if (err) return done(err);
 
-    PageLoad.find(function(err, models) {
+    PageLoad.find(function (err, models) {
       if (err) return done(err);
 
-      models.forEach(function(model) {
+      models.forEach(function (model) {
         model.remove();
       });
 
@@ -59,6 +72,7 @@ const pageLoadSchema = new Schema({
   uuid: String,
   hostname: String,
   referrer: String,
+  path: String,
   ip: String,
   os: String,
   browser: {
@@ -98,6 +112,8 @@ const pageLoadSchema = new Schema({
   ]
 });
 
+pageLoadSchema.plugin(mongooseTimestamps);
+
 PageLoad = mongoose.model('PageLoad', pageLoadSchema);
 
 
@@ -116,7 +132,7 @@ function connect(done) {
   mongoose.connect('mongodb://localhost/test');
   var db = mongoose.connection;
 
-  db.on('error', function(err) {
+  db.on('error', function (err) {
     logger.error('Error connecting to database: %s', String(err));
 
     connectionError = err;

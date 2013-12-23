@@ -36,7 +36,10 @@ describe('database', function() {
         db.get(function(err, data) {
           assert.isNull(err);
           assert.equal(data.length, 1);
-          assert.equal(data[0].uuid, 'another-uuid');
+          var item = data[0];
+          assert.equal(item.uuid, 'another-uuid');
+          assert.isDefined(item.createdAt);
+          assert.isDefined(item.updatedAt);
           done();
         });
       });

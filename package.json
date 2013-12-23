@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Data recorder for speed-trap",
   "scripts": {
-    "start": "node server/start.js"
+    "start": "node server/start.js",
+    "test_mongo": "DATABASE_DRIVER=mongo mocha test/",
+    "test": "DATABASE_DRIVER=json mocha test/"
   },
   "author": "Shane Tomlinson <shane@shanetomlinson.com>",
   "license": "MPL 2.0",
@@ -15,16 +17,13 @@
     "spdy": "1.17.10",
     "convict": "0.4.1",
     "intel": "0.4.0",
-    "mongoose": "3.8.3"
+    "mongoose": "3.8.3",
+    "moment": "2.4.0",
+    "mongoose-timestamp": "0.1.1"
   },
   "devDependencies": {
     "mocha": "~1.16.1",
     "assert": "~1.0.3",
     "chai": "~1.8.1"
-  },
-  "scripts": {
-    "start": "node server/start.js",
-    "test_mongo": "DATABASE_DRIVER=mongo mocha test/",
-    "test": "DATABASE_DRIVER=json mocha test/"
   }
 }
