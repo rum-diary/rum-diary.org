@@ -2,82 +2,32 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const path = require('path');
+const fs = require('fs');
 const Router = require('express').Router;
-const url = require('url');
-const useragent = require('useragent');
-
-const db = require('../db/db');
-
-const reduce = require('./reduce');
-const logger = require('./logger');
-
 const router = new Router();
 
-router.get('/', function(req, res) {
-  res.render('index.html');
-});
+const ROUTES_DIR = path.join(__dirname, 'routes');
 
-router.get('/index.html', function(req, res) {
-  res.redirect(301, '/');
-});
+// All routes are loaded from the individual files in the routes subdirectory.
+// Each .js file in the routes subdirectory should contain 3 fields:
+//  * verb - get, post, put, delete, etc.
+//  * path - path the respond to
+//  * handler - function to handle the route.
+loadAllRoutes();
 
+function loadAllRoutes() {
+  var files = fs.readdirSync(ROUTES_DIR);
+  files.forEach(loadRoute);
+}
 
-router.post('/navigation', function(req, res) {
-  // don't wanna me hanging around for a response.
-  res.send(200, { success: true });
+function loadRoute(fileName) {
+  if (path.extname(fileName) !== '.js') return;
 
-  logger.info('referrer', req.get('referrer'));
-
-  var data = req.body;
-  data.ip = req.get('ip');
-
-  data.referrer = req.get('referrer');
-  try {
-    var parsedUrl = url.parse(data.referrer);
-    data.hostname = parsedUrl.hostname;
-    data.path = parsedUrl.pathname;
-  } catch(e) {}
-
-  var ua = useragent.parse(req.get('user-agent'));
-  data.os = ua.os;
-  data.browser = {
-    family: ua.family,
-    major: ua.major,
-    minor: ua.minor
-  };
-
-  db.save(data, function() {});
-});
-
-
-/*
-router.get('/navigation', function(req, res) {
-  db.get(req.hostname, function(err, data) {
-    if (err) return res.send(500);
-
-    var loadTimes = findLoadTimes(data);
-
-    var returnData = {
-      load_times: loadTimes,
-      avg: findAverageLoadTime(loadTimes)
-    };
-    res.send(200, returnData);
-  });
-});
-*/
-
-router.get('/navigation/:hostname', function(req, res) {
-  var hostname = req.params.hostname;
-  logger.info('get information for %s', hostname);
-  db.getByHostname(hostname, function(err, data) {
-    if (err) return res.send(500);
-
-    var returnData = {
-      hits: reduce.pageHitsPerDay(data)
-    };
-    res.send(200, returnData);
-  });
-});
+  var routePath = path.join(ROUTES_DIR, fileName);
+  var route = require(routePath);
+  router[route.verb](route.path, route.handler);
+}
 
 module.exports = router;
 
