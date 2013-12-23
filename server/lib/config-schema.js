@@ -10,9 +10,9 @@ module.exports = {
     default: undefined
   },
   port: {
-    format: "port",
+    format: 'port',
     default: 443,
-    env: "PORT"
+    env: 'PORT'
   },
   ssl: {
     format: Boolean,
@@ -23,10 +23,16 @@ module.exports = {
     default: false
   },
   env: {
-    doc: "What environment are we running in?  Note: all hosted environments are 'production'.  ",
-    format: ["production", "development"],
-    default: "production",
+    doc: 'What environment are we running in?  Note: all hosted environments are "production".  ',
+    format: ['production', 'development'],
+    default: 'production',
     env: 'NODE_ENV'
+  },
+  database_driver: {
+    doc: 'Which driver to use for the database',
+    format: ['json', 'mongo'],
+    default: 'mongo',
+    env: 'DATABASE_DRIVER'
   },
   views_dir: path.join(__dirname, '..', 'views'),
   config_dir: path.join(__dirname, '..', 'etc'),

@@ -20,7 +20,7 @@ var intelConfig = {
   },
   // this will be set below.
   loggers: {}
-}
+};
 
 var procName = getProcName();
 intelConfig.loggers[procName] = {
@@ -37,6 +37,6 @@ module.exports = intel.getLogger(procName);
 
 
 function getProcName() {
-  return path.basename(process.argv[1], ".js");
+  return path.basename(process.argv[1], '.js');
 }
 

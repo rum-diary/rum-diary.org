@@ -80,11 +80,11 @@ spdyServer.get('/navigation', function(req, res) {
 });
 
 function findLoadTimes(data) {
-  var loadTimes = Object.keys(data).map(function(uuid) {
+  var loadTimes = data.map(function(item) {
   var loadTime;
   try {
-    var item = data[uuid].navigationTiming;
-    loadTime = item.loadEventEnd - item.navigationStart;
+    var navigationTiming = item.navigationTiming;
+    loadTime = navigationTiming.loadEventEnd - navigationTiming.navigationStart;
     } catch(e) {
       return NaN;
     }
@@ -95,11 +95,14 @@ function findLoadTimes(data) {
 
 function findAverageLoadTime(loadTimes) {
   var count = 0;
-  return loadTimes.reduce(function(prev, curr) {
+  var total = loadTimes.reduce(function(prev, curr) {
     if (isNaN(curr)) return prev;
     count++;
     return prev + curr;
-  }, 0) / count;
+  }, 0);
+
+  if (count) return total / count;
+  return 0;
 }
 
 var spdyOptions = {

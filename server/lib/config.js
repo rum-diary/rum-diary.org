@@ -40,7 +40,7 @@ function loadConfigFiles() {
   if (process.env.CONFIG_FILES && process.env.CONFIG_FILES !== '') {
     var files = process.env.CONFIG_FILES.split(',');
     files.forEach(function(file) {
-      logger.info("loading config file", file);
+      logger.info('loading config file', file);
     });
     conf.loadFile(files);
   }
