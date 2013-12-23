@@ -23,15 +23,14 @@ function incrementPageHit(returnedData, path, date) {
 }
 
 exports.pageHitsPerDay = function (hitsForHost) {
-  var returnedData = {
-    all: {}
-  };
+  var returnedData = {};
 
   hitsForHost.forEach(function (item) {
     var date = moment(item.createdAt).format('YYYY-MM-DD');
 
     if (item.path)
       incrementPageHit(returnedData, item.path, date);
+
     incrementPageHit(returnedData, '__all', date);
   });
 

@@ -24,6 +24,7 @@
   "devDependencies": {
     "mocha": "~1.16.1",
     "assert": "~1.0.3",
-    "chai": "~1.8.1"
+    "chai": "~1.8.1",
+    "request": "~2.30.0"
   }
 }
