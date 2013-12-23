@@ -16,11 +16,11 @@ module.exports = {
   },
   ssl: {
     format: Boolean,
-    default: false
+    default: true
   },
   spdy: {
     format: Boolean,
-    default: false
+    default: true
   },
   env: {
     doc: 'What environment are we running in?  Note: all hosted environments are "production".  ',
