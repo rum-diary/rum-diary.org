@@ -10,31 +10,44 @@ const cors = require('cors');
 const useragent = require('useragent');
 const spdy = require('spdy');
 
-const db = require('./db/json');
+const config = require('./lib/config');
+const logger = require('./lib/logger');
+
+const db = require('./db/db');
 
 const VIEWS_PATH = path.join(__dirname, 'views');
 const CERT_PATH = path.join(__dirname, '..', '..', 'ssl');
 
-var app = express();
+/*
+var httpServer = express();
+
+httpServer.get('*', function(req, res) {
+  if (req.secure) {
+    return next();
+  }
+  res.redirect('https://' + req.headers.host + req.url);
+});
+httpServer.listen(80);
+O*/
+var spdyServer = express();
 
 nunjucks.configure(VIEWS_PATH, {
   autoescape: true,
-  express: app
+  express: spdyServer
 });
+spdyServer.use(express.bodyParser());
+spdyServer.use(cors());
 
-app.use(express.bodyParser());
-app.use(cors());
-
-app.get('/', function(req, res) {
+spdyServer.get('/', function(req, res) {
   res.render('index.html', {
     title: 'Speed Trap!'
   });
 });
 
 
-app.post('/navigation', function(req, res) {
-  console.log("ip", req.ip);
-  console.log("referrer", req.get('referrer'));
+spdyServer.post('/navigation', function(req, res) {
+  logger.info('ip', req.ip);
+  logger.info('referrer', req.get('referrer'));
   var data = req.body;
   data.referrer = req.get('referrer');
   data.ip = req.get('ip');
@@ -48,14 +61,14 @@ app.post('/navigation', function(req, res) {
     minor: ua.minor
   };
 
-  db.save(data, function(err) {
+  db.save(data, function() {
     if (null) return res.send(500);
 
     res.send(200, { success: true, id: req.body.uuid });
   });
 });
 
-app.get('/navigation', function(req, res) {
+spdyServer.get('/navigation', function(req, res) {
   db.get(function(err, data) {
     if (null) return res.send(500);
 
@@ -71,9 +84,10 @@ app.get('/navigation', function(req, res) {
 
 function findLoadTimes(data) {
   var loadTimes = Object.keys(data).map(function(uuid) {
-    try {
+  var loadTime;
+  try {
     var item = data[uuid].navigationTiming;
-    var loadTime = item.loadEventEnd - item.navigationStart;
+    loadTime = item.loadEventEnd - item.navigationStart;
     } catch(e) {
       return NaN;
     }
@@ -98,8 +112,7 @@ var spdyOptions = {
   plain: true
 };
 
-var PORT = 443;
-spdy.createServer(spdyOptions, app).listen(PORT, function() {
-  console.log('listening on port', PORT);
+spdy.createServer(spdyOptions, spdyServer).listen(config.get('port'), function() {
+  logger.info('listening on port', config.get('port'));
 });
 

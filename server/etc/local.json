@@ -1,0 +1,8 @@
+{
+  "env": "development",
+  "hostname": "localhost",
+  "port": 8000,
+  "ssl": false,
+  "spdy": false
+}
+
