@@ -49,11 +49,12 @@ spdyServer.post('/navigation', function(req, res) {
 
   var data = req.body;
   data.ip = req.get('ip');
-  data.path = req.path;
 
   data.referrer = req.get('referrer');
   try {
-    data.hostname = url.parse(data.referrer).hostname
+    var parsedUrl = url.parse(data.referrer);
+    data.hostname = parsedUrl.hostname
+    data.path = parsedUrl.pathname;
   } catch(e) {}
 
   var ua = useragent.parse(req.get('user-agent'));
