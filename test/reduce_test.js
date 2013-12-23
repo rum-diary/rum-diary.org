@@ -9,8 +9,8 @@ const moment = require('moment');
 const reduce = require('../server/lib/reduce');
 
 describe('reduce', function() {
-  it('pageHitsPerDay', function(done) {
-    reduce.pageHitsPerDay([
+  it('pageHitsPerDay', function() {
+    var pageHitsPerDay = reduce.pageHitsPerDay([
       {
         path: '/',
         createdAt: moment().toDate()
@@ -25,16 +25,21 @@ describe('reduce', function() {
       },
       {
         path: '/page',
+        createdAt: moment().toDate()
+      },
+      {
+        path: '/page',
         createdAt: moment().subtract('days', 4).toDate()
       }
-    ], function(err, pageHitsPerDay) {
-      assert.isNull(err);
+    ]);
 
-      assert.equal(pageHitsPerDay['/'][moment().format('YYYY-MM-DD')], 2);
-      assert.equal(pageHitsPerDay['/'][moment().subtract('days', 2).format('YYYY-MM-DD')], 1);
-      assert.equal(pageHitsPerDay['/page'][moment().subtract('days', 4).format('YYYY-MM-DD')], 1);
-      done();
-    });
+    assert.equal(pageHitsPerDay['/'][moment().format('YYYY-MM-DD')].count, 2);
+    assert.equal(pageHitsPerDay['/'][moment().subtract('days', 2).format('YYYY-MM-DD')].count, 1);
+    assert.equal(pageHitsPerDay['/page'][moment().subtract('days', 4).format('YYYY-MM-DD')].count, 1);
+
+    // all pages for the domain are counted under the '__all' namespace
+    assert.equal(pageHitsPerDay['__all'][moment().format('YYYY-MM-DD')].count, 3);
+
   });
 });
 

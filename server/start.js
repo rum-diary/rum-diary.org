@@ -13,6 +13,7 @@ const url = require('url');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
+const reduce = require('./lib/reduce');
 
 const db = require('./db/db');
 
@@ -89,44 +90,16 @@ spdyServer.get('/navigation/:hostname', function(req, res) {
   db.getByHostname(hostname, function(err, data) {
     if (err) return res.send(500);
 
-    var loadTimes = findLoadTimes(data);
-
     var returnData = {
-      load_times: loadTimes,
-      avg: findAverageLoadTime(loadTimes)
+      hits: reduce.pageHitsPerDay(data)
     };
     res.send(200, returnData);
   });
 });
 
-function findLoadTimes(data) {
-  var loadTimes = data.map(function(item) {
-  var loadTime;
-  try {
-    var navigationTiming = item.navigationTiming;
-    loadTime = navigationTiming.loadEventEnd - navigationTiming.navigationStart;
-    } catch(e) {
-      return NaN;
-    }
-    return loadTime;
-  });
-  return loadTimes;
-}
 
 spdyServer.use(express.static(config.get('static_dir')));
 
-
-function findAverageLoadTime(loadTimes) {
-  var count = 0;
-  var total = loadTimes.reduce(function(prev, curr) {
-    if (isNaN(curr)) return prev;
-    count++;
-    return prev + curr;
-  }, 0);
-
-  if (count) return total / count;
-  return 0;
-}
 
 var spdyOptions = {
   key: fs.readFileSync(path.join(config.get('ssl_cert_dir'), 'rum-diary.org.key')),
