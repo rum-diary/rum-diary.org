@@ -34,6 +34,14 @@ nunjucks.configure(config.get('views_dir'), {
 });
 spdyServer.use(express.bodyParser());
 spdyServer.use(cors());
+spdyServer.use(express.logger({
+  format: 'short',
+  stream: {
+    write: function(x) {
+      logger.info(typeof x === 'string' ? x.trim() : x);
+    }
+  }
+}));
 
 spdyServer.get('/', function(req, res) {
   res.render('index.html', {
