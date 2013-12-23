@@ -14,6 +14,7 @@
     "useragent": "2.0.7",
     "spdy": "1.17.10",
     "convict": "0.4.1",
-    "intel": "0.4.0"
+    "intel": "0.4.0",
+    "mongoose": "~3.8.3"
   }
 }

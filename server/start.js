@@ -15,9 +15,6 @@ const logger = require('./lib/logger');
 
 const db = require('./db/db');
 
-const VIEWS_PATH = path.join(__dirname, 'views');
-const CERT_PATH = path.join(__dirname, '..', '..', 'ssl');
-
 /*
 var httpServer = express();
 
@@ -31,7 +28,7 @@ httpServer.listen(80);
 O*/
 var spdyServer = express();
 
-nunjucks.configure(VIEWS_PATH, {
+nunjucks.configure(config.get('views_dir'), {
   autoescape: true,
   express: spdyServer
 });
@@ -106,9 +103,9 @@ function findAverageLoadTime(loadTimes) {
 }
 
 var spdyOptions = {
-  key: fs.readFileSync(path.join(CERT_PATH, 'fridayhackers.key')),
-  cert: fs.readFileSync(path.join(CERT_PATH, 'fridayhackers.bundle')),
-  ssl: true,
+  key: fs.readFileSync(path.join(config.get('ssl_cert_dir'), 'rum-diary.org.key')),
+  cert: fs.readFileSync(path.join(config.get('ssl_cert_dir'), 'rum-diary.org.bundle')),
+  ssl: config.get('ssl'),
   plain: true
 };
 

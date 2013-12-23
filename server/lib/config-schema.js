@@ -28,6 +28,9 @@ module.exports = {
     default: "production",
     env: 'NODE_ENV'
   },
-  config_dir: path.join(__dirname, '..', 'etc')
+  views_dir: path.join(__dirname, '..', 'views'),
+  config_dir: path.join(__dirname, '..', 'etc'),
+  var_dir: path.join(__dirname, '..', 'var'),
+  ssl_cert_dir: path.join(__dirname, '..', '..', '..', 'ssl')
 };
 
