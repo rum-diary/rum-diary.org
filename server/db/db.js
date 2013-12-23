@@ -9,11 +9,11 @@ const db = getDatabase();
 exports.save = db.save;
 exports.get = db.get;
 exports.clear = db.clear;
+exports.getByHostname = db.getByHostname;
 
 function getDatabase() {
   var driver = config.get('database_driver');
   logger.info('Using %s database', driver);
   return require('./' + driver);
-
 }
 

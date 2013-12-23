@@ -26,6 +26,18 @@ exports.get = function(done) {
   });
 };
 
+exports.getByHostname = function(hostname, done) {
+  connect(function(err) {
+    if (err) return;
+
+    PageLoad.find({ hostname: hostname }, function(err, models) {
+      if (err) return logger.error("getByHostname error: %s", String(err));
+
+      done(null, models);
+    });
+  });
+};
+
 exports.clear = function(done) {
   connect(function(err) {
     if (err) return;
@@ -45,6 +57,15 @@ exports.clear = function(done) {
 
 const pageLoadSchema = new Schema({
   uuid: String,
+  hostname: String,
+  referrer: String,
+  ip: String,
+  os: String,
+  browser: {
+    family: String,
+    major: Number,
+    minor: Number
+  },
   navigationTiming: {
     'navigationStart': Number,
     'unloadEventStart': Number,

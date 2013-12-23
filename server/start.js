@@ -9,23 +9,13 @@ const fs = require('fs');
 const cors = require('cors');
 const useragent = require('useragent');
 const spdy = require('spdy');
+const url = require('url');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
 
 const db = require('./db/db');
 
-/*
-var httpServer = express();
-
-httpServer.get('*', function(req, res) {
-  if (req.secure) {
-    return next();
-  }
-  res.redirect('https://' + req.headers.host + req.url);
-});
-httpServer.listen(80);
-O*/
 var spdyServer = express();
 
 nunjucks.configure(config.get('views_dir'), {
@@ -42,6 +32,8 @@ spdyServer.use(express.logger({
     }
   }
 }));
+spdyServer.use(express.static(config.get('static_dir')));
+
 
 spdyServer.get('/', function(req, res) {
   res.render('index.html', {
@@ -51,11 +43,17 @@ spdyServer.get('/', function(req, res) {
 
 
 spdyServer.post('/navigation', function(req, res) {
+  // don't wanna me hanging around for a response.
+  res.send(200, { success: true });
+
   logger.info('ip', req.ip);
   logger.info('referrer', req.get('referrer'));
   var data = req.body;
   data.referrer = req.get('referrer');
   data.ip = req.get('ip');
+  try {
+    data.hostname = url.parse(data.referrer).hostname
+  } catch(e) {}
 
   var ua = useragent.parse(req.get('user-agent'));
 
@@ -66,16 +64,35 @@ spdyServer.post('/navigation', function(req, res) {
     minor: ua.minor
   };
 
-  db.save(data, function() {
-    if (null) return res.send(500);
-
-    res.send(200, { success: true, id: req.body.uuid });
-  });
+  db.save(data, function() {});
 });
 
+
+spdyServer.get('/include.js', function(req, res) {
+  res.sendFile
+});
+
+/*
 spdyServer.get('/navigation', function(req, res) {
-  db.get(function(err, data) {
-    if (null) return res.send(500);
+  db.get(req.hostname, function(err, data) {
+    if (err) return res.send(500);
+
+    var loadTimes = findLoadTimes(data);
+
+    var returnData = {
+      load_times: loadTimes,
+      avg: findAverageLoadTime(loadTimes)
+    };
+    res.send(200, returnData);
+  });
+});
+*/
+
+spdyServer.get('/navigation/:hostname', function(req, res) {
+  var hostname = req.params.hostname;
+  logger.info("get information for %s", hostname);
+  db.getByHostname(hostname, function(err, data) {
+    if (err) return res.send(500);
 
     var loadTimes = findLoadTimes(data);
 
