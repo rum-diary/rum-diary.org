@@ -31,7 +31,7 @@ path {
   <script src="/js/charts/hits-line.js"></script>
   <script>
     Micrajax.ajax({
-      url: "/navigation/" + document.location.hostname,
+      url: "/navigation/{{ hostname }}",
       success: function(data, respText, xhr) {
         drawHitsGraph(data.hits.__all);
       },
