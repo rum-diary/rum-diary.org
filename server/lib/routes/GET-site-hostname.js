@@ -2,9 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-exports.path = '/';
+exports.path = '/site/:hostname';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
-  res.render('GET-root.html');
+  res.render('GET-site-hostname.html', {
+    hostname: req.params.hostname
+  });
 };

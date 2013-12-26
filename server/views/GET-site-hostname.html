@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block title %}{{ hostname }} info{% endblock %}
+
+{% block inlinecss %}
+path {
+    stroke: steelblue;      /* the line colour for paths is steelblue */
+    stroke-width: 2;      /* the line width for paths is 2 pixels */
+    fill: none;         /* don't fill the area bounded by any path elements */
+}
+
+.axis path,
+.axis line {
+    fill: none;         /* don't fill areas bounded by the axis line */
+    stroke: grey;       /* make the axis line grey */
+    stroke-width: 1;      /* make the width of the axis lines 1 pixel */
+    shape-rendering: crispEdges;/* make the edges sharp */
+}
+
+{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Daily hits</h2>
+  <div id="hits"></div>
+</section>
+{% endblock %}
+
+{% block footerjs %}
+  <script src="/js/bower_components/d3/d3.js"></script>
+  <script src="/js/lib/micrajax.js"></script>
+  <script src="/js/charts/hits-line.js"></script>
+  <script>
+    Micrajax.ajax({
+      url: "/navigation/" + document.location.hostname,
+      success: function(data, respText, xhr) {
+        drawHitsGraph(data.hits.__all);
+      },
+      error: function(xhr, status, respText) {
+      }
+    });
+
+  </script>
+{% endblock %}
+
+

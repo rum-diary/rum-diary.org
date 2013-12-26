@@ -33,13 +33,17 @@ describe('reduce', function() {
       }
     ]);
 
-    assert.equal(pageHitsPerDay['/'][moment().format('YYYY-MM-DD')].count, 2);
-    assert.equal(pageHitsPerDay['/'][moment().subtract('days', 2).format('YYYY-MM-DD')].count, 1);
-    assert.equal(pageHitsPerDay['/page'][moment().subtract('days', 4).format('YYYY-MM-DD')].count, 1);
+    console.log(pageHitsPerDay);
+    assert.equal(pageHitsPerDay['/'][0].date, moment().format('YYYY-MM-DD'));
+    assert.equal(pageHitsPerDay['/'][0].hits, 2);
+    assert.equal(pageHitsPerDay['/'][2].date, moment().subtract('days', 2).format('YYYY-MM-DD'));
+    assert.equal(pageHitsPerDay['/'][2].hits, 1);
+    assert.equal(pageHitsPerDay['/page'][4].hits, 1);
 
-    // all pages for the domain are counted under the '__all' namespace
-    assert.equal(pageHitsPerDay['__all'][moment().format('YYYY-MM-DD')].count, 3);
-
+    // all pages for the domain are hitsed under the '__all' namespace
+    assert.isArray(pageHitsPerDay['__all'], 3);
+    assert.equal(pageHitsPerDay['__all'][0].hits, 3);
+    assert.equal(pageHitsPerDay['__all'][0].date, moment().format('YYYY-MM-DD'));
   });
 });
 

@@ -4,12 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
   <title>RUM Diary - {% block title %}{% endblock %}</title>
+  <style>
+  {% block inlinecss %}
+  {% endblock %}
+  </style>
 </head>
 <body>
 {% block body %}
   We need a body!
 {% endblock %}
 <script defer src="/include.js"></script>
+{% block footerjs %}
+{% endblock %}
 </body>
 </html>
 

@@ -6,37 +6,38 @@ const moment = require('moment');
 
 function getPathDateInfo(returnedData, path, date) {
   if ( ! (path in returnedData)) {
-    returnedData[path] = {};
+    returnedData[path] = [];
+    for (i = 0; i < 30; ++i) {
+      returnedData[path][i] = {
+        hits: 0,
+        date: moment().subtract('days', i).format('YYYY-MM-DD')
+      }
+    }
   }
 
-  if ( ! (date in returnedData[path])) {
-    returnedData[path][date] = {};
-  }
+  var daysAgo = moment().diff(date, 'days');
 
-  return returnedData[path][date];
+  return returnedData[path][daysAgo];
 }
 
 function incrementPageHit(returnedData, path, date) {
   var pathDateInfo = getPathDateInfo(returnedData, path, date);
-  if ( ! ('count' in pathDateInfo)) {
-    pathDateInfo.count = 0;
-  }
-  pathDateInfo.count++;
+  pathDateInfo.hits++;
 }
 
 exports.pageHitsPerDay = function (hitsForHost) {
-  var returnedData = {};
+  var hitsPerDay = {};
 
   hitsForHost.forEach(function (item) {
-    var date = moment(item.createdAt).format('YYYY-MM-DD');
+    var date = moment(item.createdAt);
 
     if (item.path)
-      incrementPageHit(returnedData, item.path, date);
+      incrementPageHit(hitsPerDay, item.path, date);
 
-    incrementPageHit(returnedData, '__all', date);
+    incrementPageHit(hitsPerDay, '__all', date);
   });
 
-  return returnedData;
+  return hitsPerDay;
 };
 
 exports.findLoadTimes = function (hitsForHost) {
