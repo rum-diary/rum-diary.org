@@ -2,10 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*global d3*/
+/*global RD, d3*/
 
-window.drawHitsGraph = (function(data) {
+RD.Graphs.hits = (function(hits) {
   'use strict';
+
+  var data = hits.all;
 
   var margin = {top: 20, right: 80, bottom: 30, left: 50},
       width = 960 - margin.left - margin.right,
