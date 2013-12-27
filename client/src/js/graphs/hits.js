@@ -4,7 +4,7 @@
 
 /*global RD, d3*/
 
-RD.Graphs.hits = (function(hits) {
+RD.Graphs.Hits = (function(hits) {
   'use strict';
 
   var data = hits.__all;
@@ -54,7 +54,6 @@ RD.Graphs.hits = (function(hits) {
 
   x.domain(d3.extent(data, function(d) { return d.date; }));
   y.domain([0, d3.max(data, function(d) { return d.hits; })]);
-
 
   svg.append('g')
       .attr('class', 'x axis')

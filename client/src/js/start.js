@@ -10,7 +10,7 @@
   Micrajax.ajax({
     url: '/navigation/' + hostname,
     success: function(data) {
-      RD.Graphs.hits(data.hits);
+      RD.Graphs.Hits(data.hits);
     },
     error: function() {
     }

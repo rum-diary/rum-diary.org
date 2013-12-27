@@ -33,7 +33,6 @@ describe('reduce', function() {
       }
     ]);
 
-    console.log(pageHitsPerDay);
     assert.equal(pageHitsPerDay['/'][0].date, moment().format('YYYY-MM-DD'));
     assert.equal(pageHitsPerDay['/'][0].hits, 2);
     assert.equal(pageHitsPerDay['/'][2].date, moment().subtract('days', 2).format('YYYY-MM-DD'));
