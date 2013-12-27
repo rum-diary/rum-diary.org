@@ -20,7 +20,6 @@ module.exports = function (grunt) {
       var context = {
         dataCollectionServer: config.get('data_collection_server')
       };
-      console.log("context", context);
 
       grunt.config('do-preprocess', {
         js: {

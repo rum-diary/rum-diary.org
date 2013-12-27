@@ -48,6 +48,11 @@ module.exports = {
     doc: "Server where clients should send data",
     format: String,
     default: "https://rum-diary.org"
+  },
+  use_concatenated_resources: {
+    doc: "Whether to use concatenated resources.",
+    format: Boolean,
+    default: true
   }
 };
 

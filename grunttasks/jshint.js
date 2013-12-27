@@ -10,7 +10,11 @@ module.exports = function (grunt) {
   grunt.config('jshint', {
     options: {
       jshintrc: '.jshintrc',
-      reporter: require('jshint-stylish')
+      reporter: require('jshint-stylish'),
+      ignores: [
+        '<%= app.src %>/include.js',
+        '<%= app.src %>/js-templates/include.js'
+      ]
     },
     all: [
       'Gruntfile.js',

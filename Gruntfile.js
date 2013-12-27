@@ -32,8 +32,8 @@ module.exports = function (grunt) {
     /*'mocha'*/
   ]);
 
-  grunt.registerTask('start', [
-    /*'jshint',*/
+  grunt.registerTask('server', [
+    'jshint',
     'preprocess',
     'serverproc'
   ]);

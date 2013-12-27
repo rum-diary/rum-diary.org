@@ -26,12 +26,9 @@ path {
 {% endblock %}
 
 {% block footerjs %}
-  <script src="/js/bower_components/d3/d3.js"></script>
-  <script src="/js/lib/micrajax.js"></script>
-  <script src="/js/rum-diary.js"></script>
-  <script src="/js/graphs/graphs.js"></script>
-  <script src="/js/graphs/hits.js"></script>
-  <script src="/js/start.js" defer></script>
+  {% for resource in resources %}
+    <script src="{{ resource }}"></script>
+  {% endfor %}
 {% endblock %}
 
 
