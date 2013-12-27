@@ -3,8 +3,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function() {
+  var idEl = document.getElementById('hits');
+  var hostname = idEl.getAttribute('data-hostname');
+
   Micrajax.ajax({
-    url: "/navigation/{{ hostname }}",
+    url: '/navigation/' + hostname,
     success: function(data, respText, xhr) {
       drawHitsGraph(data.hits.__all);
     },
