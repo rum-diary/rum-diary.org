@@ -7,8 +7,6 @@
 window.drawHitsGraph = (function(data) {
   'use strict';
 
-  console.log('data', data);
-
   var margin = {top: 20, right: 80, bottom: 30, left: 50},
       width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
@@ -33,12 +31,9 @@ window.drawHitsGraph = (function(data) {
 
   var valueline = d3.svg.line()
       .x(function(d) {
-        console.log('date', d.date.toString());
         return x(d.date);
         })
       .y(function(d) {
-        console.log('hits', d.hits);
-        /*if (!d.hits) d.hits = Math.floor(Math.random() * 40);*/
         return y(d.hits);
       });
 
