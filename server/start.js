@@ -5,23 +5,30 @@
 const express = require('express');
 const nunjucks = require('nunjucks');
 const path = require('path');
-const fs = require('fs');
 const cors = require('cors');
 const spdy = require('spdy');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
 const routes = require('./lib/routes.js');
+const ssl = require('./lib/ssl');
 
-var spdyServer = express();
+var app = express();
 
+// Template setup.
 nunjucks.configure(config.get('views_dir'), {
   autoescape: true,
-  express: spdyServer
+  express: app
 });
-spdyServer.use(express.bodyParser());
-spdyServer.use(cors());
-spdyServer.use(express.logger({
+
+// We need to get info out of the request bodies sometimes.
+app.use(express.bodyParser());
+
+// We want CORS headers.
+app.use(cors());
+
+// Send all express logs to our logger.
+app.use(express.logger({
   format: 'short',
   stream: {
     write: function(x) {
@@ -31,17 +38,24 @@ spdyServer.use(express.logger({
 }));
 
 
-spdyServer.use(routes.middleware);
-spdyServer.use(express.static(config.get('static_dir')));
+// Get all of our routes.
+app.use(routes.middleware);
 
+// Static middleware is last.
+const STATIC_ROOT = path.join(config.get('static_root'),
+                                config.get('static_dir'));
+app.use(express.static(STATIC_ROOT));
+
+// Set up SPDY.
 var spdyOptions = {
-  key: fs.readFileSync(path.join(config.get('ssl_cert_dir'), 'rum-diary.org.key')),
-  cert: fs.readFileSync(path.join(config.get('ssl_cert_dir'), 'rum-diary.org.bundle')),
+  key: ssl.getKey(),
+  cert: ssl.getCert(),
   ssl: config.get('ssl'),
   plain: true
 };
 
-spdy.createServer(spdyOptions, spdyServer).listen(config.get('port'), function() {
-  logger.info('listening on port', config.get('port'));
+const PORT = config.get('port');
+spdy.createServer(spdyOptions, app).listen(PORT, function() {
+  logger.info('listening on port', PORT);
 });
 

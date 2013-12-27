@@ -3,6 +3,7 @@
   "hostname": "localhost",
   "port": 8000,
   "ssl": false,
-  "spdy": false
+  "spdy": false,
+  "static_root": "src"
 }
 
