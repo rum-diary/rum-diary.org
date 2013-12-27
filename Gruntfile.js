@@ -14,6 +14,7 @@ module.exports = function (grunt) {
   grunt.loadTasks('grunttasks');
 
   grunt.registerTask('build', [
+    'selectconfig:dist',
     'jshint',
     'preprocess',
     /*'mocha',*/
@@ -32,11 +33,18 @@ module.exports = function (grunt) {
     /*'mocha'*/
   ]);
 
-  grunt.registerTask('server', [
-    'jshint',
-    'preprocess',
-    'serverproc'
-  ]);
+  grunt.registerTask('server', function (target) {
+    if (target === 'dist') {
+      return grunt.task.run(['build', 'serverproc:dist']);
+    }
+
+    grunt.task.run([
+      'selectconfig',
+      'jshint',
+      'preprocess',
+      'serverproc'
+    ]);
+  });
 };
 
 

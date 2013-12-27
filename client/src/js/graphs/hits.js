@@ -7,7 +7,7 @@
 RD.Graphs.hits = (function(hits) {
   'use strict';
 
-  var data = hits.all;
+  var data = hits.__all;
 
   var margin = {top: 20, right: 80, bottom: 30, left: 50},
       width = 960 - margin.left - margin.right,

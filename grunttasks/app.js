@@ -5,11 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const path = require('path');
-const config = require('../server/lib/config');
-const STATIC_ROOT = config.get('static_root');
 
 module.exports = function (grunt) {
   'use strict';
+
+  var STATIC_ROOT = path.join(__dirname, '..', 'client');
 
   grunt.config('app', {
     src: path.join(STATIC_ROOT, 'src'),
