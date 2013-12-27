@@ -43,6 +43,11 @@ module.exports = {
   },
   config_dir: path.join(__dirname, '..', 'etc'),
   var_dir: path.join(__dirname, '..', 'var'),
-  ssl_cert_dir: path.join(__dirname, '..', '..', '..', 'ssl')
+  ssl_cert_dir: path.join(__dirname, '..', '..', '..', 'ssl'),
+  data_collection_server: {
+    doc: "Server where clients should send data",
+    format: String,
+    default: "https://rum-diary.org"
+  }
 };
 

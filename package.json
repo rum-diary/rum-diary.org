@@ -36,6 +36,7 @@
     "load-grunt-tasks": "~0.2.1",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-contrib-copy": "~0.4.1",
-    "grunt-cli": "~0.1.11"
+    "grunt-cli": "~0.1.11",
+    "grunt-preprocess": "~3.0.1"
   }
 }

@@ -15,6 +15,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'jshint',
+    'preprocess',
     /*'mocha',*/
     'clean',
     'copy',
@@ -23,6 +24,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('default', [
     'jshint',
+    'preprocess',
     /*'mocha'*/
   ]);
 
@@ -30,6 +32,11 @@ module.exports = function (grunt) {
     /*'mocha'*/
   ]);
 
+  grunt.registerTask('start', [
+    /*'jshint',*/
+    'preprocess',
+    'serverproc'
+  ]);
 };
 
 

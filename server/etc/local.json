@@ -4,6 +4,7 @@
   "port": 8000,
   "ssl": false,
   "spdy": false,
-  "static_dir": "src"
+  "static_dir": "src",
+  "data_collection_server": "http://localhost:8000"
 }
 
