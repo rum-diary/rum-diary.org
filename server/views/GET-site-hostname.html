@@ -22,16 +22,32 @@ path {
 <section>
   <h2>{{ hostname }} - 30 day page views per day</h2>
   <div id="hits-graph" data-hostname="{{ hostname }}"></div>
+  <table id="hits-data">
+    {% for day in pageHitsPerDay %}
+      <tr class="hits-data-day">
+        <td class="hits-data-date">{{ day.date }}</td>
+        <td class="hits-data-hits">{{ day.hits }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 </section>
 
 <section>
   <h2>{{ hostname }} - 30 day page views per page</h2>
-  <div id="page-views"></div>
+  <table id="page-views">
+    {% for page, hits in pageHitsPerPage %}
+      <tr>
+        <td>{% if page == "__all" %}Total{% else %}{{ page }}{% endif %}</td>
+        <td>{{ hits }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 </section>
 {% endblock %}
 
 {% block footerjs %}
-  {% for resource in resources %}<script src="{{ resource }}"></script>{% endfor %}
+  {% for resource in resources %}<script src="{{ resource }}"></script>
+  {% endfor %}
 {% endblock %}
 
 

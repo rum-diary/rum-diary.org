@@ -20,7 +20,7 @@ function getPathDateInfo(returnedData, path, date) {
   return returnedData[path][daysAgo];
 }
 
-function incrementPageHit(returnedData, path, date) {
+function incrementDailyPageHit(returnedData, path, date) {
   var pathDateInfo = getPathDateInfo(returnedData, path, date);
   pathDateInfo.hits++;
 }
@@ -32,12 +32,31 @@ exports.pageHitsPerDay = function (hitsForHost) {
     var date = moment(item.createdAt);
 
     if (item.path)
-      incrementPageHit(hitsPerDay, item.path, date);
+      incrementDailyPageHit(hitsPerDay, item.path, date);
 
-    incrementPageHit(hitsPerDay, '__all', date);
+    incrementDailyPageHit(hitsPerDay, '__all', date);
   });
 
   return hitsPerDay;
+};
+
+exports.pageHitsPerPage = function (hitsForHost) {
+  var hitsPerPage = {
+    __all: 0
+  };
+
+  hitsForHost.forEach(function (item) {
+    hitsPerPage.__all++;
+
+    var path = item.path;
+    if ( ! path) return;
+
+    if ( ! (path in hitsPerPage)) hitsPerPage[path] = 0;
+
+    hitsPerPage[path]++;
+  });
+
+  return hitsPerPage;
 };
 
 exports.findLoadTimes = function (hitsForHost) {

@@ -44,5 +44,33 @@ describe('reduce', function() {
     assert.equal(pageHitsPerDay['__all'][0].hits, 3);
     assert.equal(pageHitsPerDay['__all'][0].date, moment().format('YYYY-MM-DD'));
   });
+
+  it('pageHitsPerPage', function() {
+    var pageHitsPerPage = reduce.pageHitsPerPage([
+      {
+        path: '/',
+        createdAt: moment().toDate()
+      },
+      {
+        path: '/',
+        createdAt: moment().toDate()
+      },
+      {
+        path: '/',
+        createdAt: moment().subtract('days', 2).toDate()
+      },
+      {
+        path: '/page',
+        createdAt: moment().toDate()
+      },
+      {
+        path: '/page',
+        createdAt: moment().subtract('days', 4).toDate()
+      }
+    ]);
+
+    assert.equal(pageHitsPerPage['/'], 3);
+    assert.equal(pageHitsPerPage['/page'], 2);
+  });
 });
 
