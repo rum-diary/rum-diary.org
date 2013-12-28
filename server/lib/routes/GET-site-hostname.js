@@ -20,13 +20,27 @@ exports.handler = function(req, res) {
     var pageHitsPerDay = reduce.pageHitsPerDay(data);
     var pageHitsPerPage = reduce.pageHitsPerPage(data);
 
-    console.log(pageHitsPerDay);
+    var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage);
+
     res.render('GET-site-hostname.html', {
       hostname: req.params.hostname,
       resources: client_resources('rum-diary.min.js'),
-      pageHitsPerPage: pageHitsPerPage,
+      pageHitsPerPage: pageHitsPerPageSorted,
       pageHitsPerDay: pageHitsPerDay.__all
     });
   });
 
 };
+
+function sortPageHitsPerPage(pageHitsPerPage) {
+  var sorted = Object.keys(pageHitsPerPage).map(function(key) {
+    return {
+      page: key,
+      hits: pageHitsPerPage[key]
+    };
+  }).sort(function(a, b) {
+    return b.hits - a.hits;
+  });
+
+  return sorted;
+}
