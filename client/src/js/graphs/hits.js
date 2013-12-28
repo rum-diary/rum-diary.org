@@ -39,7 +39,7 @@ RD.Graphs.Hits = (function(hits) {
         return y(d.hits);
       });
 
-  var svg = d3.select('body').append('svg')
+  var svg = d3.select('#hits-graph').append('svg')
       .attr('width', width + margin.left + margin.right)
       .attr('height', height + margin.top + margin.bottom)
       .append('g')

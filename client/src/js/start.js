@@ -4,7 +4,7 @@
 
 /* global Micrajax, RD */
 (function() {
-  var idEl = document.getElementById('hits');
+  var idEl = document.getElementById('hits-graph');
   var hostname = idEl.getAttribute('data-hostname');
 
   Micrajax.ajax({
