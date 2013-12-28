@@ -5,7 +5,7 @@
 const mocha = require('mocha');
 const assert = require('chai').assert;
 
-const db = require('../server/db/db');
+const db = require('../server/lib/db');
 
 
 beforeEach(function(done) {

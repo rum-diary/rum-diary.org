@@ -14,6 +14,6 @@ exports.getByHostname = db.getByHostname;
 function getDatabase() {
   var driver = config.get('database_driver');
   logger.info('Using %s database', driver);
-  return require('./' + driver);
+  return require('../db-drivers/' + driver);
 }
 
