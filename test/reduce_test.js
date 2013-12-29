@@ -78,6 +78,22 @@ describe('reduce', function() {
     reduce.findMedianNavigationTimes(navigationTimingData, function(err, medianInfo) {
       assert.isNull(err);
 
+      assert.isNumber(medianInfo.navigationStart);
+      assert.isNumber(medianInfo.redirectStart);
+      assert.isNumber(medianInfo.redirectEnd);
+      assert.isNumber(medianInfo.redirectDuration);
+
+      assert.isNumber(medianInfo.fetchStart);
+
+      assert.isNumber(medianInfo.domainLookupStart);
+      assert.isNumber(medianInfo.domainLookupEnd);
+      assert.isNumber(medianInfo.domainLookupDuration);
+
+      assert.isNumber(medianInfo.connectStart);
+      assert.isNumber(medianInfo.secureConnectionStart);
+      assert.isNumber(medianInfo.connectEnd);
+      assert.isNumber(medianInfo.connectDuration);
+
       assert.isNumber(medianInfo.requestStart);
       assert.isNumber(medianInfo.responseStart);
       assert.isNumber(medianInfo.responseEnd);
