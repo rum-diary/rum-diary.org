@@ -5,6 +5,7 @@
 const mocha = require('mocha');
 const assert = require('chai').assert;
 const moment = require('moment');
+const navigationTimingData = require('./data/navigation-timing.json');
 
 const reduce = require('../server/lib/reduce');
 
@@ -71,6 +72,31 @@ describe('reduce', function() {
 
     assert.equal(pageHitsPerPage['/'], 3);
     assert.equal(pageHitsPerPage['/page'], 2);
+  });
+
+  it('findMedianNavigationTimes', function(done) {
+    reduce.findMedianNavigationTimes(navigationTimingData, function(err, medianInfo) {
+      assert.isNull(err);
+
+      assert.isNumber(medianInfo.requestStart);
+      assert.isNumber(medianInfo.responseStart);
+      assert.isNumber(medianInfo.responseEnd);
+      assert.isNumber(medianInfo.requestResponseDuration);
+
+      assert.isNumber(medianInfo.domLoading);
+      assert.isNumber(medianInfo.domInteractive);
+      assert.isNumber(medianInfo.domContentLoadedEventStart);
+      assert.isNumber(medianInfo.domContentLoadedEventEnd);
+      assert.isNumber(medianInfo.domContentLoadedEventDuration);
+      assert.isNumber(medianInfo.domComplete);
+      assert.isNumber(medianInfo.processingDuration);
+
+      assert.isNumber(medianInfo.loadEventStart);
+      assert.isNumber(medianInfo.loadEventEnd);
+      assert.isNumber(medianInfo.loadEventDuration);
+
+      done();
+    });
   });
 });
 

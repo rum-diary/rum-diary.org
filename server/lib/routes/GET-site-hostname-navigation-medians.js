@@ -6,7 +6,7 @@ const db = require('../db');
 const logger = require('../logger');
 const reduce = require('../reduce');
 
-exports.path = '/navigation/:hostname';
+exports.path = '/site/:hostname/navigation/medians';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
@@ -15,9 +15,9 @@ exports.handler = function(req, res) {
   db.getByHostname(hostname, function(err, data) {
     if (err) return res.send(500);
 
-    var returnData = {
-      hits: reduce.pageHitsPerDay(data)
-    };
-    res.send(200, returnData);
+    reduce.findMedianNavigationTimes(data, function(err, medians) {
+      if (err) return res.send(500);
+      res.send(medians);
+    });
   });
 };

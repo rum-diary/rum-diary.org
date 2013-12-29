@@ -3,15 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const moment = require('moment');
+const Stats = require('fast-stats').Stats;
 
 function getPathDateInfo(returnedData, path, date) {
   if ( ! (path in returnedData)) {
     returnedData[path] = [];
-    for (i = 0; i < 30; ++i) {
+    for (var i = 0; i < 30; ++i) {
       returnedData[path][i] = {
         hits: 0,
         date: moment().subtract('days', i).format('YYYY-MM-DD')
-      }
+      };
     }
   }
 
@@ -86,3 +87,78 @@ exports.findAverageLoadTime = function (hitsForHost) {
   return 0;
 };
 
+exports.findMedianNavigationTimes = function (hitsForHost, done) {
+  getNavigationTimingStats(hitsForHost, function(err, stats) {
+    if (err) return done(err);
+
+    var medians = {};
+    for (var key in stats) {
+      medians[key] = stats[key].median();
+    }
+
+    done(null, medians);
+  });
+};
+
+function getNavigationTimingStats (hitsForHost, done) {
+  // request & response timings
+  var requestStart = new Stats();
+  var responseStart = new Stats();
+  var responseEnd = new Stats();
+  var requestResponseDuration = new Stats();
+
+  // processing timings
+  var domLoading = new Stats();
+  var domInteractive = new Stats();
+  var domContentLoadedEventStart = new Stats();
+  var domContentLoadedEventEnd = new Stats();
+  var domContentLoadedEventDuration = new Stats();
+  var domComplete = new Stats();
+  var processingDuration = new Stats();
+
+  // load timings
+  var loadEventStart = new Stats();
+  var loadEventEnd = new Stats();
+  var loadEventDuration = new Stats();
+
+  hitsForHost.forEach(function(hit) {
+    var navTiming = hit.navigationTiming;
+
+    requestStart.push(navTiming.requestStart);
+    responseStart.push(navTiming.responseStart);
+    responseEnd.push(navTiming.responseEnd);
+    requestResponseDuration.push(navTiming.responseEnd - navTiming.requestStart);
+
+    domLoading.push(navTiming.domLoading);
+    domInteractive.push(navTiming.domInteractive);
+    domContentLoadedEventStart.push(navTiming.domContentLoadedEventStart);
+    domContentLoadedEventEnd.push(navTiming.domContentLoadedEventEnd);
+    domContentLoadedEventDuration.push(navTiming.domContentLoadedEventEnd
+                                      - navTiming.domContentLoadedEventStart);
+    domComplete.push(navTiming.domComplete);
+    processingDuration.push(navTiming.domComplete - navTiming.domLoading);
+
+    loadEventStart.push(navTiming.loadEventStart);
+    loadEventEnd.push(navTiming.loadEventEnd);
+    loadEventDuration.push(navTiming.loadEventEnd - navTiming.loadEventStart);
+  });
+
+  done(null, {
+    requestStart: requestStart,
+    responseStart: responseStart,
+    responseEnd: responseEnd,
+    requestResponseDuration: requestResponseDuration,
+
+    domLoading: domLoading,
+    domInteractive: domInteractive,
+    domContentLoadedEventStart: domContentLoadedEventStart,
+    domContentLoadedEventEnd: domContentLoadedEventEnd,
+    domContentLoadedEventDuration: domContentLoadedEventDuration,
+    domComplete: domComplete,
+    processingDuration: processingDuration,
+
+    loadEventStart: loadEventStart,
+    loadEventEnd: loadEventEnd,
+    loadEventDuration: loadEventDuration
+  });
+}

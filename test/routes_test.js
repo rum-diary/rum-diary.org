@@ -13,7 +13,12 @@ const path = require('path');
 var ROUTES = {
   'GET /'                             : 200,
   'GET /index.html'                   : 301,
-  'GET /navigation/localhost'         : 200
+  'GET /site/localhost'               : 200,
+  'GET /site/localhost/all'           : 200,
+  'GET /site/localhost/navigation'    : 200,
+  'GET /site/localhost/navigation/medians'
+                                      : 200,
+  'GET /site/localhost/hits'          : 200
 };
 
 describe('start', function() {
