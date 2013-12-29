@@ -22,11 +22,18 @@ exports.handler = function(req, res) {
 
     var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage);
 
-    res.render('GET-site-hostname.html', {
-      hostname: req.params.hostname,
-      resources: client_resources('rum-diary.min.js'),
-      pageHitsPerPage: pageHitsPerPageSorted,
-      pageHitsPerDay: pageHitsPerDay.__all
+    reduce.findNavigationTimingStats(data,
+      ['range', 'median'],
+      function(err, stats) {
+      console.log(stats.median);
+      res.render('GET-site-hostname.html', {
+        hostname: req.params.hostname,
+        resources: client_resources('rum-diary.min.js'),
+        pageHitsPerPage: pageHitsPerPageSorted,
+        pageHitsPerDay: pageHitsPerDay.__all,
+        median: stats.median,
+        range: JSON.stringify(stats.range)
+      });
     });
   });
 
