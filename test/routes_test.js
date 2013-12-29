@@ -18,6 +18,8 @@ var ROUTES = {
   'GET /site/localhost/navigation'    : 200,
   'GET /site/localhost/navigation/medians'
                                       : 200,
+  'GET /site/localhost/navigation/distribution'
+                                      : 200,
   'GET /site/localhost/hits'          : 200
 };
 

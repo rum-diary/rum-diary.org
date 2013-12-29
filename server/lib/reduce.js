@@ -95,8 +95,13 @@ exports.findMedianNavigationTimes = function (hitsForHost, done) {
   });
 };
 
-exports.findNavigationTimingStats = function (hitsForHost, statsToFind, done) {
-  getNavigationTimingStats(hitsForHost, function(err, stats) {
+exports.findNavigationTimingStats = function (hitsForHost, statsToFind, options, done) {
+  if ( ! done && typeof options === "function") {
+    done = options;
+    options = {};
+  }
+
+  getNavigationTimingStats(hitsForHost, options, function(err, stats) {
     if (err) return done(err);
 
     var returnedStats = {};
@@ -112,32 +117,32 @@ exports.findNavigationTimingStats = function (hitsForHost, statsToFind, done) {
   });
 };
 
-function createStat() {
-  return new Stats();
+function createStat(options) {
+  return new Stats(options);
 }
 
-function getNavigationTimingStats (hitsForHost, done) {
+function getNavigationTimingStats (hitsForHost, options, done) {
   // request & response timings
-  var requestStart = createStat();
-  var responseStart = createStat();
-  var responseEnd = createStat();
-  var requestResponseDuration = createStat();
+  var requestStart = createStat(options);
+  var responseStart = createStat(options);
+  var responseEnd = createStat(options);
+  var requestResponseDuration = createStat(options);
 
   // processing timings
-  var domLoading = createStat();
-  var domInteractive = createStat();
-  var domContentLoadedEventStart = createStat();
-  var domContentLoadedEventEnd = createStat();
-  var domContentLoadedEventDuration = createStat();
-  var domComplete = createStat();
+  var domLoading = createStat(options);
+  var domInteractive = createStat(options);
+  var domContentLoadedEventStart = createStat(options);
+  var domContentLoadedEventEnd = createStat(options);
+  var domContentLoadedEventDuration = createStat(options);
+  var domComplete = createStat(options);
 
   // load timings
-  var loadEventStart = createStat();
-  var loadEventEnd = createStat();
-  var loadEventDuration = createStat();
+  var loadEventStart = createStat(options);
+  var loadEventEnd = createStat(options);
+  var loadEventDuration = createStat(options);
 
   // calculated when loadEventEnd happens.
-  var processingDuration = createStat();
+  var processingDuration = createStat(options);
 
   hitsForHost.forEach(function(hit) {
     var navTiming = hit.navigationTiming;
