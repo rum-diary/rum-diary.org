@@ -78,6 +78,10 @@ describe('reduce', function() {
     reduce.findMedianNavigationTimes(navigationTimingData, function(err, medianInfo) {
       assert.isNull(err);
 
+      assert.isNumber(medianInfo.unloadEventStart);
+      assert.isNumber(medianInfo.unloadEventEnd);
+      assert.isNumber(medianInfo.unloadEventDuration);
+
       assert.isNumber(medianInfo.navigationStart);
       assert.isNumber(medianInfo.redirectStart);
       assert.isNumber(medianInfo.redirectEnd);

@@ -126,139 +126,85 @@ function getNavigationTimingStats (hitsForHost, options, done) {
   // https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model
 
   // prompt for unload
-  var navigationStart = createStat(options);
+  var stats = {
+    navigationStart: createStat(options),
 
-  // redirect
-  var redirectStart = createStat(options);
-  var redirectEnd = createStat(options);
-  var redirectDuration = createStat(options);
+    // redirect - only visible if redirecting from the same domain.
+    redirectStart: createStat(options),
+    redirectEnd: createStat(options),
+    redirectDuration: createStat(options),
 
-  // App cache
-  var fetchStart = createStat(options);
+    // App cache
+    fetchStart: createStat(options),
 
-  // DNS
-  var domainLookupStart = createStat(options);
-  var domainLookupEnd = createStat(options);
-  var domainLookupDuration = createStat(options);
+    // DNS - will be the same as fetchStart if DNS is already resolved.
+    domainLookupStart: createStat(options),
+    domainLookupEnd: createStat(options),
+    domainLookupDuration: createStat(options),
 
-  // TCP
-  var connectStart = createStat(options);
-  var secureConnectionStart = createStat(options);
-  var connectEnd = createStat(options);
-  var connectDuration = createStat(options);
+    // TCP - will be the same as domainLookupDuration if reusing a connection.
+    connectStart: createStat(options),
+    secureConnectionStart: createStat(options),
+    connectEnd: createStat(options),
+    connectDuration: createStat(options),
 
-  // request & response timings
-  var requestStart = createStat(options);
-  var responseStart = createStat(options);
-  var responseEnd = createStat(options);
-  var requestResponseDuration = createStat(options);
+    // request & response
+    requestStart: createStat(options),
+    responseStart: createStat(options),
+    responseEnd: createStat(options),
+    requestResponseDuration: createStat(options),
 
-  // processing timings
-  var domLoading = createStat(options);
-  var domInteractive = createStat(options);
-  var domContentLoadedEventStart = createStat(options);
-  var domContentLoadedEventEnd = createStat(options);
-  var domContentLoadedEventDuration = createStat(options);
-  var domComplete = createStat(options);
+    // unload previous page - only valid previous page was on the same domain.
+    unloadEventStart: createStat(options),
+    unloadEventEnd: createStat(options),
+    unloadEventDuration: createStat(options),
 
-  // load timings
-  var loadEventStart = createStat(options);
-  var loadEventEnd = createStat(options);
-  var loadEventDuration = createStat(options);
+    // processing
+    domLoading: createStat(options),
+    domInteractive: createStat(options),
+    domContentLoadedEventStart: createStat(options),
+    domContentLoadedEventEnd: createStat(options),
+    domContentLoadedEventDuration: createStat(options),
+    domComplete: createStat(options),
 
-  // calculated when loadEventEnd happens.
-  var processingDuration = createStat(options);
+    // load
+    loadEventStart: createStat(options),
+    loadEventEnd: createStat(options),
+    loadEventDuration: createStat(options),
+    processingDuration: createStat(options)
+  };
 
   hitsForHost.forEach(function(hit) {
     var navTiming = hit.navigationTiming;
 
-    navigationStart.push(navTiming.navigationStart);
+    for (var key in navTiming) {
+      if (stats.hasOwnProperty(key)) stats[key].push(navTiming[key]);
+    }
 
-    // redirect
-    redirectStart.push(navTiming.redirectStart);
-    redirectEnd.push(navTiming.redirectEnd);
-    redirectDuration.push(
+    stats.redirectDuration.push(
               navTiming.redirectEnd - navTiming.redirectStart);
 
-    // App cache
-    fetchStart.push(navTiming.fetchStart);
-
-    // DNS
-    domainLookupStart.push(navTiming.domainLookupStart);
-    domainLookupEnd.push(navTiming.domainLookupEnd);
-    domainLookupDuration.push(
+    stats.domainLookupDuration.push(
               navTiming.domainLookupEnd - navTiming.domainLookupStart);
 
-    // TCP
-    connectStart.push(navTiming.connectStart);
-    secureConnectionStart.push(navTiming.secureConnectionStart);
-    connectEnd.push(navTiming.connectEnd);
-    connectDuration.push(
+    stats.connectDuration.push(
               navTiming.connectEnd - navTiming.connectStart);
 
-    requestStart.push(navTiming.requestStart);
-    responseStart.push(navTiming.responseStart);
-    responseEnd.push(navTiming.responseEnd);
-    requestResponseDuration.push(
+    stats.requestResponseDuration.push(
               navTiming.responseEnd - navTiming.requestStart);
 
-    domLoading.push(navTiming.domLoading);
-    domInteractive.push(navTiming.domInteractive);
-    domContentLoadedEventStart.push(navTiming.domContentLoadedEventStart);
-    domContentLoadedEventEnd.push(navTiming.domContentLoadedEventEnd);
-    domContentLoadedEventDuration.push(
-              navTiming.domContentLoadedEventEnd - navTiming.domContentLoadedEventStart);
-    domComplete.push(navTiming.domComplete);
+    stats.unloadEventDuration.push(
+              navTiming.unloadEventEnd - navTiming.unloadEventStart);
 
-    loadEventStart.push(navTiming.loadEventStart);
-    loadEventEnd.push(navTiming.loadEventEnd);
-    loadEventDuration.push(
+    stats.domContentLoadedEventDuration.push(
+              navTiming.domContentLoadedEventEnd - navTiming.domContentLoadedEventStart);
+
+    stats.loadEventDuration.push(
               navTiming.loadEventEnd - navTiming.loadEventStart);
 
-    processingDuration.push(
+    stats.processingDuration.push(
               navTiming.loadEventEnd - navTiming.domLoading);
   });
 
-  done(null, {
-    navigationStart: navigationStart,
-
-    // redirect
-    redirectStart: redirectStart,
-    redirectEnd: redirectEnd,
-    redirectDuration: redirectDuration,
-
-    // App cache
-    fetchStart: fetchStart,
-
-    // DNS
-    domainLookupStart: domainLookupStart,
-    domainLookupEnd: domainLookupEnd,
-    domainLookupDuration: domainLookupDuration,
-
-    // TCP
-    connectStart: connectStart,
-    secureConnectionStart: secureConnectionStart,
-    connectEnd: connectEnd,
-    connectDuration: connectDuration,
-
-    // request & response
-    requestStart: requestStart,
-    responseStart: responseStart,
-    responseEnd: responseEnd,
-    requestResponseDuration: requestResponseDuration,
-
-    // processing
-    domLoading: domLoading,
-    domInteractive: domInteractive,
-    domContentLoadedEventStart: domContentLoadedEventStart,
-    domContentLoadedEventEnd: domContentLoadedEventEnd,
-    domContentLoadedEventDuration: domContentLoadedEventDuration,
-    domComplete: domComplete,
-
-    // load
-    loadEventStart: loadEventStart,
-    loadEventEnd: loadEventEnd,
-    loadEventDuration: loadEventDuration,
-    processingDuration: processingDuration
-  });
+  done(null, stats);
 }
