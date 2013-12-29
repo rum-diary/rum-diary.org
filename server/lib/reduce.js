@@ -88,38 +88,56 @@ exports.findAverageLoadTime = function (hitsForHost) {
 };
 
 exports.findMedianNavigationTimes = function (hitsForHost, done) {
-  getNavigationTimingStats(hitsForHost, function(err, stats) {
+  exports.findNavigationTimingStats(hitsForHost, ['median'], function(err, stats) {
     if (err) return done(err);
 
-    var medians = {};
-    for (var key in stats) {
-      medians[key] = stats[key].median();
-    }
-
-    done(null, medians);
+    done(null, stats.median);
   });
 };
 
+exports.findNavigationTimingStats = function (hitsForHost, statsToFind, done) {
+  getNavigationTimingStats(hitsForHost, function(err, stats) {
+    if (err) return done(err);
+
+    var returnedStats = {};
+    for (var key in stats) {
+      statsToFind.forEach(function(statName) {
+        if ( ! (statName in returnedStats)) returnedStats[statName] = {};
+
+        returnedStats[statName][key] = stats[key][statName]();
+      });
+    }
+
+    done(null, returnedStats);
+  });
+};
+
+function createStat() {
+  return new Stats();
+}
+
 function getNavigationTimingStats (hitsForHost, done) {
   // request & response timings
-  var requestStart = new Stats();
-  var responseStart = new Stats();
-  var responseEnd = new Stats();
-  var requestResponseDuration = new Stats();
+  var requestStart = createStat();
+  var responseStart = createStat();
+  var responseEnd = createStat();
+  var requestResponseDuration = createStat();
 
   // processing timings
-  var domLoading = new Stats();
-  var domInteractive = new Stats();
-  var domContentLoadedEventStart = new Stats();
-  var domContentLoadedEventEnd = new Stats();
-  var domContentLoadedEventDuration = new Stats();
-  var domComplete = new Stats();
-  var processingDuration = new Stats();
+  var domLoading = createStat();
+  var domInteractive = createStat();
+  var domContentLoadedEventStart = createStat();
+  var domContentLoadedEventEnd = createStat();
+  var domContentLoadedEventDuration = createStat();
+  var domComplete = createStat();
 
   // load timings
-  var loadEventStart = new Stats();
-  var loadEventEnd = new Stats();
-  var loadEventDuration = new Stats();
+  var loadEventStart = createStat();
+  var loadEventEnd = createStat();
+  var loadEventDuration = createStat();
+
+  // calculated when loadEventEnd happens.
+  var processingDuration = createStat();
 
   hitsForHost.forEach(function(hit) {
     var navTiming = hit.navigationTiming;
@@ -127,20 +145,24 @@ function getNavigationTimingStats (hitsForHost, done) {
     requestStart.push(navTiming.requestStart);
     responseStart.push(navTiming.responseStart);
     responseEnd.push(navTiming.responseEnd);
-    requestResponseDuration.push(navTiming.responseEnd - navTiming.requestStart);
+    requestResponseDuration.push(
+              navTiming.responseEnd - navTiming.requestStart);
 
     domLoading.push(navTiming.domLoading);
     domInteractive.push(navTiming.domInteractive);
     domContentLoadedEventStart.push(navTiming.domContentLoadedEventStart);
     domContentLoadedEventEnd.push(navTiming.domContentLoadedEventEnd);
-    domContentLoadedEventDuration.push(navTiming.domContentLoadedEventEnd
-                                      - navTiming.domContentLoadedEventStart);
+    domContentLoadedEventDuration.push(
+              navTiming.domContentLoadedEventEnd - navTiming.domContentLoadedEventStart);
     domComplete.push(navTiming.domComplete);
-    processingDuration.push(navTiming.domComplete - navTiming.domLoading);
 
     loadEventStart.push(navTiming.loadEventStart);
     loadEventEnd.push(navTiming.loadEventEnd);
-    loadEventDuration.push(navTiming.loadEventEnd - navTiming.loadEventStart);
+    loadEventDuration.push(
+              navTiming.loadEventEnd - navTiming.loadEventStart);
+
+    processingDuration.push(
+              navTiming.loadEventEnd - navTiming.domLoading);
   });
 
   done(null, {
@@ -155,10 +177,10 @@ function getNavigationTimingStats (hitsForHost, done) {
     domContentLoadedEventEnd: domContentLoadedEventEnd,
     domContentLoadedEventDuration: domContentLoadedEventDuration,
     domComplete: domComplete,
-    processingDuration: processingDuration,
 
     loadEventStart: loadEventStart,
     loadEventEnd: loadEventEnd,
-    loadEventDuration: loadEventDuration
+    loadEventDuration: loadEventDuration,
+    processingDuration: processingDuration
   });
 }

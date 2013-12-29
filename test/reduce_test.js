@@ -98,5 +98,51 @@ describe('reduce', function() {
       done();
     });
   });
+
+  it('findNavigationTimingStats', function(done) {
+    reduce.findNavigationTimingStats(
+      navigationTimingData,
+      ['range', 'median', 'amean', 'stddev'],
+      function(err, stats) {
+      assert.isNull(err);
+
+      var medianInfo = stats.median;
+      assert.isNumber(medianInfo.requestStart);
+      assert.isNumber(medianInfo.responseStart);
+      assert.isNumber(medianInfo.responseEnd);
+      assert.isNumber(medianInfo.requestResponseDuration);
+
+      assert.isNumber(medianInfo.domLoading);
+      assert.isNumber(medianInfo.domInteractive);
+      assert.isNumber(medianInfo.domContentLoadedEventStart);
+      assert.isNumber(medianInfo.domContentLoadedEventEnd);
+      assert.isNumber(medianInfo.domContentLoadedEventDuration);
+      assert.isNumber(medianInfo.domComplete);
+      assert.isNumber(medianInfo.processingDuration);
+
+      assert.isNumber(medianInfo.loadEventStart);
+      assert.isNumber(medianInfo.loadEventEnd);
+      assert.isNumber(medianInfo.loadEventDuration);
+
+      var rangeInfo = stats.range;
+      assert.isArray(rangeInfo.requestStart);
+      assert.isArray(rangeInfo.responseStart);
+      assert.isArray(rangeInfo.responseEnd);
+      assert.isArray(rangeInfo.requestResponseDuration);
+
+      assert.isArray(rangeInfo.domLoading);
+      assert.isArray(rangeInfo.domInteractive);
+      assert.isArray(rangeInfo.domContentLoadedEventStart);
+      assert.isArray(rangeInfo.domContentLoadedEventEnd);
+      assert.isArray(rangeInfo.domContentLoadedEventDuration);
+      assert.isArray(rangeInfo.domComplete);
+      assert.isArray(rangeInfo.processingDuration);
+
+      assert.isArray(rangeInfo.loadEventStart);
+      assert.isArray(rangeInfo.loadEventEnd);
+      assert.isArray(rangeInfo.loadEventDuration);
+      done();
+    });
+  });
 });
 
