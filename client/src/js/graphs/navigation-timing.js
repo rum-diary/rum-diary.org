@@ -7,7 +7,7 @@
 RD.Graphs.NavigationTiming = (function() {
   'use strict';
 
-    var TOTAL_WIDTH = 960,
+    var TOTAL_WIDTH = 182,
         TOTAL_HEIGHT = 500,
         MARGIN_TOP = 20,
         MARGIN_RIGHT = 80,
@@ -19,16 +19,16 @@ RD.Graphs.NavigationTiming = (function() {
       'navigationStart': undefined,
       'unloadEventStart': undefined,
       */
-      'unloadEventEnd': undefined,
+      /*'unloadEventEnd': undefined,*/
       /*'redirectStart': undefined,*/
-      'redirectEnd': undefined,
+      /*'redirectEnd': undefined,*/
 
       /*
       'fetchStart': undefined,
       */
 
       /*'domainLookupStart': undefined,*/
-      'domainLookupEnd': undefined,
+      /*'domainLookupEnd': undefined,*/
 
       /*'connectStart': undefined,*/
       /*'secureConnectionStart': undefined,*/
@@ -42,7 +42,9 @@ RD.Graphs.NavigationTiming = (function() {
       /*
       'domInteractive': undefined,
       'domContentLoadedEventStart': undefined,
+      */
       'domContentLoadedEventEnd': undefined,
+     /*
       'domComplete': undefined,
       'loadEventStart': undefined,*/
       'loadEventEnd': undefined
@@ -72,28 +74,29 @@ RD.Graphs.NavigationTiming = (function() {
           .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00']);
 
       // Add a group for each section.
-      /*
       var section = svg.selectAll('.svg-group')
           .data(chartData)
-        .enter().append('svg:g')
+        .enter().append('g')
           .attr('class', 'section')
           .style('fill', '#ffffff')
           .style('stroke', '#000000');
 
-*/
 
       // Add a rect for each field
-      var rect = svg.selectAll('.svg-group')
-          .data(chartData)
-        .enter().append('svg:rect')
+      var rect = section.selectAll('rect')
+          .data(function(d) {
+            // data must be returned in an array or else no rects are added.
+            return [d];
+          })
+        .enter().append('rect')
           .attr('x', function(d) {
             return 1;//x(d.x);
           })
           .attr('y', function(d) {
             return y(d.start_y + d.y);
           })
-          .style('fill', function(d, i) {
-            return z(i);
+          .style('fill', function(d) {
+            return z(d.x);
           })
           .attr('width', '50')
           .attr('height', function(d) {
@@ -137,15 +140,6 @@ RD.Graphs.NavigationTiming = (function() {
 
     setXDomain(x, chartData);
 
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient('bottom');
-
-    svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
     return x;
   }
 
@@ -179,7 +173,7 @@ RD.Graphs.NavigationTiming = (function() {
 
   function setXDomain(x, chartData) {
     x.domain(d3.extent(chartData, function(d) {
-      return d.x;
+      return 0//d.x;
     }));
   }
 
