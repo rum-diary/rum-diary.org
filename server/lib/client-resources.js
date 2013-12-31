@@ -14,7 +14,7 @@ const config = require('./config');
 const DEPENDENCIES = {
   'rum-diary.min.js': [
     '/js/bower_components/d3/d3.js',
-    '/js/lib/micrajax.js',
+    /*'/js/lib/micrajax.js',*/
     '/js/rum-diary.js',
     '/js/graphs/graphs.js',
     '/js/graphs/hits.js',
