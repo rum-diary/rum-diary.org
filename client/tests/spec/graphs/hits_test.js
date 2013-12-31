@@ -9,7 +9,7 @@
 
   describe('RD.Graphs.Hits', function () {
 
-    afterEach(function() {
+    beforeEach(function() {
       removeSvgEls();
     });
 
@@ -18,7 +18,6 @@
     });
 
     it('exists', function () {
-      assert.isFunction(window.RD.Graphs.Hits);
       assert.isFunction(window.RD.Graphs.Hits);
     });
 
@@ -38,15 +37,17 @@
 
       var svgEl = document.querySelector('svg');
       assert.isObject(svgEl);
+      assert.notEqual(svgEl, null);
 
       var pathEl = document.querySelector('.line');
       assert.isObject(pathEl);
+      assert.notEqual(pathEl, null);
     });
 
   });
 
   function removeSvgEls() {
-    var svgEls = [].slice(document.body.querySelectorAll('svg'), 0);
+    var svgEls = [].slice.call(document.querySelectorAll('svg'), 0);
     svgEls.forEach(function(svgEl) {
       svgEl.parentNode.removeChild(svgEl);
     });
