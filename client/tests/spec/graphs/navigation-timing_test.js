@@ -17,7 +17,7 @@
     });
 
     afterEach(function() {
-      /*removeSvgEls();*/
+      removeSvgEls();
     });
 
     it('exists', function () {
@@ -35,11 +35,8 @@
       assert.isObject(svgEl);
       assert.notEqual(svgEl, null);
 
-      /*
-      var pathEl = document.querySelector('.line');
-      assert.isObject(pathEl);
-      assert.notEqual(pathEl, null);
-      */
+      var sectionEls = document.querySelectorAll('.section');
+      assert.equal(sectionEls.length, 8);
     });
 
   });

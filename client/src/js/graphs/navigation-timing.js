@@ -7,49 +7,73 @@
 RD.Graphs.NavigationTiming = (function() {
   'use strict';
 
-    var TOTAL_WIDTH = 182,
-        TOTAL_HEIGHT = 500,
-        MARGIN_TOP = 20,
-        MARGIN_RIGHT = 80,
-        MARGIN_BOTTOM = 30,
-        MARGIN_LEFT = 50;
+  var TOTAL_WIDTH = 182,
+      TOTAL_HEIGHT = 500,
+      MARGIN_TOP = 20,
+      MARGIN_RIGHT = 80,
+      MARGIN_BOTTOM = 30,
+      MARGIN_LEFT = 50;
 
-    var NAVIGATION_TIMING_FIELDS = {
-      /*
-      'navigationStart': undefined,
-      'unloadEventStart': undefined,
-      */
-      /*'unloadEventEnd': undefined,*/
-      /*'redirectStart': undefined,*/
-      /*'redirectEnd': undefined,*/
+  var NAVIGATION_TIMING_SECTIONS = [
+    {
+      name: 'Redirect',
+      start: 'redirectStart',
+      end: 'redirectEnd'
+    },
 
-      /*
-      'fetchStart': undefined,
-      */
+    {
+      name: 'App cache',
+      start: 'fetchStart',
+      end: 'domainLookupStart'
+    },
 
-      /*'domainLookupStart': undefined,*/
-      /*'domainLookupEnd': undefined,*/
+    {
+      name: 'DNS',
+      start: 'domainLookupStart',
+      end: 'domainLookupEnd'
+    },
 
-      /*'connectStart': undefined,*/
-      /*'secureConnectionStart': undefined,*/
-      'connectEnd': undefined,
+    {
+      name: 'TCP',
+      start: 'connectStart',
+      end: 'connectEnd'
+    },
 
-      /*'requestStart': undefined,*/
-      /*'responseStart': undefined,*/
-      'responseEnd': undefined,
+    {
+      name: 'Request response',
+      start: 'requestStart',
+      end: 'responseEnd'
+    },
 
-      /*'domLoading': undefined,*/
-      /*
-      'domInteractive': undefined,
-      'domContentLoadedEventStart': undefined,
-      */
-      'domContentLoadedEventEnd': undefined,
-     /*
-      'domComplete': undefined,
-      'loadEventStart': undefined,*/
-      'loadEventEnd': undefined
-    };
+    {
+      name: 'Processing',
+      start: 'domLoading',
+      end: 'domComplete'
+    },
 
+    {
+      name: 'Loading',
+      start: 'loadEventStart',
+      end: 'loadEventEnd'
+    },
+
+    {
+      name: 'DOMContentLoaded',
+      start: 'domContentLoadedEventStart',
+      end: 'domContentLoadedEventEnd'
+    }
+  ];
+
+  var BACKGROUND_COLORS = [
+    'dodgerblue',
+    'peachpuff',
+    'tan',
+    'firebrick',
+    'aquamarine',
+    'lightskyblue',
+    'salmon',
+    'green'
+  ];
 
   var Module = {
     init: function(options) {
@@ -71,15 +95,20 @@ RD.Graphs.NavigationTiming = (function() {
       var y = createYAxis(svg, width, height, chartData);
 
       var z = d3.scale.ordinal()
-          .range(['#98abc5', '#8a89a6', '#7b6888', '#6b486b', '#a05d56', '#d0743c', '#ff8c00']);
+          .range(BACKGROUND_COLORS);
+
+      var tooltip = d3.select('body')
+        .append('div')
+        .style('position', 'absolute')
+        .style('z-index', '10')
+        .style('visibility', 'hidden');
 
       // Add a group for each section.
       var section = svg.selectAll('.svg-group')
           .data(chartData)
         .enter().append('g')
           .attr('class', 'section')
-          .style('fill', '#ffffff')
-          .style('stroke', '#000000');
+          .style('fill', '#ffffff');
 
 
       // Add a rect for each field
@@ -89,18 +118,43 @@ RD.Graphs.NavigationTiming = (function() {
             return [d];
           })
         .enter().append('rect')
-          .attr('x', function(d) {
-            return 1;//x(d.x);
+          .attr('x', function() {
+            return 10;
           })
           .attr('y', function(d) {
-            return y(d.start_y + d.y);
+            return y(d.end_y);
+          })
+          .attr('height', function(d) {
+            return y(d.start_y) - y(d.end_y);
           })
           .style('fill', function(d) {
             return z(d.x);
           })
+          .style('opacity', function() {
+            return 0.5;
+          })
           .attr('width', '50')
-          .attr('height', function(d) {
-            return y(d.start_y) - y(d.start_y + d.y);
+          .style('stroke', '#000000')
+          .attr('rx', '5')
+          .attr('title', function(d) {
+            return d.name;
+          })
+          .on('mouseenter', function(d) {
+            var tooltipHTML = d.name + '<hr/>' + d.start + ': ' + d.start_y + '<hr />' + d.end + ':' + d.end_y;
+            tooltip
+                .html(tooltipHTML)
+                .style('visibility', 'visible');
+
+          })
+          .on('mousemove', function() {
+            tooltip
+                .style('top', (d3.event.pageY-10)+'px')
+                .style('left',(d3.event.pageX+10)+'px');
+          })
+          .on('mouseleave', function(d) {
+            tooltip
+                .text(d.name)
+                .style('visibility', 'hidden');
           });
 
     }
@@ -115,19 +169,18 @@ RD.Graphs.NavigationTiming = (function() {
 
   function toChartData(navigationTimingData) {
     var count = 0;
-    var total = 0;
 
-    var chartData = Object.keys(NAVIGATION_TIMING_FIELDS).map(function(key) {
-      var curr = navigationTimingData[key];
+    var chartData = NAVIGATION_TIMING_SECTIONS.map(function(section) {
       var data = {
         x: count,
-        y: curr,
-        start_y: total
+        end: section.end,
+        end_y: navigationTimingData[section.end],
+        start: section.start,
+        start_y: navigationTimingData[section.start],
+        name: section.name
       };
 
       count++;
-      total += curr;
-
       return data;
     });
 
@@ -153,8 +206,8 @@ RD.Graphs.NavigationTiming = (function() {
         .scale(y)
         .orient('left');
 
-    svg.append("g")
-            .attr("class", "y axis")
+    svg.append('g')
+            .attr('class', 'y axis')
             .call(yAxis);
 
     return y;
@@ -171,15 +224,13 @@ RD.Graphs.NavigationTiming = (function() {
     return svg;
   }
 
-  function setXDomain(x, chartData) {
-    x.domain(d3.extent(chartData, function(d) {
-      return 0//d.x;
-    }));
+  function setXDomain(x/*, chartData*/) {
+    x.domain([0,1]);
   }
 
   function setYDomain(y, chartData) {
     y.domain([0, d3.max(chartData, function(d) {
-      return d.start_y + d.y;
+      return d.end_y;
     })]);
   }
 
