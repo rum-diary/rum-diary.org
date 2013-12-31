@@ -46,11 +46,12 @@ path {
 
 <section>
   <h2> {{ hostname }} - Navigation Timing median values</h2>
+  <div id="navigation-timing-graph"></div>
   <table id="medians">
     {% for key, value in median %}
-      <tr>
-        <td>{{key}}</td>
-        <td>{{value}}</td>
+      <tr class="navigation-timing-row">
+        <td class="navigation-timing-key">{{key}}</td>
+        <td class="navigation-timing-value">{{value}}</td>
       </tr>
     {% endfor %}
   </table>

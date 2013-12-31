@@ -18,6 +18,7 @@ const DEPENDENCIES = {
     '/js/rum-diary.js',
     '/js/graphs/graphs.js',
     '/js/graphs/hits.js',
+    '/js/graphs/navigation-timing.js',
     '/js/start.js'
   ]
 };

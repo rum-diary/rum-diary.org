@@ -23,5 +23,24 @@
 
   document.getElementById('hits-data').style.display = 'none';
 
+
+  var navigationTimingEls = [].slice.call(document.querySelectorAll('.navigation-timing-row'));
+  var navigationTimingData = {};
+  navigationTimingEls.forEach(function(navigationTimingEl) {
+    var keyEl = navigationTimingEl.querySelector('.navigation-timing-key');
+    var valueEl = navigationTimingEl.querySelector('.navigation-timing-value');
+
+    navigationTimingData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
+  });
+
+  var navigationTimingGraph = RD.Graphs.NavigationTiming.create();
+  navigationTimingGraph.init({
+    data: navigationTimingData
+  });
+  navigationTimingGraph.render();
+
+  document.getElementById('medians').style.display = 'none';
+
+
 }());
 
