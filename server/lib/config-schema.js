@@ -7,31 +7,31 @@ const path = require('path');
 module.exports = {
   hostname: {
     format: String,
-    default: undefined
+    'default': undefined
   },
   port: {
     format: 'port',
-    default: 443,
+    'default': 443,
     env: 'PORT'
   },
   ssl: {
     format: Boolean,
-    default: true
+    'default': true
   },
   spdy: {
     format: Boolean,
-    default: true
+    'default': true
   },
   env: {
-    doc: 'What environment are we running in?  Note: all hosted environments are "production".  ',
+    doc: 'What environment are we running in?  Note: all hosted environments are \'production\'.',
     format: ['production', 'development'],
-    default: 'production',
+    'default': 'production',
     env: 'NODE_ENV'
   },
   database_driver: {
     doc: 'Which driver to use for the database',
     format: ['json', 'mongo'],
-    default: 'mongo',
+    'default': 'mongo',
     env: 'DATABASE_DRIVER'
   },
   views_dir: path.join(__dirname, '..', 'views'),
@@ -39,20 +39,32 @@ module.exports = {
   static_dir: {
     doc: 'Which static root to use for client side resources, select \'\' for testing',
     format: ['src', 'dist', ''],
-    default: 'dist'
+    'default': 'dist'
   },
   config_dir: path.join(__dirname, '..', 'etc'),
   var_dir: path.join(__dirname, '..', 'var'),
   ssl_cert_dir: path.join(__dirname, '..', '..', '..', 'ssl'),
-  data_collection_server: {
-    doc: "Server where clients should send data",
+  logging_dir: {
+    doc: 'Where log files should be stored',
     format: String,
-    default: "https://rum-diary.org"
+    'default': path.join(__dirname, '..', 'var', 'log')
+  },
+  data_collection_server: {
+    doc: 'Server where clients should send performance data',
+    format: String,
+    'default': 'https://rum-diary.org'
   },
   use_concatenated_resources: {
-    doc: "Whether to use concatenated resources.",
+    doc: 'Whether to use concatenated resources.',
     format: Boolean,
-    default: true
-  }
+    'default': true
+  },
+
+  proc_name: getProcName()
 };
+
+function getProcName() {
+  return path.basename(process.argv[1], '.js');
+}
+
 

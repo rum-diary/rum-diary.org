@@ -4,11 +4,9 @@
 
 const mocha = require('mocha');
 const assert = require('chai').assert;
-
 const request = require('request');
 
-const spawn = require('child_process').spawn;
-const path = require('path');
+const startStop = require('./lib/start-stop');
 
 var ROUTES = {
   'GET /'                             : 200,
@@ -23,22 +21,24 @@ var ROUTES = {
   'GET /site/localhost/hits'          : 200
 };
 
-describe('start', function() {
-  it('starts the server', function(done) {
-    start(done);
+describe('routes module', function() {
+  describe('start', function() {
+    it('starts the server', function(done) {
+      startStop.start(done);
+    });
   });
-});
 
-describe('request', function() {
-  for (var key in ROUTES) {
-    it(key, respondsWith(key, ROUTES[key]));
-  }
-});
+  describe('request', function() {
+    for (var key in ROUTES) {
+      it(key, respondsWith(key, ROUTES[key]));
+    }
+  });
 
-describe('stop', function() {
-  it('stops', function(done) {
-    stop(function() {
-      done();
+  describe('stop', function() {
+    it('stops', function(done) {
+      startStop.stop(function() {
+        done();
+      });
     });
   });
 });
@@ -61,29 +61,4 @@ function respondsWith(key, expectedCode) {
 }
 
 
-var proc;
-process.on('exit', function () {
-  if (proc) proc.kill();
-});
-
-
-function start(done) {
-  var START_PATH = path.join(__dirname, '..', 'server', 'start.js');
-  proc = spawn('node', [ START_PATH ]);
-  proc.stdout.on('data', function(buf) {
-    var str = buf.toString();
-    if (done && /listening on port/.test(str)) {
-      done();
-      done = null;
-    }
-  });
-  proc.stderr.on('data', function(buf) {
-    console.error(buf.toString());
-  });
-}
-
-function stop(done) {
-  proc.kill('SIGINT');
-  proc.on('exit', done);
-}
 

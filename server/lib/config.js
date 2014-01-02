@@ -6,6 +6,8 @@ const convict = require('convict');
 const path = require('path');
 const fs = require('fs');
 
+console.log("trying to load config!");
+
 const logger = require('./logger');
 const schema = require('./config-schema');
 
@@ -18,7 +20,6 @@ loadConfigFiles();
 conf.validate();
 
 module.exports = conf;
-
 
 function setNodeEnv() {
   if ( ! process.env.NODE_ENV) {

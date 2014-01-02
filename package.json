@@ -20,7 +20,8 @@
     "mongoose": "3.8.3",
     "moment": "2.4.0",
     "mongoose-timestamp": "0.1.1",
-    "fast-stats": "0.0.2"
+    "fast-stats": "0.0.2",
+    "mkdirp": "0.3.5"
   },
   "devDependencies": {
     "mocha": "~1.16.1",
