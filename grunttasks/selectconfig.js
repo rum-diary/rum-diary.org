@@ -6,9 +6,9 @@ const path = require('path');
 
 const CONFIG_ROOT = path.join(__dirname, '..', 'server', 'etc');
 const TARGET_TO_CONFIG = {
-  src: path.join(CONFIG_ROOT, 'local.json'),
-  test: path.join(CONFIG_ROOT, 'local.json'),
-  dist: path.join(CONFIG_ROOT, 'production.json')
+  src: [path.join(CONFIG_ROOT, 'local.json')],
+  test: [path.join(CONFIG_ROOT, 'local.json'), path.join(CONFIG_ROOT, 'test.json')],
+  dist: [path.join(CONFIG_ROOT, 'production.json')]
 };
 
 module.exports = function (grunt) {
@@ -19,7 +19,7 @@ module.exports = function (grunt) {
       target = 'src';
     }
 
-    process.env.CONFIG_FILES = TARGET_TO_CONFIG[target];
+    process.env.CONFIG_FILES = TARGET_TO_CONFIG[target].join(',');
 
     console.log('Using configuration files', process.env.CONFIG_FILES);
   });

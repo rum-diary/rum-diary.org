@@ -38,8 +38,10 @@ module.exports = function (grunt) {
       return grunt.task.run(['build', 'serverproc:dist']);
     }
 
+    var selectConfig = target === 'test' ? 'selectconfig:test' : 'selectconfig';
+
     grunt.task.run([
-      'selectconfig',
+      selectConfig,
       'jshint',
       'preprocess',
       'serverproc'

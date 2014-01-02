@@ -37,8 +37,8 @@ module.exports = {
   views_dir: path.join(__dirname, '..', 'views'),
   static_root: path.join(__dirname, '..', '..', 'client'),
   static_dir: {
-    doc: 'Which static root to use for client side resources',
-    format: ['src', 'dist'],
+    doc: 'Which static root to use for client side resources, select \'\' for testing',
+    format: ['src', 'dist', ''],
     default: 'dist'
   },
   config_dir: path.join(__dirname, '..', 'etc'),
