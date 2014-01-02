@@ -14,6 +14,8 @@ RD.Graphs.NavigationTiming = (function() {
       MARGIN_BOTTOM = 30,
       MARGIN_LEFT = 50;
 
+  var strformat = RD.String.strformat;
+
   var NAVIGATION_TIMING_SECTIONS = [
     {
       name: 'Redirect',
@@ -97,11 +99,7 @@ RD.Graphs.NavigationTiming = (function() {
       var z = d3.scale.ordinal()
           .range(BACKGROUND_COLORS);
 
-      var tooltip = d3.select('body')
-        .append('div')
-        .style('position', 'absolute')
-        .style('z-index', '10')
-        .style('visibility', 'hidden');
+      var tooltip = createTooltip();
 
       // Add a group for each section.
       var section = svg.selectAll('.svg-group')
@@ -140,21 +138,23 @@ RD.Graphs.NavigationTiming = (function() {
             return d.name;
           })
           .on('mouseenter', function(d) {
-            var tooltipHTML = d.name + '<hr/>' + d.start + ': ' + d.start_y + '<hr />' + d.end + ':' + d.end_y;
-            tooltip
-                .html(tooltipHTML)
-                .style('visibility', 'visible');
+            var tooltipHTML = strformat('%s <hr /> %s: %s <hr /> %s: %s',
+                d.name,
+                d.start,
+                d.start_y,
+                d.end,
+                d.end_y);
 
+            tooltip.html(tooltipHTML);
+            tooltip.show();
           })
           .on('mousemove', function() {
-            tooltip
-                .style('top', (d3.event.pageY-10)+'px')
-                .style('left',(d3.event.pageX+10)+'px');
+            tooltip.move(
+                (d3.event.pageX+10)+'px',
+                (d3.event.pageY-10)+'px');
           })
           .on('mouseleave', function(d) {
-            tooltip
-                .text(d.name)
-                .style('visibility', 'hidden');
+            tooltip.hide();
           });
 
     }
@@ -234,6 +234,15 @@ RD.Graphs.NavigationTiming = (function() {
     })]);
   }
 
+
+  function createTooltip() {
+    var tooltip = RD.Tooltip.create();
+    tooltip.init({
+      appendTo: 'body'
+    });
+
+    return tooltip;
+  }
 
 }());
 

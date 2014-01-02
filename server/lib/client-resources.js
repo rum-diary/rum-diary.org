@@ -16,6 +16,8 @@ const DEPENDENCIES = {
     '/js/bower_components/d3/d3.js',
     /*'/js/lib/micrajax.js',*/
     '/js/rum-diary.js',
+    '/js/string.js',
+    '/js/tooltip.js',
     '/js/graphs/graphs.js',
     '/js/graphs/hits.js',
     '/js/graphs/navigation-timing.js',
