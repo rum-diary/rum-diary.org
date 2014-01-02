@@ -73,7 +73,6 @@ const pageLoadSchema = new Schema({
   hostname: String,
   referrer: String,
   path: String,
-  ip: String,
   os: String,
   browser: {
     family: String,
