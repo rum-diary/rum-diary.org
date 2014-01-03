@@ -13,9 +13,9 @@ const schema = require('./config-schema');
 
 var conf = convict(schema);
 
-setNodeEnv();
 useDevConfigIfNoneDefined();
 loadConfigFiles();
+setNodeEnv();
 
 conf.validate();
 

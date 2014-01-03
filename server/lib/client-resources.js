@@ -14,15 +14,29 @@ const config = require('./config');
 const DEPENDENCIES = {
   'rum-diary.min.js': [
     '/js/bower_components/d3/d3.js',
-    /*'/js/lib/micrajax.js',*/
     '/js/lib/dominator.js',
     '/js/rum-diary.js',
-    '/js/string.js',
-    '/js/tooltip.js',
+    {
+      path: '/js/string.js',
+      test: 'spec/string_test.js'
+    },
+    {
+      path: '/js/tooltip.js',
+      test: 'spec/tooltip_test.js'
+    },
     '/js/graphs/graphs.js',
-    '/js/graphs/hits.js',
-    '/js/graphs/navigation-timing.js',
-    '/js/start.js'
+    {
+      path: '/js/graphs/hits.js',
+      test: 'spec/graphs/hits_test.js'
+    },
+    {
+      path: '/js/graphs/navigation-timing.js',
+      test: 'spec/graphs/navigation-timing_test.js'
+    },
+    {
+      path: '/js/start.js',
+      filter: ['testing']
+    }
   ]
 };
 
@@ -38,5 +52,27 @@ module.exports.concatenated = function(namespace) {
 };
 
 module.exports.unconcatenated = function(namespace) {
-  return DEPENDENCIES[namespace];
+  var deps = DEPENDENCIES[namespace];
+
+  return deps.map(function(dep) {
+    if (dep.path) return dep.path
+    return dep;
+  });
+};
+
+module.exports.testing = function(namespace) {
+  var deps = DEPENDENCIES[namespace];
+
+  return deps.map(function(dep) {
+    if (dep.filter && dep.filter.indexOf('testing') > -1) return [];
+
+    if ( ! dep.path) return [ '/src' + dep ];
+
+    var parts = [ '/src' + dep.path ];
+    if (dep.test) parts.push(dep.test);
+
+    return parts;
+  }).reduce(function(returnedDeps, curr) {
+    return returnedDeps.concat(curr);
+  }, []);
 };

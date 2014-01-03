@@ -5,6 +5,8 @@
 exports.path = '/';
 exports.verb = 'get';
 
+const client_resources = require('../client-resources');
+
 exports.handler = function(req, res) {
   res.render('GET-root.html');
 };

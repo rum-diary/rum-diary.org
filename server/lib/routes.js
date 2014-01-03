@@ -26,6 +26,8 @@ function loadRoute(fileName) {
 
   var routePath = path.join(ROUTES_DIR, fileName);
   var route = require(routePath);
+
+  if ( ! (route.path && route.verb)) return;
   router[route.verb](route.path, route.handler);
 }
 

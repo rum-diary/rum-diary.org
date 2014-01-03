@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Unit tests{% endblock %}
+
+{% block headercss %}
+  <link rel="stylesheet" type="text/css" href="lib/mocha/mocha.css" />
+{% endblock %}
+
+{% block body %}
+  <div id="mocha"></div>
+  <div id="hits-graph"></div>
+  <div id="navigation-timing-graph"></div>
+{% endblock %}
+
+{% block footerjs %}
+  <script src="lib/mocha/mocha.js"></script>
+  <script src="lib/chai/chai.js"></script>
+  <script src="setup.js"></script>
+
+  {% for resource in resources %}<script src="{{ resource }}"></script>
+  {% endfor %}
+  <script>
+    window.addEventListener('load', function() {
+      if (navigator.userAgent.indexOf('PhantomJS') < 0) {
+        mocha.run();
+      }
+    }, false);
+  </script>
+{% endblock %}
+
+
