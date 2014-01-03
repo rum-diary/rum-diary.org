@@ -2,10 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*global RD, d3*/
+/*global RD*/
 
 RD.Tooltip = (function() {
   'use strict';
+
+  var DOM = window.DOMinator;
 
   var Module = {
     init: function(options) {
@@ -21,25 +23,25 @@ RD.Tooltip = (function() {
     },
 
     render: function() {
-      this.tooltip = d3.select(this.appendTo)
-        .append('div')
+      this.tooltip = DOM('<div>')
         .style('position', 'absolute')
         .style('z-index', '10')
-        .style('display', 'none');
+        .hide()
+        .appendTo('body');
 
       if (this.id) this.tooltip.attr('id', this.id);
     },
 
     html: function(html) {
-      this.tooltip.html(html);
+      this.tooltip.inner(html);
     },
 
     show: function() {
-      this.tooltip.style('display', 'block');
+      this.tooltip.show();
     },
 
     hide: function() {
-      this.tooltip.style('display', 'none');
+      this.tooltip.hide();
     },
 
     move: function(x, y) {

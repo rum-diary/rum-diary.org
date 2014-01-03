@@ -15,6 +15,7 @@ const DEPENDENCIES = {
   'rum-diary.min.js': [
     '/js/bower_components/d3/d3.js',
     /*'/js/lib/micrajax.js',*/
+    '/js/lib/dominator.js',
     '/js/rum-diary.js',
     '/js/string.js',
     '/js/tooltip.js',
