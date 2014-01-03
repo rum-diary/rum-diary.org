@@ -45,6 +45,18 @@ path {
 </section>
 
 <section>
+  <h2>{{ hostname }} - Top referrers</h2>
+  <table id="referrers">
+    {% for referrer in referrers %}
+      <tr>
+        <td>{{ referrer.hostname }}</td>
+        <td>{{ referrer.count }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</section>
+
+<section>
   <h2> {{ hostname }} - Navigation Timing median values</h2>
   <div id="navigation-timing-graph"></div>
   <table id="medians">

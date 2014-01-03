@@ -19,19 +19,22 @@ exports.handler = function(req, res) {
 
     var pageHitsPerDay = reduce.pageHitsPerDay(data);
     var pageHitsPerPage = reduce.pageHitsPerPage(data);
-
     var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage);
 
-    reduce.findNavigationTimingStats(data,
-      ['range', 'median'],
-      function(err, stats) {
-      res.render('GET-site-hostname.html', {
-        hostname: req.params.hostname,
-        resources: client_resources('rum-diary.min.js'),
-        pageHitsPerPage: pageHitsPerPageSorted,
-        pageHitsPerDay: pageHitsPerDay.__all,
-        median: stats.median,
-        range: JSON.stringify(stats.range)
+    // parallelize all of the calculating!
+    reduce.findReferrers(data, function(err, referrerStats) {
+      reduce.findNavigationTimingStats(data,
+        ['range', 'median'],
+        function(err, medianStats) {
+        res.render('GET-site-hostname.html', {
+          hostname: req.params.hostname,
+          resources: client_resources('rum-diary.min.js'),
+          pageHitsPerPage: pageHitsPerPageSorted,
+          pageHitsPerDay: pageHitsPerDay.__all,
+          median: medianStats.median,
+          range: JSON.stringify(medianStats.range),
+          referrers: referrerStats.by_count
+        });
       });
     });
   });
