@@ -54,12 +54,14 @@ describe('database', function() {
       }, function(err) {
         db.save({
           hostname: 'shanetomlinson.com',
-          uuid: 'shanetomlinson-uuid'
+          uuid: 'shanetomlinson-uuid',
+          referrer: 'bigsearchcompany.com'
         }, function(err) {
           db.getByHostname('shanetomlinson.com', function(err, data) {
             assert.isNull(err);
             assert.equal(data.length, 1);
             assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+            assert.equal(data[0].referrer, 'bigsearchcompany.com');
             done();
           });
         });

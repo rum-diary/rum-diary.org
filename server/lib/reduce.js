@@ -4,6 +4,8 @@
 
 const moment = require('moment');
 const Stats = require('fast-stats').Stats;
+const url = require('url');
+const SortedArray = require('sarray');
 
 function getPathDateInfo(returnedData, path, date) {
   if ( ! (path in returnedData)) {
@@ -116,6 +118,55 @@ exports.findNavigationTimingStats = function (hitsForHost, statsToFind, options,
     done(null, returnedStats);
   });
 };
+
+exports.findReferrers = function (hitsForHost, done) {
+  var countByHostname = countReferrersByHostname(hitsForHost);
+  var sortedByCount = sortHostnamesByCount(countByHostname);
+
+  done(null, {
+    by_hostname: countByHostname,
+    by_count: sortedByCount
+  });
+};
+
+function countReferrersByHostname (hitsForHost) {
+  var countByHostname = {};
+
+  hitsForHost.forEach(function(hit) {
+    if ( ! hit.referrer) return;
+
+    var parsed;
+    try {
+      parsed = url.parse(hit.referrer);
+    } catch(e) {
+      return;
+    }
+
+    var hostname = parsed.hostname;
+    if ( ! countByHostname[hostname]) {
+      countByHostname[hostname] = 0;
+    }
+
+    countByHostname[hostname]++;
+  });
+
+  return countByHostname;
+}
+
+function sortHostnamesByCount(countByHostname) {
+  var sortedByCount = SortedArray(function(a, b) {
+    return a.count - b.count;
+  });
+
+  Object.keys(countByHostname).forEach(function(hostname) {
+    sortedByCount.add({
+      hostname: hostname,
+      count: countByHostname[hostname]
+    });
+  });
+
+  return sortedByCount.items;
+}
 
 function createStat(options) {
   return new Stats(options);

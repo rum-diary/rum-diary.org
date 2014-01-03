@@ -14,14 +14,15 @@ exports.handler = function(req, res) {
   // don't wanna me hanging around for a response.
   res.send(200, { success: true });
 
-  logger.info('referrer', req.get('referrer'));
+  // the referrer here is the page where the stats were collected,
+  // not the referrer of the page where the stats were collected.
+  var referrer = req.get('referrer');
+  logger.info('saving data for: %s', referrer);
 
   var data = req.body;
-  data.ip = req.get('ip');
 
-  data.referrer = req.get('referrer');
   try {
-    var parsedUrl = url.parse(data.referrer);
+    var parsedUrl = url.parse(referrer);
     data.hostname = parsedUrl.hostname;
     data.path = parsedUrl.pathname;
   } catch(e) {}
@@ -34,5 +35,7 @@ exports.handler = function(req, res) {
     minor: ua.minor
   };
 
-  db.save(data, function() {});
+  db.save(data, function() {
+    logger.info('data saved');
+  });
 };

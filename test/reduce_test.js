@@ -164,5 +164,20 @@ describe('reduce', function() {
       done();
     });
   });
+
+  it('findReferrers', function(done) {
+    reduce.findReferrers(
+      navigationTimingData,
+      function(err, data) {
+
+      assert.isNull(err);
+
+      assert.equal(data.by_hostname['localhost'], 9);
+      assert.equal(data.by_count[0].hostname, 'localhost');
+      assert.equal(data.by_count[0].count, 9);
+
+      done();
+    });
+  });
 });
 
