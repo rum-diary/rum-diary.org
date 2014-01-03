@@ -25,7 +25,6 @@ exports.handler = function(req, res) {
     reduce.findNavigationTimingStats(data,
       ['range', 'median'],
       function(err, stats) {
-      console.log(stats.median);
       res.render('GET-site-hostname.html', {
         hostname: req.params.hostname,
         resources: client_resources('rum-diary.min.js'),
