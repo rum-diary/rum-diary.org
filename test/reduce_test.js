@@ -179,5 +179,18 @@ describe('reduce', function() {
       done();
     });
   });
+
+  it('findHostnames', function(done) {
+    reduce.findHostnames(
+      navigationTimingData,
+      function(err, data) {
+
+      assert.isNull(err);
+
+      assert.equal(data.localhost, 9);
+
+      done();
+    });
+  });
 });
 

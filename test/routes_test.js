@@ -11,6 +11,7 @@ const startStop = require('./lib/start-stop');
 var ROUTES = {
   'GET /'                             : 200,
   'GET /index.html'                   : 301,
+  'GET /site'                         : 200,
   'GET /site/localhost'               : 200,
   'GET /site/localhost/all'           : 200,
   'GET /site/localhost/navigation'    : 200,

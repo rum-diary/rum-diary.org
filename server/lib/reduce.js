@@ -259,3 +259,21 @@ function getNavigationTimingStats (hitsForHost, options, done) {
 
   done(null, stats);
 }
+
+// TODO - this is very similar to countReferrersByHostname, can they be
+// combined?
+exports.findHostnames = function(hits, done) {
+  var hostnames = {};
+
+  hits.forEach(function(hit) {
+    if ( ! hit.hostname) return;
+
+    if ( ! (hit.hostname in hostnames)) {
+      hostnames[hit.hostname] = 0;
+    }
+
+    hostnames[hit.hostname]++;
+  });
+
+  done(null, hostnames);
+};

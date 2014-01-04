@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block title %}Site list{% endblock %}
+
+{% block body %}
+<section>
+  <h2>Sites</h2>
+  <ul>
+    {% for hostname in sites %}
+      <li>
+        <a href="{{ hostname }}">{{ hostname }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}
+
