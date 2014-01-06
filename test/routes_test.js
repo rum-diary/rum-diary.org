@@ -21,8 +21,15 @@ var ROUTES = {
                                       : 200,
   'GET /site/localhost/hits'          : 200,
   'GET /site/localhost/path/index'    : 200,
-  'GET /site/localhost/path/site/localhost'
+  'GET /site/localhost/path/some-page/with-more/and-123-digits'
+                                      : 200,
+  'GET /site/localhost/path/trailing-slash/'
+                                      : 200,
+  'GET /site/localhost/path/123'
+                                      : 200,
+  'GET /site/shanetomlinson.com/path/2013/testing-javascript-frontend-part-1-anti-patterns-and-fixes/'
                                       : 200
+
 };
 
 describe('routes module', function() {
