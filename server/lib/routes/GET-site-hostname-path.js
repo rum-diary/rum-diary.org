@@ -6,15 +6,22 @@ const db = require('../db');
 const logger = require('../logger');
 const reduce = require('../reduce');
 
-exports.path = '/site/:hostname';
+exports.path = /\/site\/(\w+)\/path\/(\w+)/;
 exports.verb = 'get';
 
 const client_resources = require('../client-resources');
 
 exports.handler = function(req, res) {
-  var hostname = req.params.hostname;
-  logger.info('get information for %s', hostname);
-  db.getByHostname(hostname, function(err, data) {
+  var hostname = req.params[0];
+  var path = req.params[1] || 'index';
+  logger.info('get information for %s%s', hostname, path);
+
+  var searchBy = {
+    hostname: hostname,
+    path: path
+  };
+
+  db.get(hostname, function(err, data) {
     if (err) return res.send(500);
 
     var pageHitsPerDay = reduce.pageHitsPerDay(data);
@@ -26,9 +33,10 @@ exports.handler = function(req, res) {
       reduce.findNavigationTimingStats(data,
         ['range', 'median'],
         function(err, medianStats) {
-        res.render('GET-site-hostname.html', {
+        res.render('GET-site-hostname-path.html', {
           root_url: req.url,
-          hostname: req.params.hostname,
+          hostname: hostname,
+          path: path,
           resources: client_resources('rum-diary.min.js'),
           pageHitsPerPage: pageHitsPerPageSorted,
           pageHitsPerDay: pageHitsPerDay.__all,

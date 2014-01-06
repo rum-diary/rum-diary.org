@@ -19,7 +19,10 @@ var ROUTES = {
                                       : 200,
   'GET /site/localhost/navigation/distribution'
                                       : 200,
-  'GET /site/localhost/hits'          : 200
+  'GET /site/localhost/hits'          : 200,
+  'GET /site/localhost/path/index'    : 200,
+  'GET /site/localhost/path/site/localhost'
+                                      : 200
 };
 
 describe('routes module', function() {
