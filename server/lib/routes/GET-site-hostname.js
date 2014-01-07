@@ -19,7 +19,7 @@ exports.handler = function(req, res) {
 
     var pageHitsPerDay = reduce.pageHitsPerDay(data);
     var pageHitsPerPage = reduce.pageHitsPerPage(data);
-    var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage);
+    var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage).slice(0, 20);
 
     // parallelize all of the calculating!
     reduce.findReferrers(data, function(err, referrerStats) {
@@ -34,7 +34,7 @@ exports.handler = function(req, res) {
           pageHitsPerDay: pageHitsPerDay.__all,
           median: medianStats.median,
           range: JSON.stringify(medianStats.range),
-          referrers: referrerStats.by_count
+          referrers: referrerStats.by_count.slice(0, 20)
         });
       });
     });

@@ -16,21 +16,21 @@ exports.handler = function(req, res) {
   var path = req.params[1] || 'index';
   logger.info('get information for %s/%s', hostname, path);
 
+  if ( ! /^\//.test(path)) {
+    path = "/" + path;
+  }
+
   var searchBy = {
     hostname: hostname,
     path: path
   };
-
-  if ( ! /^\//.test(searchBy.path)) {
-    searchBy.path = "/" + searchBy.path;
-  }
 
   db.get(searchBy, function(err, data) {
     if (err) return res.send(500);
 
     var pageHitsPerDay = reduce.pageHitsPerDay(data);
     var pageHitsPerPage = reduce.pageHitsPerPage(data);
-    var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage);
+    var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage).slice(0, 20);
 
     // parallelize all of the calculating!
     reduce.findReferrers(data, function(err, referrerStats) {
@@ -46,7 +46,7 @@ exports.handler = function(req, res) {
           pageHitsPerDay: pageHitsPerDay.__all,
           median: medianStats.median,
           range: JSON.stringify(medianStats.range),
-          referrers: referrerStats.by_count
+          referrers: referrerStats.by_count.slice(0, 20)
         });
       });
     });

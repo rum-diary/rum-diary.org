@@ -33,7 +33,7 @@ path {
 </section>
 
 <section>
-  <h2>{{ hostname }}{{ path }} - 30 day page views</h2>
+  <h2>Page views</h2>
   <table id="page-views">
     {% for page in pageHitsPerPage %}
       <tr>
@@ -45,7 +45,7 @@ path {
 </section>
 
 <section>
-  <h2>{{ hostname }}{{ path }} - Top referrers</h2>
+  <h2>Top referrers</h2>
   <table id="referrers">
     {% for referrer in referrers %}
       <tr>
@@ -57,7 +57,7 @@ path {
 </section>
 
 <section>
-  <h2> {{ hostname }}{{ path }} - Navigation Timing median values</h2>
+  <h2>Navigation timing median values</h2>
   <div id="navigation-timing-graph"></div>
   <table id="medians">
     {% for key, value in median %}
