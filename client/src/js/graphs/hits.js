@@ -9,7 +9,7 @@ RD.Graphs.Hits = (function(hits) {
 
   var data = hits.__all;
 
-  var margin = {top: 20, right: 80, bottom: 30, left: 50},
+  var margin = {top: 20, right: 80, bottom: 70, left: 50},
       width = 960 - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom;
 
@@ -58,7 +58,9 @@ RD.Graphs.Hits = (function(hits) {
   svg.append('g')
       .attr('class', 'x axis')
       .attr('transform', 'translate(0,' + height + ')')
-      .call(xAxis);
+      .call(xAxis)
+      .selectAll('text')
+        .attr('class', 'axis-label axis-label-x');
 
 
   svg.append('g')
@@ -70,6 +72,9 @@ RD.Graphs.Hits = (function(hits) {
       .attr('dy', '.71em')
       .style('text-anchor', 'end')
       .text('Hits / day');
+
+  svg.selectAll('.tick text')
+      .attr('class', 'axis-label axis-label-y')
 
 
   svg.append('path')

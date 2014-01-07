@@ -1,0 +1,18 @@
+body {
+  font-family: "Bitstream Vera Sans", "sans-serif", "serif"
+}
+
+main {
+  display: block;
+  margin: 0 auto;
+  width: 960px;
+}
+
+.axis-label {
+  font-size: 0.8em;
+}
+
+.axis-label-x {
+  transform: rotate(70deg) translateX(2.75em) translateY(-1em);
+}
+

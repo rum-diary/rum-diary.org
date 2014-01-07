@@ -208,8 +208,9 @@ RD.Graphs.NavigationTiming = (function() {
 
     svg.append('g')
             .attr('class', 'y axis')
-            .call(yAxis);
-
+            .call(yAxis)
+            .selectAll('text')
+              .attr('class', 'axis-label axis-label-y');
     return y;
   }
 
