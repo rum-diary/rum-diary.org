@@ -7,6 +7,8 @@ const nunjucks = require('nunjucks');
 const path = require('path');
 const cors = require('cors');
 const spdy = require('spdy');
+const connect_fonts = require('connect-fonts');
+const connect_fonts_vera_sans = require('connect-fonts-bitstream-vera-sans');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
@@ -37,6 +39,12 @@ app.use(express.logger({
   }
 }));
 
+app.use(connect_fonts.setup({
+  fonts: [ connect_fonts_vera_sans ],
+  allow_origin: config.get('hostname'),
+  maxage: 180 * 24 * 60 * 60 * 1000,   // 180 days
+  compress: true
+}));
 
 // Get all of our routes.
 app.use(routes.middleware);
