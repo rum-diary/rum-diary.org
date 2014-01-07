@@ -155,7 +155,7 @@ function countReferrersByHostname (hitsForHost) {
 
 function sortHostnamesByCount(countByHostname) {
   var sortedByCount = SortedArray(function(a, b) {
-    return a.count - b.count;
+    return b.count - a.count;
   });
 
   Object.keys(countByHostname).forEach(function(hostname) {
