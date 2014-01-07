@@ -6,7 +6,7 @@ const db = require('../db');
 const logger = require('../logger');
 const reduce = require('../reduce');
 
-exports.path = /\/site\/([\w\d]+(?:\.[\w\d-]+)?)\/path\/([\w\d-]+(?:\/[\w\d-]+)*\/?)$/;
+exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)?)\/path\/([\w\d-]+(?:\/[\w\d-]+)*\/?)$/;
 exports.verb = 'get';
 
 const client_resources = require('../client-resources');

@@ -28,6 +28,8 @@ var ROUTES = {
   'GET /site/localhost/path/123'
                                       : 200,
   'GET /site/shanetomlinson.com/path/2013/testing-javascript-frontend-part-1-anti-patterns-and-fixes/'
+                                      : 200,
+  'GET /site/connect-fonts.org/path/families'
                                       : 200
 
 };
