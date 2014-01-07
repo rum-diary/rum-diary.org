@@ -73,7 +73,7 @@ RD.Graphs.Hits = (function(hits) {
       .style('text-anchor', 'end')
       .text('Hits / day');
 
-  svg.selectAll('.tick text')
+  svg.selectAll('.y .tick text')
       .attr('class', 'axis-label axis-label-y')
 
 
