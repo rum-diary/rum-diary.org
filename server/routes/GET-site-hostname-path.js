@@ -2,14 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const db = require('../db');
-const logger = require('../logger');
-const reduce = require('../reduce');
+const db = require('../lib/db');
+const logger = require('../lib/logger');
+const reduce = require('../lib/reduce');
+const client_resources = require('../lib/client-resources');
+
 
 exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)?)\/path\/([\w\d-]+(?:\/[\w\d-]+)*\/?)$/;
 exports.verb = 'get';
-
-const client_resources = require('../client-resources');
 
 exports.handler = function(req, res) {
   var hostname = req.params[0];

@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const db = require('../db');
-const logger = require('../logger');
-const reduce = require('../reduce');
+const db = require('../lib/db');
+const logger = require('../lib/logger');
 
-exports.path = '/site/:hostname/hits';
+exports.path = '/site/:hostname/all';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
@@ -15,9 +14,6 @@ exports.handler = function(req, res) {
   db.getByHostname(hostname, function(err, data) {
     if (err) return res.send(500);
 
-    var returnData = {
-      hits: reduce.pageHitsPerDay(data)
-    };
-    res.send(200, returnData);
+    res.send(200, data);
   });
 };

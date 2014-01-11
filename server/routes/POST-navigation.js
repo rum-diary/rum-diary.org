@@ -4,8 +4,8 @@
 
 const url = require('url');
 const useragent = require('useragent');
-const logger = require('../logger');
-const db = require('../db');
+const logger = require('../lib/logger');
+const db = require('../lib/db');
 
 exports.path = '/navigation';
 exports.verb = 'post';

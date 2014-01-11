@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const db = require('../db');
-const logger = require('../logger');
+const db = require('../lib/db');
+const logger = require('../lib/logger');
+const reduce = require('../lib/reduce');
 
-exports.path = '/site/:hostname/all';
+exports.path = '/site/:hostname/navigation/distribution';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
@@ -14,6 +15,9 @@ exports.handler = function(req, res) {
   db.getByHostname(hostname, function(err, data) {
     if (err) return res.send(500);
 
-    res.send(200, data);
+    reduce.findNavigationTimingStats(data, ['distribution'], { bucket_precision: 25 }, function(err, stats) {
+      if (err) return res.send(500);
+      res.send(stats);
+    });
   });
 };

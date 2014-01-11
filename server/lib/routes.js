@@ -7,7 +7,7 @@ const fs = require('fs');
 const Router = require('express').Router;
 const router = new Router();
 
-const ROUTES_DIR = path.join(__dirname, 'routes');
+const ROUTES_DIR = path.join(__dirname, '..', 'routes');
 
 // All routes are loaded from the individual files in the routes subdirectory.
 // Each .js file in the routes subdirectory should contain 3 fields:
