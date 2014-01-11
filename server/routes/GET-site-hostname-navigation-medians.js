@@ -3,16 +3,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const db = require('../lib/db');
-const logger = require('../lib/logger');
 const reduce = require('../lib/reduce');
+const getQuery = require('../lib/site-query');
 
 exports.path = '/site/:hostname/navigation/medians';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
-  var hostname = req.params.hostname;
-  logger.info('get information for %s', hostname);
-  db.getByHostname(hostname, function(err, data) {
+  var query = getQuery(req);
+
+  db.get(query, function(err, data) {
     if (err) return res.send(500);
 
     reduce.findMedianNavigationTimes(data, function(err, medians) {

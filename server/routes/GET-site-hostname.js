@@ -4,36 +4,17 @@
 
 const moment = require('moment');
 const db = require('../lib/db');
-const logger = require('../lib/logger');
 const reduce = require('../lib/reduce');
-const client_resources = require('../lib/client-resources');
+const clientResources = require('../lib/client-resources');
+const getQuery = require('../lib/site-query');
 
 exports.path = '/site/:hostname';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
-  var query = {
-    hostname: req.params.hostname
-  };
-
-  var start, end;
-
-  if (req.query.start) {
-    start = moment(req.query.start).startOf('day');
-  } else {
-    start = moment().subtract('days', 30).startOf('day');
-  }
-
-  if (req.query.end) {
-    end = moment(req.query.end).endOf('day');
-  } else {
-    end = moment().endOf('day');
-  }
-
-  query.updatedAt = {
-    '$gte': start.toDate(),
-    '$lte': end.toDate()
-  };
+  var query = getQuery(req);
+  var start = moment(query['$gte']);
+  var end = moment(query['$lte']);
 
   db.get(query, function(err, data) {
     if (err) return res.send(500);
@@ -50,7 +31,7 @@ exports.handler = function(req, res) {
         res.render('GET-site-hostname.html', {
           root_url: req.url.replace(/\?.*/, ''),
           hostname: req.params.hostname,
-          resources: client_resources('rum-diary.min.js'),
+          resources: clientResources('rum-diary.min.js'),
           pageHitsPerPage: pageHitsPerPageSorted,
           pageHitsPerDay: pageHitsPerDay.__all,
           median: medianStats.median,

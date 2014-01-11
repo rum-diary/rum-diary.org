@@ -6,12 +6,15 @@ const db = require('../lib/db');
 const logger = require('../lib/logger');
 const reduce = require('../lib/reduce');
 const client_resources = require('../lib/client-resources');
+const getQuery = require('../lib/site-query');
 
 
 exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)?)\/path\/([\w\d-]+(?:\/[\w\d-]+)*\/?)$/;
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
+  var query = getQuery(req);
+
   var hostname = req.params[0];
   var path = req.params[1] || 'index';
   logger.info('get information for %s/%s', hostname, path);
@@ -20,12 +23,10 @@ exports.handler = function(req, res) {
     path = "/" + path;
   }
 
-  var searchBy = {
-    hostname: hostname,
-    path: path
-  };
+  query.hostname = hostname;
+  query.path = path;
 
-  db.get(searchBy, function(err, data) {
+  db.get(query, function(err, data) {
     if (err) return res.send(500);
 
     var pageHitsPerDay = reduce.pageHitsPerDay(data);
