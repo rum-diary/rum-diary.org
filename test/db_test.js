@@ -29,44 +29,84 @@ describe('database', function() {
   });
 
   describe('get', function() {
-    it('should get saved data', function(done) {
+    beforeEach(function(done) {
       db.save({
         uuid: 'another-uuid'
-      }, function(err) {
-        db.get(function(err, data) {
-          assert.isNull(err);
-          assert.equal(data.length, 1);
-          var item = data[0];
-          assert.equal(item.uuid, 'another-uuid');
-          assert.isDefined(item.createdAt);
-          assert.isDefined(item.updatedAt);
-          done();
-        });
+      }, done);
+    });
+
+    it('should get saved data', function(done) {
+      db.get(function(err, data) {
+        assert.isNull(err);
+        assert.equal(data.length, 1);
+        var item = data[0];
+        assert.equal(item.uuid, 'another-uuid');
+        assert.isDefined(item.createdAt);
+        assert.isDefined(item.updatedAt);
+        done();
       });
     });
   });
 
   describe('getByHostname', function() {
-    it('should return data for the specified hostname', function(done) {
+    beforeEach(function(done) {
       db.save({
-        hostname: 'rum-diary.org',
-        uuid: 'rum-diary-uid'
-      }, function(err) {
-        db.save({
-          hostname: 'shanetomlinson.com',
-          uuid: 'shanetomlinson-uuid',
-          referrer: 'bigsearchcompany.com'
-        }, function(err) {
-          db.getByHostname('shanetomlinson.com', function(err, data) {
-            assert.isNull(err);
-            assert.equal(data.length, 1);
-            assert.equal(data[0].uuid, 'shanetomlinson-uuid');
-            assert.equal(data[0].referrer, 'bigsearchcompany.com');
-            done();
-          });
-        });
+        hostname: 'shanetomlinson.com',
+        uuid: 'shanetomlinson-uuid',
+        referrer: 'bigsearchcompany.com'
+      }, done);
+    });
+
+    it('should return data for the specified hostname', function(done) {
+      db.getByHostname('shanetomlinson.com', function(err, data) {
+        assert.isNull(err);
+        assert.equal(data.length, 1);
+        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].referrer, 'bigsearchcompany.com');
+        done();
       });
     });
   });
+
+  describe('get with tags', function() {
+    beforeEach(function(done) {
+      db.save({
+        hostname: 'shanetomlinson.com',
+        uuid: 'shanetomlinson-uuid',
+        referrer: 'bigsearchcompany.com',
+        tags: ['experiment1', 'tag'],
+      }, done);
+    });
+
+    it('returns item if tag is stored', function(done) {
+      db.get({ tags: 'experiment1' }, function(err, data) {
+        assert.equal(data.length, 1);
+        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].referrer, 'bigsearchcompany.com');
+        assert.equal(data[0].tags[0], 'experiment1');
+        assert.equal(data[0].tags[1], 'tag');
+        done();
+      });
+    });
+
+    it('returns item if other tag is stored', function(done) {
+      db.get({ tags: 'tag' }, function(err, data) {
+        assert.equal(data.length, 1);
+        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].referrer, 'bigsearchcompany.com');
+        assert.equal(data[0].tags[0], 'experiment1');
+        assert.equal(data[0].tags[1], 'tag');
+        done();
+      });
+    });
+
+    it('returns no items if tag is not found', function(done) {
+      db.get({ tags: 'not_valid' }, function(err, data) {
+        assert.equal(data.length, 0);
+        done();
+      });
+    });
+  });
+
 });
 
