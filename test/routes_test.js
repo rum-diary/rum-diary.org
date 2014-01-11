@@ -13,6 +13,10 @@ var ROUTES = {
   'GET /index.html'                   : 301,
   'GET /site'                         : 200,
   'GET /site/localhost'               : 200,
+  'GET /site/localhost?start=2013-12-25'
+                                      : 200,
+  'GET /site/localhost?start=2013-12-25&end=2014-01-05'
+                                      : 200,
   'GET /site/localhost/all'           : 200,
   'GET /site/localhost/navigation'    : 200,
   'GET /site/localhost/navigation/medians'

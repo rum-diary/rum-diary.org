@@ -20,7 +20,7 @@ path {
 
 {% block body %}
 <section>
-  <h2>{{ hostname }} - 30 day page views per day</h2>
+  <h2>{{ hostname }} - {{ startDate }} to {{ endDate }}</h2>
   <div id="hits-graph" data-hostname="{{ hostname }}"></div>
   <table id="hits-data">
     {% for day in pageHitsPerDay %}

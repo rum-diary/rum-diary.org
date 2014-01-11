@@ -10,7 +10,35 @@ const navigationTimingData = require('./data/navigation-timing.json');
 const reduce = require('../server/lib/reduce');
 
 describe('reduce', function() {
-  it('pageHitsPerDay', function() {
+  it('pageHitsPerDay with start/end date specified', function() {
+    var pageHitsPerDay = reduce.pageHitsPerDay([
+      {
+        path: '/',
+        createdAt: moment().toDate()
+      },
+      {
+        path: '/',
+        createdAt: moment().toDate()
+      },
+      {
+        path: '/',
+        createdAt: moment().subtract('days', 2).toDate()
+      },
+      {
+        path: '/page',
+        createdAt: moment().toDate()
+      },
+      {
+        path: '/page',
+        createdAt: moment().subtract('days', 4).toDate()
+      }
+    ], moment().subtract('days', 7), moment());
+
+    // data is limited to 8 days (7 days ago + today)
+    assert.equal(pageHitsPerDay['/'].length, 8);
+  });
+
+  it('pageHitsPerDay with no start/end date specified - use start/end date in data', function() {
     var pageHitsPerDay = reduce.pageHitsPerDay([
       {
         path: '/',
@@ -33,6 +61,9 @@ describe('reduce', function() {
         createdAt: moment().subtract('days', 4).toDate()
       }
     ]);
+
+    // 4 days ago + today
+    assert.equal(pageHitsPerDay['/'].length, 5);
 
     assert.equal(pageHitsPerDay['/'][0].date, moment().format('YYYY-MM-DD'));
     assert.equal(pageHitsPerDay['/'][0].hits, 2);

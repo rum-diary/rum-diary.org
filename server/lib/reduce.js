@@ -7,35 +7,85 @@ const Stats = require('fast-stats').Stats;
 const url = require('url');
 const SortedArray = require('sarray');
 
-function getPathDateInfo(returnedData, path, date) {
-  if ( ! (path in returnedData)) {
-    returnedData[path] = [];
-    for (var i = 0; i < 30; ++i) {
-      returnedData[path][i] = {
+function ensurePageInfo(returnedData, page, startDate, endDate) {
+  if ( ! (page in returnedData)) {
+    var numDays = moment(endDate).diff(startDate, 'days');
+    returnedData[page] = [];
+    // <= to include both the start and end date
+    for (var i = 0; i <= numDays; ++i) {
+      returnedData[page][i] = {
         hits: 0,
-        date: moment().subtract('days', i).format('YYYY-MM-DD')
+        date: moment(endDate).subtract('days', i).format('YYYY-MM-DD')
       };
     }
   }
 
-  var daysAgo = moment().diff(date, 'days');
-
-  return returnedData[path][daysAgo];
+  return returnedData;
 }
 
-function incrementDailyPageHit(returnedData, path, date) {
-  var pathDateInfo = getPathDateInfo(returnedData, path, date);
-  pathDateInfo.hits++;
+function getPageDateInfo(returnedData, page, startDate, date) {
+  var index = moment(date).diff(startDate, 'days');
+  return returnedData[page][index];
 }
 
-exports.pageHitsPerDay = function (hitsForHost) {
+function incrementDailyPageHit(returnedData, page, date) {
+  var pageDateInfo = getPageDateInfo(returnedData, page, date);
+  if ( ! pageDateInfo) return new Error('invalid date range');
+  pageDateInfo.hits++;
+}
+
+function earliestDate(data, dateName) {
+  return data.reduce(function(prevStart, item) {
+            var currStart = moment(item[dateName]);
+            if ( ! prevStart) return currStart;
+            if (currStart.isBefore(prevStart)) return currStart;
+            return prevStart;
+          }, null);
+}
+
+function latestDate(data, dateName) {
+  return data.reduce(function(prevEnd, item) {
+            var currEnd = moment(item[dateName]);
+            if ( ! prevEnd) return currEnd;
+            if (currEnd.isAfter(prevEnd)) return currEnd;
+            return prevEnd;
+          }, null);
+}
+
+/**
+ * Find the number of page hits per day per page. Returns a dictionary that is
+ *    keyed by page path. Each path contains an array of objects, each object
+ *    contains a date and number of hits. The "__all" path contains aggregate
+ *    data of all paths.
+ *
+ *    example:
+ * {
+ *    __all: [{ date: '2013-12-30', hits: 4 }, { date: '2013-12-31', hits: 3 }, ...
+ *    '/': [{ date: '2013-12-30', hits: 2 }, { date: '2013-12-31', hits: 3 }, ...
+ *    '/about': [{ date: '2013-12-30', hits: 2 }, { date: '2013-12-31', hits: 0 }, ...
+ * }
+ *
+ * @method pageHitsPerDay
+ * @param [array] hits - hit data - assumed to be from a single host
+ * @param [date] (startDate) - start date of data. If not given, searches
+ *           through data for earliest date
+ * @param [date] (endDate) - end date of data. If not given, searches
+ *           through data for last date
+ */
+exports.pageHitsPerDay = function (hits, startDate, endDate) {
+  if ( ! startDate) startDate = earliestDate(hits, 'createdAt');
+  if ( ! endDate) endDate = latestDate(hits, 'createdAt');
+
   var hitsPerDay = {};
+  ensurePageInfo(hitsPerDay, '__all', startDate, endDate);
 
-  hitsForHost.forEach(function (item) {
+  hits.forEach(function (item) {
     var date = moment(item.createdAt);
 
-    if (item.path)
+    if (item.path) {
+      ensurePageInfo(hitsPerDay, item.path, startDate, endDate);
       incrementDailyPageHit(hitsPerDay, item.path, date);
+    }
 
     incrementDailyPageHit(hitsPerDay, '__all', date);
   });
@@ -43,12 +93,12 @@ exports.pageHitsPerDay = function (hitsForHost) {
   return hitsPerDay;
 };
 
-exports.pageHitsPerPage = function (hitsForHost) {
+exports.pageHitsPerPage = function (hits) {
   var hitsPerPage = {
     __all: 0
   };
 
-  hitsForHost.forEach(function (item) {
+  hits.forEach(function (item) {
     hitsPerPage.__all++;
 
     var path = item.path;
@@ -62,8 +112,8 @@ exports.pageHitsPerPage = function (hitsForHost) {
   return hitsPerPage;
 };
 
-exports.findLoadTimes = function (hitsForHost) {
-  var loadTimes = hitsForHost.map(function (item) {
+exports.findLoadTimes = function (hits) {
+  var loadTimes = hits.map(function (item) {
     var loadTime;
     try {
       var navigationTiming = item.navigationTiming;
@@ -77,9 +127,9 @@ exports.findLoadTimes = function (hitsForHost) {
   return loadTimes;
 };
 
-exports.findAverageLoadTime = function (hitsForHost) {
+exports.findAverageLoadTime = function (hits) {
   var count = 0;
-  var total = exports.findLoadTimes(hitsForHost).reduce(function (prev, curr) {
+  var total = exports.findLoadTimes(hits).reduce(function (prev, curr) {
     if (isNaN(curr)) return prev;
     count++;
     return prev + curr;
@@ -89,21 +139,21 @@ exports.findAverageLoadTime = function (hitsForHost) {
   return 0;
 };
 
-exports.findMedianNavigationTimes = function (hitsForHost, done) {
-  exports.findNavigationTimingStats(hitsForHost, ['median'], function(err, stats) {
+exports.findMedianNavigationTimes = function (hits, done) {
+  exports.findNavigationTimingStats(hits, ['median'], function(err, stats) {
     if (err) return done(err);
 
     done(null, stats.median);
   });
 };
 
-exports.findNavigationTimingStats = function (hitsForHost, statsToFind, options, done) {
+exports.findNavigationTimingStats = function (hits, statsToFind, options, done) {
   if ( ! done && typeof options === "function") {
     done = options;
     options = {};
   }
 
-  getNavigationTimingStats(hitsForHost, options, function(err, stats) {
+  getNavigationTimingStats(hits, options, function(err, stats) {
     if (err) return done(err);
 
     var returnedStats = {};
@@ -119,8 +169,8 @@ exports.findNavigationTimingStats = function (hitsForHost, statsToFind, options,
   });
 };
 
-exports.findReferrers = function (hitsForHost, done) {
-  var countByHostname = countReferrersByHostname(hitsForHost);
+exports.findReferrers = function (hits, done) {
+  var countByHostname = countReferrersByHostname(hits);
   var sortedByCount = sortHostnamesByCount(countByHostname);
 
   done(null, {
@@ -129,10 +179,10 @@ exports.findReferrers = function (hitsForHost, done) {
   });
 };
 
-function countReferrersByHostname (hitsForHost) {
+function countReferrersByHostname (hits) {
   var countByHostname = {};
 
-  hitsForHost.forEach(function(hit) {
+  hits.forEach(function(hit) {
     if ( ! hit.referrer) return;
 
     var parsed;
@@ -172,7 +222,7 @@ function createStat(options) {
   return new Stats(options);
 }
 
-function getNavigationTimingStats (hitsForHost, options, done) {
+function getNavigationTimingStats (hits, options, done) {
   // For descriptions, see:
   // https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model
 
@@ -225,7 +275,7 @@ function getNavigationTimingStats (hitsForHost, options, done) {
     processingDuration: createStat(options)
   };
 
-  hitsForHost.forEach(function(hit) {
+  hits.forEach(function(hit) {
     var navTiming = hit.navigationTiming;
 
     for (var key in navTiming) {
