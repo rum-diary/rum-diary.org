@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const moment = require('moment');
+const logger = require('../lib/logger');
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
@@ -13,21 +14,27 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query['$gte']);
-  var end = moment(query['$lte']);
+  var start = moment(query.updatedAt['$gte']);
+  var end = moment(query.updatedAt['$lte']);
 
   db.get(query, function(err, data) {
     if (err) return res.send(500);
 
+    var reductionStart = new Date();
+
+    // TODO - parallelize all of the calculating!
     var pageHitsPerDay = reduce.pageHitsPerDay(data, start, end);
     var pageHitsPerPage = reduce.pageHitsPerPage(data);
     var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage).slice(0, 20);
 
-    // parallelize all of the calculating!
     reduce.findReferrers(data, function(err, referrerStats) {
       reduce.findNavigationTimingStats(data,
         ['range', 'median'],
         function(err, medianStats) {
+        var reductionEnd = new Date();
+        var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
+        logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
+
         res.render('GET-site-hostname.html', {
           root_url: req.url.replace(/\?.*/, ''),
           hostname: req.params.hostname,

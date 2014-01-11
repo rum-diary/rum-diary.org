@@ -29,6 +29,8 @@ exports.handler = function(req, res) {
   db.get(query, function(err, data) {
     if (err) return res.send(500);
 
+    var reductionStart = new Date();
+
     var pageHitsPerDay = reduce.pageHitsPerDay(data);
     var pageHitsPerPage = reduce.pageHitsPerPage(data);
     var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage).slice(0, 20);
@@ -38,6 +40,10 @@ exports.handler = function(req, res) {
       reduce.findNavigationTimingStats(data,
         ['range', 'median'],
         function(err, medianStats) {
+        var reductionEnd = new Date();
+        var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
+        logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
+
         res.render('GET-site-hostname-path.html', {
           root_url: req.url,
           hostname: hostname,

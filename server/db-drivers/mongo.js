@@ -20,6 +20,7 @@ exports.save = function (item, done) {
 };
 
 exports.get = function (searchBy, done) {
+  var startTime = new Date();
   if ( ! done && typeof searchBy === "function") {
     done = searchBy;
     searchBy = {};
@@ -36,6 +37,10 @@ exports.get = function (searchBy, done) {
     if (err) return;
       logger.info("searching: %s", JSON.stringify(searchBy));
       PageLoad.find(searchBy, function (err, models) {
+        var endTime = new Date();
+        var duration = endTime.getDate() - startTime.getDate();
+        logger.info('database query time for %s: %s ms',
+                        JSON.stringify(searchBy), duration);
         if (err) {
           logger.error("Error while retreiving models: %s", String(err));
           return done(err);
