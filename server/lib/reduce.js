@@ -6,16 +6,20 @@ const moment = require('moment');
 const Stats = require('fast-stats').Stats;
 const url = require('url');
 const SortedArray = require('sarray');
+const Promise = require('bluebird');
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 function ensurePageInfo(returnedData, page, startDate, endDate) {
   if ( ! (page in returnedData)) {
-    var numDays = moment(endDate).diff(startDate, 'days');
+    var numDays = diffDays(startDate, endDate);
     returnedData[page] = [];
     // <= to include both the start and end date
     for (var i = 0; i <= numDays; ++i) {
+      var date = new Date();
+      date.setTime(startDate + (i * MS_PER_DAY));
       returnedData[page][i] = {
         hits: 0,
-        date: moment(endDate).subtract('days', i).format('YYYY-MM-DD')
+        date: moment(date).format('YYYY-MM-DD')
       };
     }
   }
@@ -23,121 +27,51 @@ function ensurePageInfo(returnedData, page, startDate, endDate) {
   return returnedData;
 }
 
+function diffDays(startDate, date) {
+  return Math.floor((date - startDate) / MS_PER_DAY);
+}
+
 function getPageDateInfo(returnedData, page, startDate, date) {
-  var index = moment(date).diff(startDate, 'days');
+  var index = diffDays(startDate, date);
   return returnedData[page][index];
 }
 
-function incrementDailyPageHit(returnedData, page, date) {
-  var pageDateInfo = getPageDateInfo(returnedData, page, date);
+function incrementDailyPageHit(returnedData, page, startDate, date) {
+  var pageDateInfo = getPageDateInfo(returnedData, page, startDate, date);
   if ( ! pageDateInfo) return new Error('invalid date range');
   pageDateInfo.hits++;
 }
 
 function earliestDate(data, dateName) {
   return data.reduce(function(prevStart, item) {
-            var currStart = moment(item[dateName]);
+            var currStart = new Date(item[dateName]);
             if ( ! prevStart) return currStart;
-            if (currStart.isBefore(prevStart)) return currStart;
+            if (currStart < prevStart) return currStart;
             return prevStart;
           }, null);
 }
 
 function latestDate(data, dateName) {
   return data.reduce(function(prevEnd, item) {
-            var currEnd = moment(item[dateName]);
+            var currEnd = new Date(item[dateName]);
             if ( ! prevEnd) return currEnd;
-            if (currEnd.isAfter(prevEnd)) return currEnd;
+            if (currEnd > prevEnd) return currEnd;
             return prevEnd;
           }, null);
 }
 
-/**
- * Find the number of page hits per day per page. Returns a dictionary that is
- *    keyed by page path. Each path contains an array of objects, each object
- *    contains a date and number of hits. The '__all' path contains aggregate
- *    data of all paths.
- *
- *    example:
- * {
- *    __all: [{ date: '2013-12-30', hits: 4 }, { date: '2013-12-31', hits: 3 }, ...
- *    '/': [{ date: '2013-12-30', hits: 2 }, { date: '2013-12-31', hits: 3 }, ...
- *    '/about': [{ date: '2013-12-30', hits: 2 }, { date: '2013-12-31', hits: 0 }, ...
- * }
- *
- * @method pageHitsPerDay
- * @param [array] hits - hit data - assumed to be from a single host
- * @param [date] (startDate) - start date of data. If not given, searches
- *           through data for earliest date
- * @param [date] (endDate) - end date of data. If not given, searches
- *           through data for last date
- */
-exports.pageHitsPerDay = function (hits, options, done) {
-  if (typeof options === "function" && !done) {
-    done = options;
-    options = {};
-  }
-
-  exports.mapReduce(hits, ['hits_per_day'], options, function(err, data) {
-    if (err) return done(err);
-    done(null, data.hits_per_day);
-  });
-};
-
 function updatePageHit(hitsPerDay, options, hit) {
-  var date = moment(hit.createdAt);
+  var date = new Date(hit.updatedAt);
 
   if (hit.path) {
     ensurePageInfo(hitsPerDay, hit.path, options.start, options.end);
-    incrementDailyPageHit(hitsPerDay, hit.path, date);
+    incrementDailyPageHit(hitsPerDay, hit.path, options.start, date);
   }
 
-  incrementDailyPageHit(hitsPerDay, '__all', date);
+  incrementDailyPageHit(hitsPerDay, '__all', options.start, date);
 }
 
-exports.pageHitsPerPage = function (hits, done) {
-  exports.mapReduce(hits, ['hits_per_page'], function(err, data) {
-    if (err) return done(err);
-    done(null, data.hits_per_page);
-  });
-};
-
-exports.findLoadTimes = function (hits) {
-  var loadTimes = hits.map(function (item) {
-    var loadTime;
-    try {
-      var navigationTiming = item.navigationTiming;
-      loadTime = navigationTiming.loadEventEnd
-                    - navigationTiming.navigationStart;
-    } catch(e) {
-      return NaN;
-    }
-    return loadTime;
-  });
-  return loadTimes;
-};
-
-exports.findAverageLoadTime = function (hits) {
-  var count = 0;
-  var total = exports.findLoadTimes(hits).reduce(function (prev, curr) {
-    if (isNaN(curr)) return prev;
-    count++;
-    return prev + curr;
-  }, 0);
-
-  if (count) return total / count;
-  return 0;
-};
-
-exports.findMedianNavigationTimes = function (hits, done) {
-  exports.findNavigationTimingStats(hits, ['median'], function(err, stats) {
-    if (err) return done(err);
-
-    done(null, stats.median);
-  });
-};
-
-exports.calculateStats = function(values, statsToFind, done) {
+exports.calculateNavigationTimingStats = function(values, statsToFind, done) {
   var returnedStats = {};
   for (var key in values) {
     statsToFind.forEach(function(statName) {
@@ -160,36 +94,6 @@ exports.findNavigationTimingStats = function (hits, statsToFind, options, done) 
   options.navigation.calculate = statsToFind;
   getNavigationTimingStats(hits, options, done);
 };
-
-exports.findReferrers = function (hits, done) {
-  exports.mapReduce(hits, ['referrers'], function(err, data) {
-    done(null, data.referrers);
-  });
-};
-
-function countReferrersByHostname (hits) {
-  var countByHostname = {};
-
-  hits.forEach(function(hit) {
-    if ( ! hit.referrer) return;
-
-    var parsed;
-    try {
-      parsed = url.parse(hit.referrer);
-    } catch(e) {
-      return;
-    }
-
-    var hostname = parsed.hostname;
-    if ( ! countByHostname[hostname]) {
-      countByHostname[hostname] = 0;
-    }
-
-    countByHostname[hostname]++;
-  });
-
-  return countByHostname;
-}
 
 function sortHostnamesByCount(countByHostname) {
   var sortedByCount = SortedArray(function(a, b) {
@@ -305,8 +209,6 @@ function getNavigationTimingStats (hits, options, done) {
   });
 }
 
-// TODO - this is very similar to countReferrersByHostname, can they be
-// combined?
 exports.findHostnames = function(hits, done) {
   exports.mapReduce(hits, ['hostnames'], function(err, data) {
     if (err) return done(err);
@@ -328,14 +230,15 @@ function updateHostname(hostnames, hit) {
 function updateReferrer(referrers, hit) {
   if ( ! hit.referrer) return;
 
-  var parsed;
+  var hostname;
   try {
-    parsed = url.parse(hit.referrer);
+    // XXX todo - do this on incoming.
+    var parsed = url.parse(hit.referrer);
+    hostname = parsed.hostname;
   } catch(e) {
     return;
   }
 
-  var hostname = parsed.hostname;
   if ( ! referrers[hostname]) {
     referrers[hostname] = 0;
   }
@@ -355,6 +258,9 @@ function updateHitsPerPage(hitsPerPage, hit) {
 }
 
 exports.mapReduce = function(hits, fields, options, done) {
+  var resolver = Promise.defer();
+
+  var startTime = new Date();
   if (typeof options === "function" && !done) {
     done = options;
     options = {};
@@ -379,6 +285,9 @@ exports.mapReduce = function(hits, fields, options, done) {
     if ( ! options.start) options.start = earliestDate(hits, 'createdAt');
     if ( ! options.end) options.end = latestDate(hits, 'createdAt');
 
+    options.start = moment(options.start).startOf('day').toDate().getTime();
+    options.end = moment(options.end).endOf('day').toDate().getTime();
+
     data.hits_per_day = {};
     ensurePageInfo(data.hits_per_day, '__all', options.start, options.end);
   }
@@ -396,16 +305,30 @@ exports.mapReduce = function(hits, fields, options, done) {
   }
 
   if (doNavigation) {
-    exports.calculateStats(data.navigation_values, options.navigation.calculate,
+    exports.calculateNavigationTimingStats(data.navigation_values, options.navigation.calculate,
         function(err, stats) {
-      if (err) return done(err);
+      if (err) return fail(err);
 
       data.navigation = stats;
-      done(null, data);
+      complete();
     });
-
-    return;
+  }
+  else {
+    complete();
   }
 
-  done(null, data);
+  function fail(reason) {
+    if (done) done(reason);
+    resolver.reject(reason);
+  }
+
+  function complete() {
+    data.processing_time = (new Date().getTime() - startTime.getTime());
+    setTimeout(function() {
+      if (done) done(null, data);
+      resolver.resolve(data);
+    }, 0);
+  }
+
+  return resolver.promise;
 };

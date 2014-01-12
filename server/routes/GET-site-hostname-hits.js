@@ -15,10 +15,10 @@ exports.handler = function(req, res) {
   db.get(query, function(err, data) {
     if (err) return res.send(500);
 
-    reduce.pageHitsPerDay(data, function(err, hits) {
+    reduce.mapReduce(data, ['hits'], function(err, stats) {
       if (err) return res.send(500);
 
-      res.send(200, { hits: hits });
+      res.send(200, { hits: stats.hits });
     });
   });
 };

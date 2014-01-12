@@ -15,9 +15,13 @@ exports.handler = function(req, res) {
   db.get(query, function(err, data) {
     if (err) return res.send(500);
 
-    reduce.findMedianNavigationTimes(data, function(err, medians) {
+    reduce.mapReduce(data, ['navigation'], {
+      navigation: {
+        calculate: ['median']
+      }
+    }, function(err, stats) {
       if (err) return res.send(500);
-      res.send(medians);
+      res.send(stats.navigation.median);
     });
   });
 };
