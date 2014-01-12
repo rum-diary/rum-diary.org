@@ -221,7 +221,7 @@ function getNavigationTimingObject(options) {
     // redirect - only visible if redirecting from the same domain.
     redirectStart: createStat(options),
     redirectEnd: createStat(options),
-    /*redirectDuration: createStat(options),*/
+    redirectDuration: createStat(options),
 
     // App cache
     fetchStart: createStat(options),
@@ -229,38 +229,38 @@ function getNavigationTimingObject(options) {
     // DNS - will be the same as fetchStart if DNS is already resolved.
     domainLookupStart: createStat(options),
     domainLookupEnd: createStat(options),
-    /*domainLookupDuration: createStat(options),*/
+    domainLookupDuration: createStat(options),
 
     // TCP - will be the same as domainLookupDuration if reusing a connection.
     connectStart: createStat(options),
     secureConnectionStart: createStat(options),
     connectEnd: createStat(options),
-    /*connectDuration: createStat(options),*/
+    connectDuration: createStat(options),
 
     // request & response
     requestStart: createStat(options),
     responseStart: createStat(options),
     responseEnd: createStat(options),
-    /*requestResponseDuration: createStat(options),*/
+    requestResponseDuration: createStat(options),
 
     // unload previous page - only valid previous page was on the same domain.
     unloadEventStart: createStat(options),
     unloadEventEnd: createStat(options),
-    /*unloadEventDuration: createStat(options),*/
+    unloadEventDuration: createStat(options),
 
     // processing
     domLoading: createStat(options),
     domInteractive: createStat(options),
     domContentLoadedEventStart: createStat(options),
     domContentLoadedEventEnd: createStat(options),
-    /*domContentLoadedEventDuration: createStat(options),*/
+    domContentLoadedEventDuration: createStat(options),
     domComplete: createStat(options),
 
     // load
     loadEventStart: createStat(options),
     loadEventEnd: createStat(options),
-    /*loadEventDuration: createStat(options),*/
-    /*processingDuration: createStat(options)*/
+    loadEventDuration: createStat(options),
+    processingDuration: createStat(options)
   };
 
   return stats;
@@ -273,7 +273,6 @@ function updateNavigationTiming(stats, hit) {
       if (stats.hasOwnProperty(key)) stats[key].push(navTiming[key]);
     }
 
-    /*
     stats.redirectDuration.push(
               navTiming.redirectEnd - navTiming.redirectStart);
 
@@ -297,7 +296,6 @@ function updateNavigationTiming(stats, hit) {
 
     stats.processingDuration.push(
               navTiming.loadEventEnd - navTiming.domLoading);
-    */
 }
 
 function getNavigationTimingStats (hits, options, done) {
