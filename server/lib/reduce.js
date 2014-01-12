@@ -55,7 +55,7 @@ function latestDate(data, dateName) {
 /**
  * Find the number of page hits per day per page. Returns a dictionary that is
  *    keyed by page path. Each path contains an array of objects, each object
- *    contains a date and number of hits. The "__all" path contains aggregate
+ *    contains a date and number of hits. The '__all' path contains aggregate
  *    data of all paths.
  *
  *    example:
@@ -72,44 +72,34 @@ function latestDate(data, dateName) {
  * @param [date] (endDate) - end date of data. If not given, searches
  *           through data for last date
  */
-exports.pageHitsPerDay = function (hits, startDate, endDate) {
-  if ( ! startDate) startDate = earliestDate(hits, 'createdAt');
-  if ( ! endDate) endDate = latestDate(hits, 'createdAt');
+exports.pageHitsPerDay = function (hits, options, done) {
+  if (typeof options === "function" && !done) {
+    done = options;
+    options = {};
+  }
 
-  var hitsPerDay = {};
-  ensurePageInfo(hitsPerDay, '__all', startDate, endDate);
-
-  hits.forEach(function (item) {
-    var date = moment(item.createdAt);
-
-    if (item.path) {
-      ensurePageInfo(hitsPerDay, item.path, startDate, endDate);
-      incrementDailyPageHit(hitsPerDay, item.path, date);
-    }
-
-    incrementDailyPageHit(hitsPerDay, '__all', date);
+  exports.mapReduce(hits, ['hits_per_day'], options, function(err, data) {
+    if (err) return done(err);
+    done(null, data.hits_per_day);
   });
-
-  return hitsPerDay;
 };
 
-exports.pageHitsPerPage = function (hits) {
-  var hitsPerPage = {
-    __all: 0
-  };
+function updatePageHit(hitsPerDay, options, hit) {
+  var date = moment(hit.createdAt);
 
-  hits.forEach(function (item) {
-    hitsPerPage.__all++;
+  if (hit.path) {
+    ensurePageInfo(hitsPerDay, hit.path, options.start, options.end);
+    incrementDailyPageHit(hitsPerDay, hit.path, date);
+  }
 
-    var path = item.path;
-    if ( ! path) return;
+  incrementDailyPageHit(hitsPerDay, '__all', date);
+}
 
-    if ( ! (path in hitsPerPage)) hitsPerPage[path] = 0;
-
-    hitsPerPage[path]++;
+exports.pageHitsPerPage = function (hits, done) {
+  exports.mapReduce(hits, ['hits_per_page'], function(err, data) {
+    if (err) return done(err);
+    done(null, data.hits_per_page);
   });
-
-  return hitsPerPage;
 };
 
 exports.findLoadTimes = function (hits) {
@@ -147,35 +137,33 @@ exports.findMedianNavigationTimes = function (hits, done) {
   });
 };
 
+exports.calculateStats = function(values, statsToFind, done) {
+  var returnedStats = {};
+  for (var key in values) {
+    statsToFind.forEach(function(statName) {
+      if ( ! (statName in returnedStats)) returnedStats[statName] = {};
+
+      returnedStats[statName][key] = values[key][statName]();
+    });
+  }
+
+  done(null, returnedStats);
+};
+
 exports.findNavigationTimingStats = function (hits, statsToFind, options, done) {
-  if ( ! done && typeof options === "function") {
+  if ( ! done && typeof options === 'function') {
     done = options;
     options = {};
   }
 
-  getNavigationTimingStats(hits, options, function(err, stats) {
-    if (err) return done(err);
-
-    var returnedStats = {};
-    for (var key in stats) {
-      statsToFind.forEach(function(statName) {
-        if ( ! (statName in returnedStats)) returnedStats[statName] = {};
-
-        returnedStats[statName][key] = stats[key][statName]();
-      });
-    }
-
-    done(null, returnedStats);
-  });
+  if ( ! options.navigation) options.navigation = {};
+  options.navigation.calculate = statsToFind;
+  getNavigationTimingStats(hits, options, done);
 };
 
 exports.findReferrers = function (hits, done) {
-  var countByHostname = countReferrersByHostname(hits);
-  var sortedByCount = sortHostnamesByCount(countByHostname);
-
-  done(null, {
-    by_hostname: countByHostname,
-    by_count: sortedByCount
+  exports.mapReduce(hits, ['referrers'], function(err, data) {
+    done(null, data.referrers);
   });
 };
 
@@ -222,7 +210,7 @@ function createStat(options) {
   return new Stats(options);
 }
 
-function getNavigationTimingStats (hits, options, done) {
+function getNavigationTimingObject(options) {
   // For descriptions, see:
   // https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model
 
@@ -275,7 +263,10 @@ function getNavigationTimingStats (hits, options, done) {
     processingDuration: createStat(options)
   };
 
-  hits.forEach(function(hit) {
+  return stats;
+}
+
+function updateNavigationTiming(stats, hit) {
     var navTiming = hit.navigationTiming;
 
     for (var key in navTiming) {
@@ -305,25 +296,116 @@ function getNavigationTimingStats (hits, options, done) {
 
     stats.processingDuration.push(
               navTiming.loadEventEnd - navTiming.domLoading);
-  });
+}
 
-  done(null, stats);
+function getNavigationTimingStats (hits, options, done) {
+  exports.mapReduce(hits, ['navigation'], options, function(err, data) {
+    if (err) return done(err);
+    done(null, data.navigation);
+  });
 }
 
 // TODO - this is very similar to countReferrersByHostname, can they be
 // combined?
 exports.findHostnames = function(hits, done) {
-  var hostnames = {};
+  exports.mapReduce(hits, ['hostnames'], function(err, data) {
+    if (err) return done(err);
+    done(null, data.hostnames);
+  });
+};
 
-  hits.forEach(function(hit) {
-    if ( ! hit.hostname) return;
 
+function updateHostname(hostnames, hit) {
+  if (hit.hostname) {
     if ( ! (hit.hostname in hostnames)) {
       hostnames[hit.hostname] = 0;
     }
 
     hostnames[hit.hostname]++;
+  }
+}
+
+function updateReferrer(referrers, hit) {
+  if ( ! hit.referrer) return;
+
+  var parsed;
+  try {
+    parsed = url.parse(hit.referrer);
+  } catch(e) {
+    return;
+  }
+
+  var hostname = parsed.hostname;
+  if ( ! referrers[hostname]) {
+    referrers[hostname] = 0;
+  }
+
+  referrers[hostname]++;
+}
+
+function updateHitsPerPage(hitsPerPage, hit) {
+  hitsPerPage.__all++;
+
+  var path = hit.path;
+  if ( ! path) return;
+
+  if ( ! (path in hitsPerPage)) hitsPerPage[path] = 0;
+
+  hitsPerPage[path]++;
+}
+
+exports.mapReduce = function(hits, fields, options, done) {
+  if (typeof options === "function" && !done) {
+    done = options;
+    options = {};
+  }
+
+  var data = {};
+
+  var doHostnames = fields.indexOf('hostnames') > -1;
+  if (doHostnames) data.hostnames = {};
+
+  var doHitsPerPage = fields.indexOf('hits_per_page') > -1;
+  if (doHitsPerPage) data.hits_per_page = { __all: 0 };
+
+  var doReferrers = fields.indexOf('referrers') > -1;
+  if (doReferrers) data.referrers = { by_hostname: {} };
+
+  var doNavigation = fields.indexOf('navigation') > -1;
+  if (doNavigation) data.navigation_values = getNavigationTimingObject(options);
+
+  var doHitsPerDay = fields.indexOf('hits_per_day') > -1;
+  if (doHitsPerDay) {
+    if ( ! options.start) options.start = earliestDate(hits, 'createdAt');
+    if ( ! options.end) options.end = latestDate(hits, 'createdAt');
+
+    data.hits_per_day = {};
+    ensurePageInfo(data.hits_per_day, '__all', options.start, options.end);
+  }
+
+  hits.forEach(function(hit) {
+    if (doHostnames) updateHostname(data.hostnames, hit);
+    if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
+    if (doReferrers) updateReferrer(data.referrers.by_hostname, hit);
+    if (doNavigation) updateNavigationTiming(data.navigation_values, hit);
+    if (doHitsPerDay) updatePageHit(data.hits_per_day, options, hit);
   });
 
-  done(null, hostnames);
+  if (doReferrers) {
+    data.referrers.by_count = sortHostnamesByCount(data.referrers.by_hostname);
+  }
+
+  if (doNavigation) {
+    exports.calculateStats(data.navigation_values, options.navigation.calculate,
+        function(err, stats) {
+      if (err) return done(err);
+
+      data.navigation = stats;
+      done(null, data);
+    });
+
+    return;
+  }
+
+  done(null, data);
 };

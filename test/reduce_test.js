@@ -10,8 +10,8 @@ const navigationTimingData = require('./data/navigation-timing.json');
 const reduce = require('../server/lib/reduce');
 
 describe('reduce', function() {
-  it('pageHitsPerDay with start/end date specified', function() {
-    var pageHitsPerDay = reduce.pageHitsPerDay([
+  it('pageHitsPerDay with start/end date specified', function(done) {
+    reduce.pageHitsPerDay([
       {
         path: '/',
         createdAt: moment().toDate()
@@ -32,14 +32,18 @@ describe('reduce', function() {
         path: '/page',
         createdAt: moment().subtract('days', 4).toDate()
       }
-    ], moment().subtract('days', 7), moment());
-
-    // data is limited to 8 days (7 days ago + today)
-    assert.equal(pageHitsPerDay['/'].length, 8);
+    ], {
+      start: moment().subtract('days', 7),
+      end: moment()
+    }, function(err, pageHitsPerDay) {
+      // data is limited to 8 days (7 days ago + today)
+      assert.equal(pageHitsPerDay['/'].length, 8);
+      done();
+    });
   });
 
-  it('pageHitsPerDay with no start/end date specified - use start/end date in data', function() {
-    var pageHitsPerDay = reduce.pageHitsPerDay([
+  it('pageHitsPerDay with no start/end date specified - use start/end date in data', function(done) {
+    reduce.pageHitsPerDay([
       {
         path: '/',
         createdAt: moment().toDate()
@@ -60,25 +64,27 @@ describe('reduce', function() {
         path: '/page',
         createdAt: moment().subtract('days', 4).toDate()
       }
-    ]);
+    ], function(err, pageHitsPerDay) {
+      // 4 days ago + today
+      assert.equal(pageHitsPerDay['/'].length, 5);
 
-    // 4 days ago + today
-    assert.equal(pageHitsPerDay['/'].length, 5);
+      assert.equal(pageHitsPerDay['/'][0].date, moment().format('YYYY-MM-DD'));
+      assert.equal(pageHitsPerDay['/'][0].hits, 2);
+      assert.equal(pageHitsPerDay['/'][2].date, moment().subtract('days', 2).format('YYYY-MM-DD'));
+      assert.equal(pageHitsPerDay['/'][2].hits, 1);
+      assert.equal(pageHitsPerDay['/page'][4].hits, 1);
 
-    assert.equal(pageHitsPerDay['/'][0].date, moment().format('YYYY-MM-DD'));
-    assert.equal(pageHitsPerDay['/'][0].hits, 2);
-    assert.equal(pageHitsPerDay['/'][2].date, moment().subtract('days', 2).format('YYYY-MM-DD'));
-    assert.equal(pageHitsPerDay['/'][2].hits, 1);
-    assert.equal(pageHitsPerDay['/page'][4].hits, 1);
+      // all pages for the domain are hitsed under the '__all' namespace
+      assert.isArray(pageHitsPerDay['__all'], 3);
+      assert.equal(pageHitsPerDay['__all'][0].hits, 3);
+      assert.equal(pageHitsPerDay['__all'][0].date, moment().format('YYYY-MM-DD'));
 
-    // all pages for the domain are hitsed under the '__all' namespace
-    assert.isArray(pageHitsPerDay['__all'], 3);
-    assert.equal(pageHitsPerDay['__all'][0].hits, 3);
-    assert.equal(pageHitsPerDay['__all'][0].date, moment().format('YYYY-MM-DD'));
+      done();
+    });
   });
 
-  it('pageHitsPerPage', function() {
-    var pageHitsPerPage = reduce.pageHitsPerPage([
+  it('pageHitsPerPage', function(done) {
+    reduce.pageHitsPerPage([
       {
         path: '/',
         createdAt: moment().toDate()
@@ -99,10 +105,11 @@ describe('reduce', function() {
         path: '/page',
         createdAt: moment().subtract('days', 4).toDate()
       }
-    ]);
-
-    assert.equal(pageHitsPerPage['/'], 3);
-    assert.equal(pageHitsPerPage['/page'], 2);
+    ], function(err, pageHitsPerPage) {
+      assert.equal(pageHitsPerPage['/'], 3);
+      assert.equal(pageHitsPerPage['/page'], 2);
+      done();
+    });
   });
 
   it('findMedianNavigationTimes', function(done) {

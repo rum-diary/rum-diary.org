@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const moment = require('moment');
 const db = require('../lib/db');
 const logger = require('../lib/logger');
 const reduce = require('../lib/reduce');
-const client_resources = require('../lib/client-resources');
+const clientResources = require('../lib/client-resources');
 const getQuery = require('../lib/site-query');
 
 
@@ -14,6 +15,8 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
+  var start = moment(query.updatedAt['$gte']);
+  var end = moment(query.updatedAt['$lte']);
 
   var hostname = req.params[0];
   var path = req.params[1] || 'index';
@@ -26,35 +29,38 @@ exports.handler = function(req, res) {
   query.hostname = hostname;
   query.path = path;
 
-  db.get(query, function(err, data) {
-    if (err) return res.send(500);
-
+  db.get(query, function(err, hits) {
     var reductionStart = new Date();
 
-    var pageHitsPerDay = reduce.pageHitsPerDay(data);
-    var pageHitsPerPage = reduce.pageHitsPerPage(data);
-    var pageHitsPerPageSorted = sortPageHitsPerPage(pageHitsPerPage).slice(0, 20);
+    reduce.mapReduce(hits, [
+      'hits_per_day',
+      'hits_per_page',
+      'referrers',
+      'navigation'
+    ], {
+      start: start,
+      end: end,
+      navigation: {
+        calculate: ['median']
+      }
+    }, function(err, data) {
+      var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
 
-    // parallelize all of the calculating!
-    reduce.findReferrers(data, function(err, referrerStats) {
-      reduce.findNavigationTimingStats(data,
-        ['range', 'median'],
-        function(err, medianStats) {
-        var reductionEnd = new Date();
-        var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
-        logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
+      var reductionEnd = new Date();
+      var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
+      logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
-        res.render('GET-site-hostname-path.html', {
-          root_url: req.url,
-          hostname: hostname,
-          path: path,
-          resources: client_resources('rum-diary.min.js'),
-          pageHitsPerPage: pageHitsPerPageSorted,
-          pageHitsPerDay: pageHitsPerDay.__all,
-          median: medianStats.median,
-          range: JSON.stringify(medianStats.range),
-          referrers: referrerStats.by_count.slice(0, 20)
-        });
+      res.render('GET-site-hostname-path.html', {
+        root_url: req.url.replace(/\?.*/, ''),
+        path: path,
+        hostname: req.params.hostname,
+        resources: clientResources('rum-diary.min.js'),
+        pageHitsPerPage: pageHitsPerPageSorted,
+        pageHitsPerDay: data.hits_per_day.__all,
+        median: data.navigation.median,
+        referrers: data.referrers.by_count.slice(0, 20),
+        startDate: start.format('MMM DD'),
+        endDate: end.format('MMM DD')
       });
     });
   });
