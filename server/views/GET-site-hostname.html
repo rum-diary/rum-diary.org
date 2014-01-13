@@ -19,8 +19,11 @@ path {
 {% endblock %}
 
 {% block body %}
-<section>
-  <h2>{{ hostname }} - {{ startDate }} to {{ endDate }}</h2>
+<header>
+  <h1>{{ hostname }} - {{ startDate }} to {{ endDate }}</h1>
+</header>
+<section id="daily-hits">
+  <h2>Daily hits</h2>
   <div id="hits-graph" data-hostname="{{ hostname }}"></div>
   <table id="hits-data">
     {% for day in pageHitsPerDay %}
@@ -32,7 +35,7 @@ path {
   </table>
 </section>
 
-<section>
+<section id="top-pages">
   <h2>Top Pages</h2>
   <table id="page-views">
     {% for page in pageHitsPerPage %}

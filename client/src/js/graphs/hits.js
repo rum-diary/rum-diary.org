@@ -10,8 +10,8 @@ RD.Graphs.Hits = (function(hits) {
   var data = hits.__all;
 
   var margin = {top: 20, right: 80, bottom: 70, left: 50},
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
+      width = 600 - margin.left - margin.right,
+      height = 350 - margin.top - margin.bottom;
 
   var parseDate = d3.time.format('%Y-%m-%d').parse;
 

@@ -1,5 +1,9 @@
 body {
-  font-family: "Bitstream Vera Sans", "sans-serif", "serif"
+  font-family: "Bitstream Vera Sans", "sans-serif", "serif";
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+       -o-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 main {
@@ -7,6 +11,23 @@ main {
   margin: 0 auto 10em auto;
   width: 960px;
 }
+
+section {
+  clear: both;
+}
+
+#daily-hits {
+  width: 500px;
+  float: left;
+  clear: none;
+}
+
+#top-pages {
+  width: 350px;
+  float: right;
+  clear: none;
+}
+
 
 .axis-label {
   font-size: 0.8em;
