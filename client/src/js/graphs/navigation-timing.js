@@ -134,11 +134,11 @@ RD.Graphs.NavigationTiming = (function() {
           .attr('width', '50')
           .style('stroke', '#000000')
           .attr('rx', '5')
-          .attr('title', function(d) {
-            return d.name;
-          })
           .on('mouseenter', function(d) {
-            var tooltipHTML = strformat('%s <hr /> %s: %s <hr /> %s: %s',
+            var tooltipHTML = strformat(
+                '<h3 class="tooltip-title">%s</h3>' +
+                '<p class="tooltip-section">%s: %s</p>' +
+                '<p class="tooltip-section">%s: %s</p>',
                 d.name,
                 d.start,
                 d.start_y,

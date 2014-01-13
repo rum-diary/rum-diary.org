@@ -4,7 +4,7 @@ body {
 
 main {
   display: block;
-  margin: 0 auto;
+  margin: 0 auto 10em auto;
   width: 960px;
 }
 
@@ -16,3 +16,23 @@ main {
   transform: rotate(70deg) translateX(2.75em) translateY(-1em);
 }
 
+
+.tooltip {
+  background-color: #fff;
+  border: 1px solid #555;
+  border-radius: 5px;
+  display: none;
+  padding: 1em;
+  position: absolute;
+  z-index: 10;
+}
+
+.tooltip-title {
+  border-bottom: 1px solid #555;
+  margin: 0;
+  padding: 0 0 .5em 0;
+}
+
+.tooltip-section {
+  margin: .5em 0;
+}

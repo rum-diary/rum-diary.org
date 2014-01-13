@@ -23,11 +23,7 @@ RD.Tooltip = (function() {
     },
 
     render: function() {
-      this.tooltip = DOM('<div>')
-        .style('position', 'absolute')
-        .style('z-index', '10')
-        .hide()
-        .appendTo('body');
+      this.tooltip = DOM('<div>').addClass('tooltip').appendTo('body');
 
       if (this.id) this.tooltip.attr('id', this.id);
     },
