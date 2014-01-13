@@ -14,8 +14,10 @@ exports.handler = function(req, res) {
   // don't wanna me hanging around for a response.
   res.send(200, { success: true });
 
-  // the referrer here is the page where the stats were collected,
+  // The referrer here is the page where the stats were collected,
   // not the referrer of the page where the stats were collected.
+  // The referrer of the page where the stats were collection is
+  // collected by the client and sent in the data set.
   var referrer = req.get('referrer');
   logger.info('saving data for: %s', referrer);
 
@@ -25,6 +27,14 @@ exports.handler = function(req, res) {
     var parsedUrl = url.parse(referrer);
     data.hostname = parsedUrl.hostname;
     data.path = parsedUrl.pathname;
+  } catch(e) {}
+
+  try {
+    if (data.referrer) {
+      var parsedReferrer = url.parse(data.referrer);
+      data.referrer_hostname = parsedUrl.hostname;
+      data.referrer_path = parsedUrl.pathname;
+    }
   } catch(e) {}
 
   var ua = useragent.parse(req.get('user-agent'));

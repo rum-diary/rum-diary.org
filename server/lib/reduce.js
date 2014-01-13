@@ -230,13 +230,15 @@ function updateHostname(hostnames, hit) {
 function updateReferrer(referrers, hit) {
   if ( ! hit.referrer) return;
 
-  var hostname;
-  try {
-    // XXX todo - do this on incoming.
-    var parsed = url.parse(hit.referrer);
-    hostname = parsed.hostname;
-  } catch(e) {
-    return;
+  var hostname = hit.referrer_hostname;
+  if ( ! hostname) {
+    /*console.log("referrer_hostname not saved");*/
+    try {
+      var parsed = url.parse(hit.referrer);
+      hostname = parsed.hostname;
+    } catch(e) {
+      return;
+    }
   }
 
   if ( ! referrers[hostname]) {

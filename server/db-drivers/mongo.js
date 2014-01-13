@@ -76,8 +76,10 @@ exports.clear = function (done) {
 const pageLoadSchema = new Schema({
   uuid: String,
   hostname: String,
-  referrer: String,
   path: String,
+  referrer: String,
+  referrer_hostname: String,
+  referrer_path: String,
   os: String,
   browser: {
     family: String,

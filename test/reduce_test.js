@@ -5,6 +5,7 @@
 const mocha = require('mocha');
 const assert = require('chai').assert;
 const moment = require('moment');
+const url = require('url');
 const navigationTimingData = require('./data/navigation-timing.json');
 
 const reduce = require('../server/lib/reduce');
@@ -137,9 +138,17 @@ describe('reduce', function() {
     var copy = [];
 
     // give us a respectable amount of data
-    while(copy.length < 50000) {
+    while(copy.length < 100000) {
       copy = copy.concat(navigationTimingData);
     }
+
+    copy.forEach(function(item, index) {
+      // test to make sure items that were saved with
+      // only referrer are handled correctly.
+      if (index > 1000) {
+        item.referrer_hostname = url.parse(item.referrer).hostname;
+      }
+    });
 
     reduce.mapReduce(copy, [
       'hostnames',
