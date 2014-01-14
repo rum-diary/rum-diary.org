@@ -7,6 +7,7 @@ const Stats = require('fast-stats').Stats;
 const url = require('url');
 const SortedArray = require('sarray');
 const Promise = require('bluebird');
+const EasierObject = require('easierobject').easierObject;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 function ensurePageInfo(returnedData, page, startDate, endDate) {
@@ -71,17 +72,48 @@ function updatePageHit(hitsPerDay, options, hit) {
   incrementDailyPageHit(hitsPerDay, '__all', options.start, date);
 }
 
-exports.calculateNavigationTimingStats = function(values, statsToFind, done) {
-  var returnedStats = {};
-  for (var key in values) {
-    statsToFind.forEach(function(statName) {
-      if ( ! (statName in returnedStats)) returnedStats[statName] = {};
+function toStatsToCalculate(userDefinedStats) {
+  return userDefinedStats.reduce(function(prevValue, curr) {
+    if (curr === 'quartiles') {
+      prevValue.push({
+        statName: 'percentile',
+        args: [25],
+        outName: '25'
+      });
+      prevValue.push({
+        statName: 'percentile',
+        args: [50],
+        outName: '50'
+      });
+      prevValue.push({
+        statName: 'percentile',
+        args: [75],
+        outName: '75'
+      });
+    }
+    else {
+      prevValue.push({
+        statName: curr,
+        args: [],
+        outName: curr
+      });
+    }
+    return prevValue;
+  }, []);
+}
+exports.calculateNavigationTimingStats =
+      function(accumulators, statsUserWants, done) {
+  var statsToCalculate = toStatsToCalculate(statsUserWants);
+  var returnedStats = new EasierObject();
 
-      returnedStats[statName][key] = values[key][statName]();
+  for (var key in accumulators) {
+    statsToCalculate.forEach(function(stat) {
+      returnedStats.setItem(stat.outName, key,
+            accumulators[key][stat.statName].apply(accumulators[key], stat.args));
     });
   }
 
-  done(null, returnedStats);
+  done(null, returnedStats.obj);
 };
 
 exports.findNavigationTimingStats = function (hits, statsToFind, options, done) {

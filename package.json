@@ -25,7 +25,8 @@
     "sarray": "0.0.5",
     "connect-fonts-bitstream-vera-sans": "0.0.1",
     "connect-fonts": "0.0.12",
-    "bluebird": "~0.11.5-1"
+    "bluebird": "~0.11.5-1",
+    "easierobject": "0.0.3"
   },
   "devDependencies": {
     "mocha": "~1.16.1",

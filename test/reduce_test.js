@@ -170,5 +170,33 @@ describe('reduce', function() {
       done();
     });
   });
+
+  it('mapReduce', function(done) {
+    reduce.mapReduce(navigationTimingData, [
+      'navigation'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment(),
+      navigation: {
+        calculate: ['quartiles']
+      }
+    }).then(function(data) {
+      console.log('processing time quartiles', data.processing_time);
+      assert.ok(data.navigation['25']);
+      assert.ok(data.navigation['50']);
+      assert.ok(data.navigation['75']);
+
+      /*
+      console.log('25%', data.navigation['25']);
+      console.log('50%', data.navigation['50']);
+      console.log('75%', data.navigation['75']);
+      */
+
+      done();
+    }).error(function(err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
 });
 

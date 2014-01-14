@@ -31,9 +31,9 @@ exports.handler = function(req, res) {
       start: start,
       end: end,
       navigation: {
-        calculate: ['median']
+        calculate: ['25', 'median', '75']
       }
-    }, function(err, data) {
+    }).then(function(data) {
       var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
 
       var reductionEnd = new Date();
@@ -51,6 +51,8 @@ exports.handler = function(req, res) {
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD')
       });
+    }).catch(function(err) {
+      res.send(500);
     });
   });
 
