@@ -110,9 +110,7 @@ function toStatsToCalculate(userDefinedStats) {
 }
 
 function calculateNavigationTimingStats(accumulators, statsUserWants) {
-  var resolver = Promise.defer();
-
-  try {
+  return Promise.attempt(function() {
     var statsToCalculate = toStatsToCalculate(statsUserWants);
     var returnedStats = new EasierObject();
 
@@ -124,12 +122,8 @@ function calculateNavigationTimingStats(accumulators, statsUserWants) {
       });
     }
 
-    resolver.resolve(returnedStats.obj);
-  } catch(e) {
-    resolver.reject(e);
-  }
-
-  return resolver.promise;
+    return returnedStats.obj;
+  });
 }
 
 exports.findNavigationTimingStats = function (hits, statsToFind, options, done) {
@@ -169,7 +163,7 @@ function createStat(options) {
   return new Stats(options);
 }
 
-function getNavigationTimingObject(options) {
+function getNavigationTimingAccumulators(options) {
   // For descriptions, see:
   // https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model
 
@@ -307,65 +301,61 @@ function updateHitsPerPage(hitsPerPage, hit) {
 }
 
 exports.mapReduce = function(hits, fields, options, done) {
-  var resolver = Promise.defer();
-
   var startTime = new Date();
-  if (typeof options === 'function' && !done) {
-    done = options;
-    options = {};
-  }
+  return Promise.attempt(function() {
+    if (typeof options === 'function' && !done) {
+      done = options;
+      options = {};
+    }
 
-  var data = {};
+    var data = {};
 
-  var doHostnames = fields.indexOf('hostnames') > -1;
-  if (doHostnames) data.hostnames = {};
+    var doHostnames = fields.indexOf('hostnames') > -1;
+    if (doHostnames) data.hostnames = {};
 
-  var doHitsPerPage = fields.indexOf('hits_per_page') > -1;
-  if (doHitsPerPage) data.hits_per_page = { __all: 0 };
+    var doHitsPerPage = fields.indexOf('hits_per_page') > -1;
+    if (doHitsPerPage) data.hits_per_page = { __all: 0 };
 
-  var doReferrers = fields.indexOf('referrers') > -1;
-  if (doReferrers) data.referrers = { by_hostname: {} };
+    var doReferrers = fields.indexOf('referrers') > -1;
+    if (doReferrers) data.referrers = { by_hostname: {} };
 
-  var doNavigation = fields.indexOf('navigation') > -1;
-  if (doNavigation) data.navigation_values = getNavigationTimingObject(options);
+    var doNavigation = fields.indexOf('navigation') > -1;
+    if (doNavigation) data.navigation_accumulators = getNavigationTimingAccumulators(options);
 
-  var doHitsPerDay = fields.indexOf('hits_per_day') > -1;
-  if (doHitsPerDay) {
-    if ( ! options.start) options.start = earliestDate(hits, 'createdAt');
-    if ( ! options.end) options.end = latestDate(hits, 'createdAt');
+    var doHitsPerDay = fields.indexOf('hits_per_day') > -1;
+    if (doHitsPerDay) {
+      if ( ! options.start) options.start = earliestDate(hits, 'createdAt');
+      if ( ! options.end) options.end = latestDate(hits, 'createdAt');
 
-    options.start = moment(options.start).startOf('day').toDate().getTime();
-    options.end = moment(options.end).endOf('day').toDate().getTime();
+      options.start = moment(options.start).startOf('day').toDate().getTime();
+      options.end = moment(options.end).endOf('day').toDate().getTime();
 
-    data.hits_per_day = {};
-    ensurePageInfo(data.hits_per_day, '__all', options.start, options.end);
-  }
+      data.hits_per_day = {};
+      ensurePageInfo(data.hits_per_day, '__all', options.start, options.end);
+    }
 
-  hits.forEach(function(hit) {
-    if (doHostnames) updateHostname(data.hostnames, hit);
-    if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
-    if (doReferrers) updateReferrer(data.referrers.by_hostname, hit);
-    if (doNavigation) updateNavigationTiming(data.navigation_values, hit);
-    if (doHitsPerDay) updatePageHit(data.hits_per_day, options, hit);
-  });
+    hits.forEach(function(hit) {
+      if (doHostnames) updateHostname(data.hostnames, hit);
+      if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
+      if (doReferrers) updateReferrer(data.referrers.by_hostname, hit);
+      if (doNavigation) updateNavigationTiming(data.navigation_accumulators, hit);
+      if (doHitsPerDay) updatePageHit(data.hits_per_day, options, hit);
+    });
 
-  if (doReferrers) {
-    data.referrers.by_count = sortHostnamesByCount(data.referrers.by_hostname);
-  }
+    if (doReferrers) {
+      data.referrers.by_count
+              = sortHostnamesByCount(data.referrers.by_hostname);
+    }
 
-  if (doNavigation) {
-    calculateNavigationTimingStats(
-        data.navigation_values, options.navigation.calculate)
-    .then(function(stats) {
-      data.navigation = stats;
-      resolver.resolve(data);
-    }).error(resolver.reject.bind(resolver));
-  }
-  else {
-    resolver.resolve(data);
-  }
+    if (! doNavigation) return data;
 
-  return resolver.promise.then(function(data) {
+    return calculateNavigationTimingStats(
+        data.navigation_accumulators, options.navigation.calculate)
+      .then(function(navigationTimingStats) {
+        data.navigation = navigationTimingStats;
+        return data;
+      });
+  }).then(function(data) {
     data.processing_time = (new Date().getTime() - startTime.getTime());
     if (done) done(null, data);
     return data;
