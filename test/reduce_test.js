@@ -163,7 +163,7 @@ describe('reduce', function() {
         calculate: ['median']
       }
     }).then(function(data) {
-      console.log('processing time', data.processing_time);
+      console.log('processing time full: %s ms', data.processing_time);
       done();
     }).error(function(err) {
       assert.isTrue(false, err);
@@ -181,16 +181,32 @@ describe('reduce', function() {
         calculate: ['quartiles']
       }
     }).then(function(data) {
-      console.log('processing time quartiles', data.processing_time);
+      console.log('processing time quartiles: %s ms', data.processing_time);
       assert.ok(data.navigation['25']);
       assert.ok(data.navigation['50']);
       assert.ok(data.navigation['75']);
 
-      /*
-      console.log('25%', data.navigation['25']);
-      console.log('50%', data.navigation['50']);
-      console.log('75%', data.navigation['75']);
-      */
+      done();
+    }).error(function(err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
+
+  it('mapReduce', function(done) {
+    reduce.mapReduce(navigationTimingData, [
+      'navigation'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment(),
+      navigation: {
+        calculate: ['25', '50', '75']
+      }
+    }).then(function(data) {
+      console.log('processing time 25, 50, 75: %s ms', data.processing_time);
+      assert.ok(data.navigation['25']);
+      assert.ok(data.navigation['50']);
+      assert.ok(data.navigation['75']);
 
       done();
     }).error(function(err) {

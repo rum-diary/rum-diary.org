@@ -31,7 +31,7 @@ exports.handler = function(req, res) {
       start: start,
       end: end,
       navigation: {
-        calculate: ['25', 'median', '75']
+        calculate: ['25', '50', '75']
       }
     }).then(function(data) {
       var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
@@ -52,6 +52,7 @@ exports.handler = function(req, res) {
         endDate: end.format('MMM DD')
       });
     }).catch(function(err) {
+      logger.error(String(err));
       res.send(500);
     });
   });

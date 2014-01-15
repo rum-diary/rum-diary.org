@@ -74,26 +74,33 @@ function updatePageHit(hitsPerDay, options, hit) {
 
 function toStatsToCalculate(userDefinedStats) {
   return userDefinedStats.reduce(function(prevValue, curr) {
-    if (curr === 'quartiles') {
+    if (! isNaN(curr)) {
       prevValue.push({
-        statName: 'percentile',
+        name: 'percentile',
+        args: [ parseInt(curr, 10) ],
+        outName: curr
+      });
+    }
+    else if (curr === 'quartiles') {
+      prevValue.push({
+        name: 'percentile',
         args: [25],
         outName: '25'
       });
       prevValue.push({
-        statName: 'percentile',
+        name: 'percentile',
         args: [50],
         outName: '50'
       });
       prevValue.push({
-        statName: 'percentile',
+        name: 'percentile',
         args: [75],
         outName: '75'
       });
     }
     else {
       prevValue.push({
-        statName: curr,
+        name: curr,
         args: [],
         outName: curr
       });
@@ -101,20 +108,29 @@ function toStatsToCalculate(userDefinedStats) {
     return prevValue;
   }, []);
 }
-exports.calculateNavigationTimingStats =
-      function(accumulators, statsUserWants, done) {
-  var statsToCalculate = toStatsToCalculate(statsUserWants);
-  var returnedStats = new EasierObject();
 
-  for (var key in accumulators) {
-    statsToCalculate.forEach(function(stat) {
-      returnedStats.setItem(stat.outName, key,
-            accumulators[key][stat.statName].apply(accumulators[key], stat.args));
-    });
+function calculateNavigationTimingStats(accumulators, statsUserWants) {
+  var resolver = Promise.defer();
+
+  try {
+    var statsToCalculate = toStatsToCalculate(statsUserWants);
+    var returnedStats = new EasierObject();
+
+    for (var key in accumulators) {
+      statsToCalculate.forEach(function(stat) {
+        var accumulator = accumulators[key];
+        var value = accumulator[stat.name].apply(accumulator, stat.args);
+        returnedStats.setItem(stat.outName, key, value);
+      });
+    }
+
+    resolver.resolve(returnedStats.obj);
+  } catch(e) {
+    resolver.reject(e);
   }
 
-  done(null, returnedStats.obj);
-};
+  return resolver.promise;
+}
 
 exports.findNavigationTimingStats = function (hits, statsToFind, options, done) {
   if ( ! done && typeof options === 'function') {
@@ -124,7 +140,14 @@ exports.findNavigationTimingStats = function (hits, statsToFind, options, done) 
 
   if ( ! options.navigation) options.navigation = {};
   options.navigation.calculate = statsToFind;
-  getNavigationTimingStats(hits, options, done);
+  exports.mapReduce(hits, ['navigation'], options)
+    .then(function(data) {
+      done(null, data.navigation);
+      return data;
+    }).error(function(reason) {
+      done(reason);
+      return reason;
+    });
 };
 
 function sortHostnamesByCount(countByHostname) {
@@ -234,13 +257,6 @@ function updateNavigationTiming(stats, hit) {
               navTiming.loadEventEnd - navTiming.domLoading);
 }
 
-function getNavigationTimingStats (hits, options, done) {
-  exports.mapReduce(hits, ['navigation'], options, function(err, data) {
-    if (err) return done(err);
-    done(null, data.navigation);
-  });
-}
-
 exports.findHostnames = function(hits, done) {
   exports.mapReduce(hits, ['hostnames'], function(err, data) {
     if (err) return done(err);
@@ -264,7 +280,6 @@ function updateReferrer(referrers, hit) {
 
   var hostname = hit.referrer_hostname;
   if ( ! hostname) {
-    /*console.log("referrer_hostname not saved");*/
     try {
       var parsed = url.parse(hit.referrer);
       hostname = parsed.hostname;
@@ -295,7 +310,7 @@ exports.mapReduce = function(hits, fields, options, done) {
   var resolver = Promise.defer();
 
   var startTime = new Date();
-  if (typeof options === "function" && !done) {
+  if (typeof options === 'function' && !done) {
     done = options;
     options = {};
   }
@@ -339,30 +354,23 @@ exports.mapReduce = function(hits, fields, options, done) {
   }
 
   if (doNavigation) {
-    exports.calculateNavigationTimingStats(data.navigation_values, options.navigation.calculate,
-        function(err, stats) {
-      if (err) return fail(err);
-
+    calculateNavigationTimingStats(
+        data.navigation_values, options.navigation.calculate)
+    .then(function(stats) {
       data.navigation = stats;
-      complete();
-    });
+      resolver.resolve(data);
+    }).error(resolver.reject.bind(resolver));
   }
   else {
-    complete();
+    resolver.resolve(data);
   }
 
-  function fail(reason) {
-    if (done) done(reason);
-    resolver.reject(reason);
-  }
-
-  function complete() {
+  return resolver.promise.then(function(data) {
     data.processing_time = (new Date().getTime() - startTime.getTime());
-    setTimeout(function() {
-      if (done) done(null, data);
-      resolver.resolve(data);
-    }, 0);
-  }
-
-  return resolver.promise;
+    if (done) done(null, data);
+    return data;
+  }).error(function(reason) {
+    if (done) done(reason);
+    return reason;
+  });
 };
