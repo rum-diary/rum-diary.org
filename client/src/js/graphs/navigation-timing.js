@@ -7,7 +7,7 @@
 RD.Graphs.NavigationTiming = (function() {
   'use strict';
 
-  var TOTAL_WIDTH = 182,
+  var TOTAL_WIDTH = 400,
       TOTAL_HEIGHT = 500,
       MARGIN_TOP = 20,
       MARGIN_RIGHT = 80,
@@ -81,16 +81,19 @@ RD.Graphs.NavigationTiming = (function() {
     init: function(options) {
       options = options || {};
 
-      this.data = options.data;
+      this.q1 = options.q1 || [];
+      this.q2 = options.q2 || [];
+      this.q3 = options.q3 || [];
+      this.root = options.root || '#navigation-timing-graph'
     },
 
     render: function() {
       var width = TOTAL_WIDTH - MARGIN_LEFT - MARGIN_RIGHT,
           height = TOTAL_HEIGHT - MARGIN_TOP - MARGIN_BOTTOM;
 
-      var chartData = toChartData(this.data);
+      var chartData = toChartData(this.q1, 0).concat(toChartData(this.q2, 1)).concat(toChartData(this.q3, 2));
 
-      var svg = createSvgElement(width, height);
+      var svg = createSvgElement(this.root, width, height);
 
       var x = createXAxis(svg, width, height, chartData);
 
@@ -116,8 +119,8 @@ RD.Graphs.NavigationTiming = (function() {
             return [d];
           })
         .enter().append('rect')
-          .attr('x', function() {
-            return 10;
+          .attr('x', function(d) {
+            return (1 + d.x) * 10 + (d.x * 50);
           })
           .attr('y', function(d) {
             return y(d.end_y);
@@ -126,7 +129,7 @@ RD.Graphs.NavigationTiming = (function() {
             return y(d.start_y) - y(d.end_y);
           })
           .style('fill', function(d) {
-            return z(d.x);
+            return z(d.z);
           })
           .style('opacity', function() {
             return 0.5;
@@ -167,12 +170,13 @@ RD.Graphs.NavigationTiming = (function() {
 
   return Module;
 
-  function toChartData(navigationTimingData) {
+  function toChartData(navigationTimingData, x) {
     var count = 0;
 
     var chartData = NAVIGATION_TIMING_SECTIONS.map(function(section) {
       var data = {
-        x: count,
+        x: x,
+        z: count,
         end: section.end,
         end_y: navigationTimingData[section.end],
         start: section.start,
@@ -214,8 +218,8 @@ RD.Graphs.NavigationTiming = (function() {
     return y;
   }
 
-  function createSvgElement(width, height) {
-    var svg = d3.select('#navigation-timing-graph').append('svg')
+  function createSvgElement(root, width, height) {
+    var svg = d3.select(root).append('svg')
         .attr('width', width + MARGIN_LEFT + MARGIN_RIGHT)
         .attr('height', height + MARGIN_TOP + MARGIN_BOTTOM)
       .append('g')
@@ -225,8 +229,10 @@ RD.Graphs.NavigationTiming = (function() {
     return svg;
   }
 
-  function setXDomain(x/*, chartData*/) {
-    x.domain([0,1]);
+  function setXDomain(x, chartData) {
+    x.domain([0, d3.max(chartData, function(d) {
+      return d.x;
+    })]);
   }
 
   function setYDomain(y, chartData) {

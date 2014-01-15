@@ -60,13 +60,19 @@ path {
 </section>
 
 <section>
-  <h2>Navigation timing median values</h2>
-  <div id="navigation-timing-graph"></div>
+  <h2>Navigation timing quartile values</h2>
+
+  <div class="navigation-timing-graph" id="navigation-timing-1q-graph"></div>
+
   <table id="medians">
-    {% for key, value in median %}
+    {% for key, first_q_value in first_q %}
+      {% set second_q_value = second_q[key] %}
+      {% set third_q_value = third_q[key] %}
       <tr class="navigation-timing-row">
         <td class="navigation-timing-key">{{key}}</td>
-        <td class="navigation-timing-value">{{value}}</td>
+        <td class="navigation-timing-first_q_value">{{first_q_value}}</td>
+        <td class="navigation-timing-second_q_value">{{second_q_value}}</td>
+        <td class="navigation-timing-third_q_value">{{third_q_value}}</td>
       </tr>
     {% endfor %}
   </table>

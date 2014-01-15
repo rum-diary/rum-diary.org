@@ -27,7 +27,7 @@
     it('draws', function () {
       var graph = RD.Graphs.NavigationTiming.create();
       graph.init({
-        data: navigationTimingData
+        q1: navigationTimingData
       });
       graph.render();
 

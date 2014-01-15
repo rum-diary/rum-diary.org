@@ -26,19 +26,31 @@
 
 
     var navigationTimingEls = [].slice.call(document.querySelectorAll('.navigation-timing-row'));
-    var navigationTimingData = {};
+    var navigationTiming1QData = {};
+    var navigationTiming2QData = {};
+    var navigationTiming3QData = {};
     navigationTimingEls.forEach(function(navigationTimingEl) {
       var keyEl = navigationTimingEl.querySelector('.navigation-timing-key');
-      var valueEl = navigationTimingEl.querySelector('.navigation-timing-value');
 
-      navigationTimingData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
+      var valueEl = navigationTimingEl.querySelector('.navigation-timing-first_q_value');
+      navigationTiming1QData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
+
+      valueEl = navigationTimingEl.querySelector('.navigation-timing-second_q_value');
+      navigationTiming2QData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
+
+      valueEl = navigationTimingEl.querySelector('.navigation-timing-third_q_value');
+      navigationTiming3QData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
     });
 
     var navigationTimingGraph = RD.Graphs.NavigationTiming.create();
     navigationTimingGraph.init({
-      data: navigationTimingData
+      root: '#navigation-timing-1q-graph',
+      q1: navigationTiming1QData,
+      q2: navigationTiming2QData,
+      q3: navigationTiming3QData
     });
     navigationTimingGraph.render();
+
 
     document.getElementById('medians').style.display = 'none';
   }, false);
