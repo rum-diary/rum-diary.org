@@ -3,12 +3,34 @@
 
 {% block headercss %}
   <link rel="stylesheet" type="text/css" href="lib/mocha/mocha.css" />
+  <style>
+
+  body {
+    font: 10px sans-serif;
+  }
+
+  .bar rect {
+    fill: steelblue;
+    shape-rendering: crispEdges;
+  }
+
+  .bar text {
+    fill: #fff;
+  }
+
+  .axis path, .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+</style>
 {% endblock %}
 
 {% block body %}
   <div id="mocha"></div>
   <div id="hits-graph"></div>
   <div id="navigation-timing-graph"></div>
+  <div id="graph"></div>
 {% endblock %}
 
 {% block footerjs %}
