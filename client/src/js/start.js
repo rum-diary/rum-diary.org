@@ -59,9 +59,11 @@
     var graph = RD.Graphs.NavigationTiming.create();
     graph.init({
       root: '#navigation-timing-1q-graph',
-      q1: navigationTiming1QData,
-      q2: navigationTiming2QData,
-      q3: navigationTiming3QData
+      data: [
+        navigationTiming1QData,
+        navigationTiming2QData,
+        navigationTiming3QData
+      ]
     });
     graph.render();
 

@@ -7,7 +7,7 @@
 RD.Graphs.NavigationTiming = (function() {
   'use strict';
 
-  var TOTAL_WIDTH = 400,
+  var TOTAL_WIDTH = 650,
       TOTAL_HEIGHT = 500,
       MARGIN_TOP = 20,
       MARGIN_RIGHT = 80,
@@ -81,85 +81,28 @@ RD.Graphs.NavigationTiming = (function() {
     init: function(options) {
       options = options || {};
 
-      this.q1 = options.q1 || [];
-      this.q2 = options.q2 || [];
-      this.q3 = options.q3 || [];
+      this.data = options.data || [];
       this.root = options.root || '#navigation-timing-graph'
+
+      this.total_width = options.width || TOTAL_WIDTH;
+      this.total_height = options.height || TOTAL_HEIGHT;
     },
 
     render: function() {
-      var width = TOTAL_WIDTH - MARGIN_LEFT - MARGIN_RIGHT,
-          height = TOTAL_HEIGHT - MARGIN_TOP - MARGIN_BOTTOM;
+      var chartWidth = this.total_width - MARGIN_LEFT - MARGIN_RIGHT;
+      var chartHeight = this.total_height - MARGIN_TOP - MARGIN_BOTTOM;
+      var barWidth = (chartWidth / this.data.length) - 20;
 
-      var chartData = toChartData(this.q1, 0).concat(toChartData(this.q2, 1)).concat(toChartData(this.q3, 2));
+      var chartData = toChartData(this.data);
 
-      var svg = createSvgElement(this.root, width, height);
-
-      var x = createXAxis(svg, width, height, chartData);
-
-      var y = createYAxis(svg, width, height, chartData);
-
-      var z = d3.scale.ordinal()
-          .range(BACKGROUND_COLORS);
-
+      var svg = createSvgElement(this.root, chartWidth, chartHeight);
+      var x = createXAxis(svg, chartWidth, chartHeight, chartData);
+      var y = createYAxis(svg, chartWidth, chartHeight, chartData);
+      var z = d3.scale.ordinal().range(BACKGROUND_COLORS);
       var tooltip = createTooltip();
 
-      // Add a group for each section.
-      var section = svg.selectAll('.svg-group')
-          .data(chartData)
-        .enter().append('g')
-          .attr('class', 'section')
-          .style('fill', '#ffffff');
-
-
-      // Add a rect for each field
-      var rect = section.selectAll('rect')
-          .data(function(d) {
-            // data must be returned in an array or else no rects are added.
-            return [d];
-          })
-        .enter().append('rect')
-          .attr('x', function(d) {
-            return (1 + d.x) * 10 + (d.x * 50);
-          })
-          .attr('y', function(d) {
-            return y(d.end_y);
-          })
-          .attr('height', function(d) {
-            return y(d.start_y) - y(d.end_y);
-          })
-          .style('fill', function(d) {
-            return z(d.z);
-          })
-          .style('opacity', function() {
-            return 0.5;
-          })
-          .attr('width', '50')
-          .style('stroke', '#000000')
-          .attr('rx', '5')
-          .on('mouseenter', function(d) {
-            var tooltipHTML = strformat(
-                '<h3 class="tooltip-title">%s</h3>' +
-                '<p class="tooltip-section">%s: %s</p>' +
-                '<p class="tooltip-section">%s: %s</p>',
-                d.name,
-                d.start,
-                d.start_y,
-                d.end,
-                d.end_y);
-
-            tooltip.html(tooltipHTML);
-            tooltip.show();
-          })
-          .on('mousemove', function() {
-            tooltip.move(
-                (d3.event.pageX+10)+'px',
-                (d3.event.pageY-10)+'px');
-          })
-          .on('mouseleave', function(d) {
-            tooltip.hide();
-          });
-
+      var container = drawContainer(svg, chartData);
+      drawSeries(container, x, y, z, barWidth, tooltip);
     }
 
   };
@@ -170,7 +113,13 @@ RD.Graphs.NavigationTiming = (function() {
 
   return Module;
 
-  function toChartData(navigationTimingData, x) {
+  function toChartData(navigationTimingSeries) {
+    return navigationTimingSeries.map(toChartSeries).reduce(function(total, series) {
+      return total.concat(series);
+    }, []);
+  }
+
+  function toChartSeries(navigationTimingData, x) {
     var count = 0;
 
     var chartData = NAVIGATION_TIMING_SECTIONS.map(function(section) {
@@ -215,6 +164,7 @@ RD.Graphs.NavigationTiming = (function() {
             .call(yAxis)
             .selectAll('text')
               .attr('class', 'axis-label axis-label-y');
+
     return y;
   }
 
@@ -251,5 +201,63 @@ RD.Graphs.NavigationTiming = (function() {
     return tooltip;
   }
 
+  function drawContainer(svg, chartData) {
+    return svg.selectAll('.svg-group')
+            .data(chartData)
+          .enter().append('g')
+            .attr('class', 'section')
+            .style('fill', '#ffffff');
+  }
+
+  function drawSeries(container, x, y, z, barWidth, tooltip) {
+      // Add a rect for each field
+      var rect = container.selectAll('rect')
+          .data(function(d) {
+            // data must be returned in an array or else no rects are added.
+            return [d];
+          })
+        .enter().append('rect')
+          .attr('x', function(d) {
+            return (1 + d.x) * 10 + (d.x * barWidth);
+          })
+          .attr('y', function(d) {
+            return y(d.end_y);
+          })
+          .attr('height', function(d) {
+            return y(d.start_y) - y(d.end_y);
+          })
+          .style('fill', function(d) {
+            return z(d.z);
+          })
+          .style('opacity', function() {
+            return 0.5;
+          })
+          .attr('width', '' + barWidth)
+          .style('stroke', '#000000')
+          .attr('rx', '5')
+          .on('mouseenter', function(d) {
+            var tooltipHTML = strformat(
+                '<h3 class="tooltip-title">%s</h3>' +
+                '<p class="tooltip-section">%s: %s</p>' +
+                '<p class="tooltip-section">%s: %s</p>',
+                d.name,
+                d.start,
+                d.start_y,
+                d.end,
+                d.end_y);
+
+            tooltip.html(tooltipHTML);
+            tooltip.show();
+          })
+          .on('mousemove', function() {
+            tooltip.move(
+                (d3.event.pageX+10)+'px',
+                (d3.event.pageY-10)+'px');
+          })
+          .on('mouseleave', function(d) {
+            tooltip.hide();
+          });
+
+  }
 }());
 
