@@ -75,11 +75,18 @@ describe('database', function() {
         uuid: 'shanetomlinson-uuid',
         referrer: 'bigsearchcompany.com',
         tags: ['experiment1', 'tag'],
-      }, done);
+      }, function() {
+        db.save({
+          hostname: 'shanetomlinson.com',
+          uuid: 'shanetomlinson-uuid',
+          referrer: 'bigsearchcompany.com',
+          tags: ['experiment22', 'tag'],
+        }, done);
+      });
     });
 
     it('returns item if tag is stored', function(done) {
-      db.get({ tags: 'experiment1' }, function(err, data) {
+      db.get({ hostname: 'shanetomlinson.com', tags: ['experiment1'] }, function(err, data) {
         assert.equal(data.length, 1);
         assert.equal(data[0].uuid, 'shanetomlinson-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
@@ -90,12 +97,28 @@ describe('database', function() {
     });
 
     it('returns item if other tag is stored', function(done) {
-      db.get({ tags: 'tag' }, function(err, data) {
+      db.get({ tags: ['tag'] }, function(err, data) {
+        assert.equal(data.length, 2);
+        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].tags[1], 'tag');
+        done();
+      });
+    });
+
+    it('returns item if both tags are specified', function(done) {
+      db.get({ tags: ['tag', 'experiment1'] }, function(err, data) {
         assert.equal(data.length, 1);
         assert.equal(data[0].uuid, 'shanetomlinson-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
         assert.equal(data[0].tags[0], 'experiment1');
         assert.equal(data[0].tags[1], 'tag');
+        done();
+      });
+    });
+
+    it('returns no items if any tag is invalid', function(done) {
+      db.get({ tags: ['tag', 'not_valid'] }, function(err, data) {
+        assert.equal(data.length, 0);
         done();
       });
     });

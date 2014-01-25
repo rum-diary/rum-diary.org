@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 (function() {
  var Micrajax = (function() {
-  "use strict";
+  'use strict';
 
   function curry(fToBind) {
     var aArgs = [].slice.call(arguments, 1),
@@ -45,16 +45,16 @@
 
   function toRequestString(data) {
     var components = [],
-        requestString = "";
+        requestString = '';
 
     for(var key in data) {
-      if (typeof data[key] !== "undefined") {
-        components.push(encodeURIComponent(key) + "=" + encodeURIComponent(data[key]));
+      if (typeof data[key] !== 'undefined') {
+        components.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
       }
     }
 
     if (components && components.length) {
-      requestString = components.join("&");
+      requestString = components.join('&');
     }
 
     return requestString;
@@ -79,8 +79,8 @@
   function getURL(url, type, data) {
     var requestString = toRequestString(data);
 
-    if (type === "GET" && requestString) {
-      url += "?" + requestString;
+    if (type === 'GET' && requestString) {
+      url += '?' + requestString;
     }
 
     return url;
@@ -89,10 +89,10 @@
   function getData(contentType, type, data) {
     var sendData;
 
-    if (type !== "GET" && data) {
+    if (type !== 'GET' && data) {
       switch(contentType) {
-        case "application/json":
-          if(typeof data === "string") {
+        case 'application/json':
+          if(typeof data === 'string') {
             sendData = data;
           }
           else {
@@ -117,7 +117,7 @@
     if (xhrObject) {
       xhrObject.onreadystatechange = curry(onReadyStateChange, xhrObject, callback);
 
-      var type = (options.type || "GET").toUpperCase(),
+      var type = (options.type || 'GET').toUpperCase(),
           contentType = options.contentType || 'application/x-www-form-urlencoded',
           url = getURL(options.url, type, options.data);
 
@@ -125,7 +125,7 @@
 
       xhrObject.open(type, url, true);
       var headers = {
-        "Content-type" : contentType
+        'Content-type' : contentType
       };
       for(var k in options.headers) {
         headers[k] = options.headers[k];
@@ -134,7 +134,7 @@
       xhrObject.send(data);
     }
     else {
-      throw "could not get XHR object";
+      throw 'could not get XHR object';
     }
 
     return xhrObject;
@@ -150,7 +150,7 @@
         mockXHR.status = status;
         mockXHR.responseText = responseText;
         if (!mockXHR.statusText)
-          mockXHR.statusText = status !== 0 ? statusText : "error";
+          mockXHR.statusText = status !== 0 ? statusText : 'error';
         mockXHR.readyState = 4;
 
         if (status >= 200 && status < 300 || status === 304) {
@@ -170,7 +170,7 @@
       });
 
       mockXHR.abort = function() {
-        mockXHR.statusText = "aborted";
+        mockXHR.statusText = 'aborted';
         xhrObject.abort();
       };
 
@@ -211,6 +211,7 @@
       this.stored = create(PersistentStorage);
       this.uuid = guid();
 
+      this.tags = options.tags || [];
     },
 
     get: function () {
@@ -219,7 +220,8 @@
         navigationTiming: this.navigationTiming.diff(),
         timers: this.timers.get(),
         events: this.events.get(),
-        referrer: document.referrer || ''
+        referrer: document.referrer || '',
+        tags: this.tags
       };
     },
 
@@ -396,8 +398,11 @@
 (function () {
   'use strict';
 
+  var server = '/* @echo dataCollectionServer */';
   var speedTrap = window.SpeedTrap;
-  speedTrap.init();
+  speedTrap.init({
+    tags: getTagsFromScriptTag()
+  });
 
   try {
     window.addEventListener('load', onloadHandler, false);
@@ -413,7 +418,6 @@
   }
 
   function sendData(data, done) {
-    var server = '/* @echo dataCollectionServer */';
     Micrajax.ajax({
       type: 'POST',
       url: server + '/navigation',
@@ -423,6 +427,20 @@
         done();
       }
     });
+  }
+
+  function getTagsFromScriptTag() {
+    var scripts = document.scripts;
+
+    for (var i = 0; i < scripts.length; ++i) {
+      var script = scripts[i];
+      if (script.src === server + '/include.js') {
+        var tags = script.getAttribute('data-tags') || '';
+        return tags.split(',');
+      }
+    }
+
+    return [];
   }
 
 }());

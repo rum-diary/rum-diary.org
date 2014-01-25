@@ -12,6 +12,7 @@ const logger = require('../lib/logger');
 var PageLoad;
 
 exports.save = function (item, done) {
+  /*console.log("saving item: %s", JSON.stringify(item));*/
   connect(function (err) {
     if (err) return done(err);
     var pageLoad = createPageLoad(item);
@@ -33,23 +34,35 @@ exports.get = function (searchBy, done) {
     };
   }
 
+  if (searchBy.tags) {
+    // If the $all is not specified, then it matches tags in order
+    searchBy.tags = {
+      $all: searchBy.tags
+    };
+  }
+
   connect(function (err) {
     if (err) return;
       logger.info("searching: %s", JSON.stringify(searchBy));
-      PageLoad.find(searchBy, function (err, models) {
-        var endTime = new Date();
-        var duration = endTime.getDate() - startTime.getDate();
-        logger.info('database query time for %s: %s ms',
-                        JSON.stringify(searchBy), duration);
-        if (err) {
+      var query = PageLoad.find(searchBy);
+      query.exec()
+        .onResolve(computeDuration)
+        .then(function(models) {
+          done(null, models);
+        })
+        .then(null, function(err) {
           logger.error("Error while retreiving models: %s", String(err));
-          return done(err);
-        }
-
-        done(null, models);
-      });
+          done(err);
+        });
     }
   );
+
+  function computeDuration() {
+    var endTime = new Date();
+    var duration = endTime.getDate() - startTime.getDate();
+    logger.info('database query time for %s: %s ms',
+                    JSON.stringify(searchBy), duration);
+  }
 };
 
 exports.getByHostname = function (hostname, done) {
