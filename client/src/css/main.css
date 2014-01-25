@@ -14,18 +14,28 @@ main {
 
 section {
   clear: both;
+  margin-bottom: 100px;
 }
 
 #daily-hits {
-  width: 500px;
+  width: 600px;
+  margin: 0 auto;
+}
+
+#referrers {
+  width: 350px;
   float: left;
   clear: none;
 }
 
 #top-pages {
-  width: 350px;
   float: right;
   clear: none;
+  width: 450px;
+}
+
+#navigation-timing {
+  clear: both;
 }
 
 
