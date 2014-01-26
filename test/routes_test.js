@@ -6,6 +6,8 @@ const mocha = require('mocha');
 const assert = require('chai').assert;
 const request = require('request');
 
+const config = require('../server/lib/config');
+
 const startStop = require('./lib/start-stop');
 
 var ROUTES = {
@@ -64,7 +66,7 @@ function respondsWith(key, expectedCode) {
   return function(done) {
     var parts = key.split(' ');
     var verb = parts[0].toUpperCase();
-    var url = 'http://localhost:8000' + parts[1];
+    var url = 'http://localhost:' + config.get('https_port') + parts[1];
     request({
       // disable redirect following to ensure that 301 and 302s are reported.
       followRedirect: false,

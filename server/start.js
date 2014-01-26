@@ -64,8 +64,22 @@ var spdyOptions = {
   plain: true
 };
 
-const PORT = config.get('port');
-spdy.createServer(spdyOptions, app).listen(PORT, function() {
-  logger.info('listening on port', PORT);
+const HTTPS_PORT = config.get('https_port');
+spdy.createServer(spdyOptions, app).listen(HTTPS_PORT, function() {
+  logger.info('https listening on port', HTTPS_PORT);
 });
 
+// set up http redirect. Put this on its own process perhaps?
+const HTTP_PORT = config.get('http_port');
+const http =  express.createServer();
+
+// allow http protocol for local testing.
+const protocol = config.get('ssl') ? 'https://' : 'http://';
+const redirectTo = protocol + config.get('hostname') + (HTTPS_PORT !== 443 ? ':' + HTTPS_PORT : '');
+http.get('*',function(req,res){
+  res.redirect(301, redirectTo + req.url)
+})
+
+http.listen(HTTP_PORT, function() {
+  logger.info('http listening on port', HTTP_PORT);
+});
