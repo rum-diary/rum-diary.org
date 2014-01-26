@@ -9,12 +9,15 @@ const cors = require('cors');
 const spdy = require('spdy');
 const connect_fonts = require('connect-fonts');
 const connect_fonts_vera_sans = require('connect-fonts-bitstream-vera-sans');
+const gzip_static = require('connect-gzip-static');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
 const routes = require('./lib/routes.js');
 const ssl = require('./lib/ssl');
 
+const STATIC_ROOT = path.join(config.get('static_root'),
+                                config.get('static_dir'));
 var app = express();
 
 // Template setup.
@@ -50,9 +53,8 @@ app.use(connect_fonts.setup({
 app.use(routes.middleware);
 
 // Static middleware is last.
-const STATIC_ROOT = path.join(config.get('static_root'),
-                                config.get('static_dir'));
-app.use(express.static(STATIC_ROOT));
+app.use(gzip_static(STATIC_ROOT, { force: true }));
+
 
 // Set up SPDY.
 var spdyOptions = {

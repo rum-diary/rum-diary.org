@@ -20,7 +20,8 @@ module.exports = function (grunt) {
     /*'mocha',*/
     'clean',
     'copy',
-    'uglify'
+    'uglify',
+    'zopfli'
   ]);
 
   grunt.registerTask('default', [
