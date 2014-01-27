@@ -73,6 +73,7 @@
 
   function histogramGraph() {
     var histogramDataEls = DOMinator('#histogram-data li');
+    if (! histogramDataEls.length) return;
     var histogramData = [];
 
     var min, max;
@@ -98,7 +99,7 @@
     histogram.init({
       root: '#histogram-graph',
       data: histogramData,
-      ticks: 75
+      ticks: Math.min(histogramData.length, 75)
     });
     histogram.render();
 

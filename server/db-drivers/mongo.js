@@ -4,6 +4,7 @@
 
 const moment = require('moment');
 const mongoose = require('mongoose');
+const Promise = require('bluebird');
 const mongooseTimestamps = require('mongoose-timestamp');
 const Schema = mongoose.Schema;
 
@@ -21,6 +22,8 @@ exports.save = function (item, done) {
 };
 
 exports.get = function (searchBy, done) {
+  var resolver = Promise.defer();
+
   var startTime = new Date();
   if ( ! done && typeof searchBy === "function") {
     done = searchBy;
@@ -48,14 +51,19 @@ exports.get = function (searchBy, done) {
       query.exec()
         .onResolve(computeDuration)
         .then(function(models) {
-          done(null, models);
+          if (done) done(null, models);
+          resolver.resolve(models);
         })
         .then(null, function(err) {
           logger.error("Error while retreiving models: %s", String(err));
-          done(err);
+          if (done) done(err);
+          resolver.reject(err);
         });
     }
   );
+
+  return resolver.promise;
+
 
   function computeDuration() {
     var endTime = new Date();
