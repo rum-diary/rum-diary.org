@@ -64,6 +64,11 @@ module.exports = {
     format: Boolean,
     'default': true
   },
+  strong_http_caching: {
+    doc: 'Add strong HTTP caching to resources.',
+    format: Boolean,
+    'default': true
+  },
 
   proc_name: getProcName()
 };

@@ -5,7 +5,7 @@
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
   <title>RUM Diary - {% block title %}{% endblock %}</title>
   <link href="/en/vera-regular/fonts.css" type="text/css" rel="stylesheet" />
-  <link href="/css/main.css" type="text/css" rel="stylesheet" />
+  <link href="{{ "/css/main.css" | cachify }}" type="text/css" rel="stylesheet" />
   {% block headercss %}
   {% endblock %}
   <style>
@@ -21,6 +21,8 @@
   </main>
 <script defer src="/include.js" data-tags="experimental,zopfli"></script>
 {% block footerjs %}
+  {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
+  {% endfor %}
 {% endblock %}
 </body>
 </html>

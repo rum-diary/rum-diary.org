@@ -10,6 +10,7 @@ const connect_fonts = require('connect-fonts');
 const connect_fonts_vera_sans = require('connect-fonts-bitstream-vera-sans');
 const gzip_static = require('connect-gzip-static');
 const helmet = require('helmet');
+const cachify = require('connect-cachify');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
@@ -30,9 +31,15 @@ app.use(helmet.contentTypeOptions());
 app.disable('x-powered-by');
 
 // Template setup.
-nunjucks.configure(config.get('views_dir'), {
+var env = nunjucks.configure(config.get('views_dir'), {
   autoescape: true,
   express: app
+});
+
+// sets up a filter to use in the templates that allows for cachifying.
+env.addFilter('cachify', function(str) {
+  if (config.get('strong_http_caching')) return cachify.cachify(str);
+  return str;
 });
 
 // We need to get info out of the request bodies sometimes.
@@ -58,6 +65,12 @@ app.use(connect_fonts.setup({
 // Get all of our routes.
 app.use(routes.middleware);
 
+// set up cachify before the static middleware to strip off any md5's then
+// serve up the correct gzipped item.
+app.use(cachify.setup({}, {
+  root: STATIC_ROOT
+}));
+
 // Static middleware is last.
 app.use(gzip_static(STATIC_ROOT, { force: true }));
 
@@ -77,7 +90,7 @@ spdy.createServer(spdyOptions, app).listen(HTTPS_PORT, function() {
 
 // set up http redirect. Put this on its own process perhaps?
 const HTTP_PORT = config.get('http_port');
-const http =  express.createServer();
+const http =  express();
 http.disable('x-powered-by');
 
 // allow http protocol for local testing.

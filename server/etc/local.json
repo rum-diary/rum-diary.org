@@ -7,6 +7,7 @@
   "spdy": false,
   "static_dir": "src",
   "data_collection_server": "http://localhost:8443",
-  "use_concatenated_resources": false
+  "use_concatenated_resources": false,
+  "strong_http_caching": false
 }
 
