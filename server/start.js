@@ -5,11 +5,11 @@
 const express = require('express');
 const nunjucks = require('nunjucks');
 const path = require('path');
-const cors = require('cors');
 const spdy = require('spdy');
 const connect_fonts = require('connect-fonts');
 const connect_fonts_vera_sans = require('connect-fonts-bitstream-vera-sans');
 const gzip_static = require('connect-gzip-static');
+const helmet = require('helmet');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
@@ -18,7 +18,16 @@ const ssl = require('./lib/ssl');
 
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
-var app = express();
+const app = express();
+
+app.use(helmet.xframe('deny'));
+if (config.get('ssl')) {
+  app.use(helmet.hsts());
+}
+app.use(helmet.csp());
+app.use(helmet.iexss());
+app.use(helmet.contentTypeOptions());
+app.disable('x-powered-by');
 
 // Template setup.
 nunjucks.configure(config.get('views_dir'), {
@@ -28,9 +37,6 @@ nunjucks.configure(config.get('views_dir'), {
 
 // We need to get info out of the request bodies sometimes.
 app.use(express.bodyParser());
-
-// We want CORS headers.
-app.use(cors());
 
 // Send all express logs to our logger.
 app.use(express.logger({
@@ -72,6 +78,7 @@ spdy.createServer(spdyOptions, app).listen(HTTPS_PORT, function() {
 // set up http redirect. Put this on its own process perhaps?
 const HTTP_PORT = config.get('http_port');
 const http =  express.createServer();
+http.disable('x-powered-by');
 
 // allow http protocol for local testing.
 const protocol = config.get('ssl') ? 'https://' : 'http://';

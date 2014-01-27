@@ -4,6 +4,8 @@
 
 const path = require('path');
 const fs = require('fs');
+const cors = require('cors');
+const corsMiddleware = cors();
 const Router = require('express').Router;
 const router = new Router();
 
@@ -28,7 +30,11 @@ function loadRoute(fileName) {
   var route = require(routePath);
 
   if ( ! (route.path && route.verb)) return;
-  router[route.verb](route.path, route.handler);
+  if (route.enable_cors) {
+    router[route.verb](route.path, corsMiddleware, route.handler);
+  } else {
+    router[route.verb](route.path, route.handler);
+  }
 }
 
 module.exports = router;

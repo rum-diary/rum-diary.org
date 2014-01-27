@@ -7,6 +7,8 @@ const assert = require('chai').assert;
 const request = require('request');
 
 const config = require('../server/lib/config');
+const baseURL = 'http://localhost:' + config.get('https_port');
+
 
 const startStop = require('./lib/start-stop');
 
@@ -53,6 +55,21 @@ describe('routes module', function() {
     }
   });
 
+  describe('POST /navigation', function() {
+    it('should have CORS `access-control-allow-origin: *` header', function(done) {
+      request.post(baseURL + '/navigation', function(err, response) {
+        assert.equal(response.statusCode, 200);
+
+        // CORS is only allowed for POST /navigation
+        assert.equal(response.headers['access-control-allow-origin'], '*');
+
+        testCommonResponseHeaders(response);
+
+        done();
+      });
+    });
+  });
+
   describe('stop', function() {
     it('stops', function(done) {
       startStop.stop(function() {
@@ -66,7 +83,7 @@ function respondsWith(key, expectedCode) {
   return function(done) {
     var parts = key.split(' ');
     var verb = parts[0].toUpperCase();
-    var url = 'http://localhost:' + config.get('https_port') + parts[1];
+    var url = baseURL + parts[1];
     request({
       // disable redirect following to ensure that 301 and 302s are reported.
       followRedirect: false,
@@ -74,10 +91,30 @@ function respondsWith(key, expectedCode) {
       method: verb,
     }, function(err, response) {
       assert.equal(response.statusCode, expectedCode);
+
+      // CORS is only allowed for POST /navigation
+      assert.isUndefined(response.headers['access-control-allow-origin']);
+
+      testCommonResponseHeaders(response);
+
       done();
     });
   };
 }
 
+function testCommonResponseHeaders(response) {
+  // Remove the x-powered-by
+  assert.isUndefined(response.headers['x-powered-by']);
+
+  // ensure CSP headers
+  assert.equal(response.headers['x-content-security-policy'],
+            "default-src 'self';");
+
+  // DENY xframes
+  assert.equal(response.headers['x-frame-options'], 'DENY');
+
+  // disable mime type sniffing
+  assert.equal(response.headers['x-content-type-options'], 'nosniff');
+}
 
 

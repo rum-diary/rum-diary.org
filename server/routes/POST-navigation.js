@@ -9,6 +9,7 @@ const db = require('../lib/db');
 
 exports.path = '/navigation';
 exports.verb = 'post';
+exports.enable_cors = true;
 
 exports.handler = function(req, res) {
   // don't wanna me hanging around for a response.
