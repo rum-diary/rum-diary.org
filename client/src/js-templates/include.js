@@ -61,6 +61,21 @@
   }
 
 
+  function setRequestHeaders(definedHeaders, xhrObject) {
+    var headers = {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json;text/plain'
+    };
+
+    for(var definedHeader in definedHeaders) {
+      headers[definedHeader] = definedHeaders[definedHeader];
+    }
+
+    for(var key in headers) {
+      xhrObject.setRequestHeader(key, headers[key]);
+    }
+  }
+
   function getURL(url, type, data) {
     var requestString = toRequestString(data);
 
@@ -115,6 +130,7 @@
       for(var k in options.headers) {
         headers[k] = options.headers[k];
       }
+      setRequestHeaders(headers, xhrObject);
       xhrObject.send(data);
     }
     else {
