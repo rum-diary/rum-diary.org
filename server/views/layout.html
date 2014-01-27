@@ -19,7 +19,7 @@
       We need a body!
     {% endblock %}
   </main>
-<script defer src="/include.js" data-tags="experimental,zopfli"></script>
+<script defer src="/include.js" data-tags="experimental,zopfli,cache"></script>
 {% block footerjs %}
   {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
   {% endfor %}
