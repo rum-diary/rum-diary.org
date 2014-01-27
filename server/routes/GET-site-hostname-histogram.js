@@ -6,6 +6,7 @@ const Promise = require('bluebird');
 const db = require('../lib/db');
 const clientResources = require('../lib/client-resources');
 const getQuery = require('../lib/site-query');
+const Stats = require('fast-stats').Stats;
 
 exports.path = '/site/:hostname/histogram';
 exports.verb = 'get';
@@ -39,7 +40,7 @@ exports.handler = function(req, res) {
 
 function filterNavigationTimingStats(hits, stat) {
   return Promise.attempt(function() {
-    var stats = [];
+    var stats = new Stats({bucket_precision: 10});
 
     hits.forEach(function(hit) {
       var value = hit.navigationTiming[stat] || null;
@@ -47,8 +48,20 @@ function filterNavigationTimingStats(hits, stat) {
       stats.push(value);
     });
 
-    var nintyPercent = Math.ceil(stats.length * 0.9);
 
-    return stats.slice(0, nintyPercent);
+    var values = [];
+    var d = stats.distribution();
+    d.forEach(function(bucket) {
+      if (bucket.count < 2) {
+        /*console.log('too few items for %s - %s', bucket.bucket, bucket.count);*/
+        return;
+      }
+
+      for (var i = 0; i < bucket.count; ++i) {
+        values.push(bucket.bucket);
+      }
+    });
+
+    return values;
   });
 }
