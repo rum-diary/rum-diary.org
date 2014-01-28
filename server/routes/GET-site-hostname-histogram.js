@@ -40,7 +40,7 @@ exports.handler = function(req, res) {
 
 function filterNavigationTimingStats(hits, stat) {
   return Promise.attempt(function() {
-    var stats = new Stats({bucket_precision: 10});
+    var stats = new Stats();
 
     hits.forEach(function(hit) {
       var value = hit.navigationTiming[stat] || null;
@@ -48,9 +48,22 @@ function filterNavigationTimingStats(hits, stat) {
       stats.push(value);
     });
 
+    var filtered = stats.iqr();
+    console.log('difference: %s->%s', hits.length, filtered.length);
+    var range = filtered.range();
+
+    var precision = Math.ceil((range[1] - range[0]) / 75);
+    console.log('precision: %s', precision);
+    var bucketed = new Stats({ bucket_precision: precision });
+    hits.forEach(function(hit, index) {
+      var value = hit.navigationTiming[stat] || NaN;
+      if (isNaN(value) || value === null) return;
+      bucketed.push(value);
+    });
+
 
     var values = [];
-    var d = stats.distribution();
+    var d = bucketed.distribution();
     d.forEach(function(bucket) {
       if (bucket.count < 2) {
         /*console.log('too few items for %s - %s', bucket.bucket, bucket.count);*/
