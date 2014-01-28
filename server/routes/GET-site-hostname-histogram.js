@@ -17,7 +17,7 @@ exports.handler = function(req, res) {
   var end = moment(query.updatedAt['$lte']);
 
   var statName = 'domContentLoadedEventEnd';
-  if (req.query.histogram) statName = req.query.histogram;
+  if (req.query.plot) statName = req.query.plot;
 
   db.get(query)
     .then(function(data) {
@@ -25,12 +25,14 @@ exports.handler = function(req, res) {
     })
     .then(function(stats) {
       res.render('GET-site-hostname-histogram.html', {
+        baseURL: req.url.replace(/\?.*/, ''),
         histogram: stats,
         statName: statName,
         hostname: req.params.hostname,
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD'),
-        resources: clientResources('rum-diary.min.js')
+        resources: clientResources('rum-diary.min.js'),
+        navigationTimingFields: getNavigationTimingFields()
       });
     })
     .then(null, function(err) {
@@ -38,38 +40,65 @@ exports.handler = function(req, res) {
     });
 };
 
+function getNavigationTimingFields() {
+  return Object.keys({
+    'navigationStart': Number,
+    'unloadEventStart': Number,
+    'unloadEventEnd': Number,
+    'redirectStart': Number,
+    'redirectEnd': Number,
+    'fetchStart': Number,
+    'domainLookupStart': Number,
+    'domainLookupEnd': Number,
+    'connectStart': Number,
+    'connectEnd': Number,
+    'secureConnectionStart': Number,
+    'requestStart': Number,
+    'responseStart': Number,
+    'responseEnd': Number,
+    'domLoading': Number,
+    'domInteractive': Number,
+    'domContentLoadedEventStart': Number,
+    'domContentLoadedEventEnd': Number,
+    'domComplete': Number,
+    'loadEventStart': Number,
+    'loadEventEnd': Number
+  });
+}
+
 function filterNavigationTimingStats(hits, stat) {
+  console.log("statName", stat);
   return Promise.attempt(function() {
     var stats = new Stats();
 
     hits.forEach(function(hit) {
-      var value = hit.navigationTiming[stat] || null;
-      if (isNaN(value) || value === null) return;
+      var value = hit.navigationTiming[stat] || NaN;
+      if (isNaN(value) || value === null || value === Infinity) return;
       stats.push(value);
     });
 
-    var filtered = stats.iqr();
-    console.log('difference: %s->%s', hits.length, filtered.length);
-    var range = filtered.range();
+    var iqr = stats.iqr();
+    if (iqr.length === 0) return [];
+    var range = iqr.range();
 
-    var precision = Math.ceil((range[1] - range[0]) / 75);
-    console.log('precision: %s', precision);
+    var start = range[0] || 0;
+    var end = range[1] || (stats.length - 1);
+
+    var buckets = Math.min(iqr.length, 75) || 1;
+    var precision = Math.ceil((end - start) / buckets);
     var bucketed = new Stats({ bucket_precision: precision });
-    hits.forEach(function(hit, index) {
-      var value = hit.navigationTiming[stat] || NaN;
-      if (isNaN(value) || value === null) return;
-      bucketed.push(value);
-    });
 
+    hits.forEach(function(hit) {
+      var value = hit.navigationTiming[stat] || NaN;
+      if (isNaN(value) || value === null || value === Infinity) return;
+      if (start <= value && value <= end) {
+        bucketed.push(value);
+      }
+    });
 
     var values = [];
     var d = bucketed.distribution();
     d.forEach(function(bucket) {
-      if (bucket.count < 2) {
-        /*console.log('too few items for %s - %s', bucket.bucket, bucket.count);*/
-        return;
-      }
-
       for (var i = 0; i < bucket.count; ++i) {
         values.push(bucket.bucket);
       }

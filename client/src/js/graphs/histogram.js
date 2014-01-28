@@ -30,7 +30,7 @@ RD.Graphs.Histogram = (function() {
                    d3.max(this.data, function(d) { return d })])
           .range([0, width]);
 
-      // Generate a histogram using twenty uniformly-spaced bins.
+      // Generate a histogram using uniformly-spaced bins.
       var data = d3.layout.histogram()
           .bins(x.ticks(this.ticks))
           (this.data);

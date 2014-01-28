@@ -36,6 +36,13 @@
       <li>{{ value }}</li>
     {% endfor %}
   </ul>
+  <ul>
+    {% for field in navigationTimingFields %}
+    <li>
+      <a href="{{ baseURL }}?plot={{ field }}">{{ field }}</a>
+    </li>
+    {% endfor %}
+  </ul>
 </section>
 
 {% endblock %}
