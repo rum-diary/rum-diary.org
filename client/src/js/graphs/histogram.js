@@ -7,6 +7,8 @@
 RD.Graphs.Histogram = (function() {
   'use strict';
 
+  var strformat = RD.String.strformat;
+
   var Module = {
     create: function() {
       return Object.create(this);
@@ -35,6 +37,12 @@ RD.Graphs.Histogram = (function() {
           .bins(x.ticks(this.ticks))
           (this.data);
 
+      // use 2px to give a nice border between adjacent elements.
+      var rectWidth = Math.ceil((width / data.length) - 2);
+      // offset the rect by half the width so they
+      // are centered on their x.
+      var rectOffset = (rectWidth / 2) - 1;
+
       var y = d3.scale.linear()
           .domain([0, d3.max(data, function(d) { return d.y; })])
           .range([height, 0]);
@@ -53,19 +61,42 @@ RD.Graphs.Histogram = (function() {
           .data(data)
         .enter().append("g")
           .attr("class", "bar")
-          .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
+          .attr("transform", function(d) { return "translate(" + (x(d.x) - rectOffset) + "," + y(d.y) + ")"; });
+
+      var tooltip = createTooltip();
 
       bar.append("rect")
           .attr("x", 1)
-          .attr("width", x(data[0].dx) - 1)
-          .attr("height", function(d) { return height - y(d.y); });
+          .attr("width", rectWidth)
+          .attr("height", function(d) {
+              return height - y(d.y);
+          })
+          .on('mouseenter', function(d) {
+            var tooltipHTML = strformat(
+                '<h3 class="tooltip-title noborder">%s->%s</h3>',
+                d.x,
+                d.y);
 
+            tooltip.html(tooltipHTML);
+            tooltip.show();
+          })
+          .on('mousemove', function() {
+            tooltip.move(
+                (d3.event.pageX+10)+'px',
+                (d3.event.pageY-10)+'px');
+          })
+          .on('mouseleave', function(d) {
+            tooltip.hide();
+          });
+
+      /*
       bar.append("text")
           .attr("dy", ".75em")
           .attr("y", 6)
           .attr("x", x(data[0].dx) / 2)
           .attr("text-anchor", "middle")
           .text(function(d) { return d.y; });
+          */
 
       svg.append("g")
           .attr("class", "x axis")
@@ -73,6 +104,15 @@ RD.Graphs.Histogram = (function() {
           .call(xAxis);
     }
   };
+
+  function createTooltip() {
+    var tooltip = RD.Tooltip.create();
+    tooltip.init({
+      appendTo: 'body'
+    });
+
+    return tooltip;
+  }
 
   return Module;
 }());

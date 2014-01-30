@@ -64,6 +64,10 @@ section {
   padding: 0 0 .5em 0;
 }
 
+.tooltip-title.noborder {
+  border: none;
+}
+
 .tooltip-section {
   margin: .5em 0;
 }
