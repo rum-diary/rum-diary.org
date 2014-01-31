@@ -40,13 +40,8 @@
 
   {% for resource in resources %}<script src="{{ resource }}"></script>
   {% endfor %}
-  <script>
-    window.addEventListener('load', function() {
-      if (navigator.userAgent.indexOf('PhantomJS') < 0) {
-        mocha.run();
-      }
-    }, false);
-  </script>
+
+  <script src="run.js"></script>
 {% endblock %}
 
 

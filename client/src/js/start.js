@@ -9,6 +9,7 @@
     hitsGraph();
     navigationTimingGraph();
     histogramGraph();
+    cdfGraph();
 
   }, false);
 
@@ -105,6 +106,46 @@
 
     DOMinator('#histogram-data').hide();
   }
+
+
+  function cdfGraph() {
+    var cdfDataEls = DOMinator('#cdf-data tr');
+    if (! cdfDataEls.length) return;
+    var cdfData = [];
+
+    cdfDataEls.forEach(function(rowEl) {
+      var x = DOMinator(rowEl).find('.elapsed-time').inner().trim();
+      if (! x.length) return;
+      if (isNaN(x)) return;
+
+      var y = DOMinator(rowEl).find('.cdf').inner().trim();
+      if (! y.length) return;
+      if (isNaN(y)) return;
+
+      var yVal = parseFloat(y);
+      // cut off at 98%, going all the way to 100% results in often very
+      // skewed graphs.
+      if (yVal > 0.98) return;
+
+      cdfData.push({
+        x: parseInt(x, 10),
+        y: parseFloat(y)
+      });
+    });
+
+    console.log('cdf data', JSON.stringify(cdfData));
+
+    var cdf = RD.Graphs.CDF.create();
+    cdf.init({
+      root: '#cdf-graph',
+      data: cdfData
+    });
+    cdf.render();
+
+    DOMinator('#cdf-data').hide();
+  }
+
+
 
 }());
 

@@ -38,6 +38,10 @@ const DEPENDENCIES = {
       test: 'spec/graphs/histogram_test.js'
     },
     {
+      path: '/js/graphs/cdf.js',
+      test: 'spec/graphs/cdf_test.js'
+    },
+    {
       path: '/js/start.js',
       filter: ['testing']
     }
