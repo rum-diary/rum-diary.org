@@ -23,60 +23,81 @@ path {
   <h1>{{ hostname }} - {{ startDate }} to {{ endDate }}</h1>
 </header>
 
-<section id="daily-hits">
-  <h2>Daily hits</h2>
-  <div id="hits-graph" data-hostname="{{ hostname }}"></div>
-  <table id="hits-data">
-    {% for day in pageHitsPerDay %}
-      <tr class="hits-data-day">
-        <td class="hits-data-date">{{ day.date }}</td>
-        <td class="hits-data-hits">{{ day.hits }}</td>
-      </tr>
-    {% endfor %}
-  </table>
+<section class="row">
+  <section id="overview" class="row-left">
+    <h2>Overview</h2>
+    <dl>
+      <dt class="overview-name small">Today</dt>
+      <dd class="overview-stat">{{ hits.today }}</dd>
+      <dt class="overview-name small">Total</dt>
+      <dd class="overview-stat">{{ hits.total }}</dd>
+      <dt class="overview-name small">Unique</dt>
+      <dd class="overview-stat">{{ hits.unique }}</dd>
+      <dt class="overview-name small">Repeat</dt>
+      <dd class="overview-stat">{{ hits.repeat }}</dd>
+    </dl>
+
+  </section>
+
+  <section id="daily-hits" class="row-right">
+    <h2>Daily hits</h2>
+    <div id="hits-graph" data-hostname="{{ hostname }}"></div>
+    <table id="hits-data">
+      {% for day in pageHitsPerDay %}
+        <tr class="hits-data-day">
+          <td class="hits-data-date">{{ day.date }}</td>
+          <td class="hits-data-hits">{{ day.hits }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </section>
 </section>
 
-<section id="top-pages">
-  <h2>Top Pages</h2>
-  <table id="page-views">
-    {% for page in pageHitsPerPage %}
-      <tr>
-        <td>{% if page.page == "__all" %}Total{% else %}<a href="{{ root_url }}/path{{ page.page }}">{{ page.page }}</a>{% endif %}</td>
-        <td>{{ page.hits }}</td>
-      </tr>
-    {% endfor %}
-  </table>
+
+<section class="row">
+  <section id="referrers" class="row-left">
+    <h2>Top referrers</h2>
+    <dl id="referrers">
+      {% for referrer in referrers %}
+        <dt class="referrers-hostname">{{ referrer.hostname }}</dt>
+        <dd class="referrers-count small">{{ referrer.count }}</dd>
+      {% endfor %}
+    </dl>
+  </section>
+
+  <section id="top-pages" class="row-right">
+    <h2>Top Pages</h2>
+    <dl id="page-views">
+      {% for page in pageHitsPerPage %}
+        {% if page.page != "__all" %}
+          <dt class="hits-path"><a href="{{ root_url }}/path{{ page.page }}">{{ page.page }}</a></dt>
+          <dd class="hits-count small">{{ page.hits }}</dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+  </section>
+
 </section>
 
-<section id="referrers">
-  <h2>Top referrers</h2>
-  <table id="referrers">
-    {% for referrer in referrers %}
-      <tr>
-        <td>{{ referrer.hostname }}</td>
-        <td>{{ referrer.count }}</td>
-      </tr>
-    {% endfor %}
-  </table>
-</section>
+<section class="row">
+  <section id="navigation-timing" class="row-center">
+    <h2>Navigation timing quartile values</h2>
 
-<section id="navigation-timing">
-  <h2>Navigation timing quartile values</h2>
+    <div class="navigation-timing-graph" id="navigation-timing-1q-graph"></div>
 
-  <div class="navigation-timing-graph" id="navigation-timing-1q-graph"></div>
-
-  <table id="medians">
-    {% for key, first_q_value in first_q %}
-      {% set second_q_value = second_q[key] %}
-      {% set third_q_value = third_q[key] %}
-      <tr class="navigation-timing-row">
-        <td class="navigation-timing-key">{{key}}</td>
-        <td class="navigation-timing-first_q_value">{{first_q_value}}</td>
-        <td class="navigation-timing-second_q_value">{{second_q_value}}</td>
-        <td class="navigation-timing-third_q_value">{{third_q_value}}</td>
-      </tr>
-    {% endfor %}
-  </table>
+    <table id="medians">
+      {% for key, first_q_value in first_q %}
+        {% set second_q_value = second_q[key] %}
+        {% set third_q_value = third_q[key] %}
+        <tr class="navigation-timing-row">
+          <td class="navigation-timing-key">{{key}}</td>
+          <td class="navigation-timing-first_q_value">{{first_q_value}}</td>
+          <td class="navigation-timing-second_q_value">{{second_q_value}}</td>
+          <td class="navigation-timing-third_q_value">{{third_q_value}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </section>
 </section>
 
 {% endblock %}
