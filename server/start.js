@@ -47,7 +47,7 @@ app.use(express.bodyParser());
 
 // Send all express logs to our logger.
 app.use(express.logger({
-  format: 'short',
+  format: 'tiny',
   stream: {
     write: function(x) {
       logger.info(typeof x === 'string' ? x.trim() : x);
