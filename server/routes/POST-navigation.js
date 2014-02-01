@@ -33,10 +33,12 @@ exports.handler = function(req, res) {
   try {
     if (data.referrer) {
       var parsedReferrer = url.parse(data.referrer);
-      data.referrer_hostname = parsedUrl.hostname;
-      data.referrer_path = parsedUrl.pathname;
+      data.referrer_hostname = parsedReferrer.hostname;
+      data.referrer_path = parsedReferrer.pathname;
     }
-  } catch(e) {}
+  } catch(e) {
+    logger.warn('error parsing referrer: %s', String(e));
+  }
 
   var ua = useragent.parse(req.get('user-agent'));
   data.os = ua.os;

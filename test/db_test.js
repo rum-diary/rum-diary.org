@@ -53,7 +53,9 @@ describe('database', function() {
       db.save({
         hostname: 'shanetomlinson.com',
         uuid: 'shanetomlinson-uuid',
-        referrer: 'bigsearchcompany.com'
+        referrer: 'https://bigsearchcompany.com/search',
+        referrer_hostname: 'bigsearchcompany.com',
+        referrer_path: '/search'
       }, done);
     });
 
@@ -62,7 +64,9 @@ describe('database', function() {
         assert.isNull(err);
         assert.equal(data.length, 1);
         assert.equal(data[0].uuid, 'shanetomlinson-uuid');
-        assert.equal(data[0].referrer, 'bigsearchcompany.com');
+        assert.equal(data[0].referrer, 'https://bigsearchcompany.com/search');
+        assert.equal(data[0].referrer_hostname, 'bigsearchcompany.com');
+        assert.equal(data[0].referrer_path, '/search');
         done();
       });
     });
