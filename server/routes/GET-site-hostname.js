@@ -26,7 +26,9 @@ exports.handler = function(req, res) {
       'hits_per_day',
       'hits_per_page',
       'referrers',
-      'navigation'
+      'navigation',
+      'unique',
+      'returning'
     ], {
       start: start,
       end: end,
@@ -38,12 +40,7 @@ exports.handler = function(req, res) {
 
       var reductionEnd = new Date();
       var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
-
-      var totalHits = pageHitsPerPageSorted[0].hits;
-      // force unique visitors to be at least 80%;
-      var uniqueMultiplier = 0.8 + Math.random() * 0.2;
-      var unique = Math.floor(uniqueMultiplier * totalHits);
-      var repeat = totalHits - unique;
+      logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
       res.render('GET-site-hostname.html', {
         root_url: req.url.replace(/\?.*/, ''),
@@ -59,9 +56,9 @@ exports.handler = function(req, res) {
         endDate: end.format('MMM DD'),
         hits: {
           today: data.hits_per_day.__all[data.hits_per_day.__all.length - 1].hits,
-          total: totalHits,
-          unique: unique,
-          repeat: repeat
+          total: pageHitsPerPageSorted[0].hits,
+          unique: data.unique,
+          repeat: data.returning
         }
       });
     }).catch(function(err) {

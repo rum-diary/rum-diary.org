@@ -212,6 +212,13 @@
       this.uuid = guid();
 
       this.tags = options.tags || [];
+
+      // store a bit with the site being tracked to avoid sending cookies to
+      // rum-diary.org. This bit keeps track whether the user has visited
+      // this site before. Since localStorage is scoped to a particular
+      // domain, it is not shared with other sites.
+      this.returning = !!localStorage.getItem('_st');
+      localStorage.setItem('_st', '1');
     },
 
     get: function () {
@@ -221,7 +228,8 @@
         timers: this.timers.get(),
         events: this.events.get(),
         referrer: document.referrer || '',
-        tags: this.tags
+        tags: this.tags,
+        returning: this.returning
       };
     },
 
@@ -388,7 +396,6 @@
   }
 
   exports.SpeedTrap = create(SpeedTrap);
-  exports.SpeedTrap.init();
 
 }(this));
 

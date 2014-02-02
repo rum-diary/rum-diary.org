@@ -55,7 +55,8 @@ describe('database', function() {
         uuid: 'shanetomlinson-uuid',
         referrer: 'https://bigsearchcompany.com/search',
         referrer_hostname: 'bigsearchcompany.com',
-        referrer_path: '/search'
+        referrer_path: '/search',
+        returning: true
       }, done);
     });
 
@@ -67,6 +68,7 @@ describe('database', function() {
         assert.equal(data[0].referrer, 'https://bigsearchcompany.com/search');
         assert.equal(data[0].referrer_hostname, 'bigsearchcompany.com');
         assert.equal(data[0].referrer_path, '/search');
+        assert.equal(data[0].returning, true);
         done();
       });
     });

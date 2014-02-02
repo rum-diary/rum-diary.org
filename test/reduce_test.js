@@ -171,7 +171,7 @@ describe('reduce', function() {
     });
   });
 
-  it('mapReduce', function(done) {
+  it('mapReduce with navigation quartiles', function(done) {
     reduce.mapReduce(navigationTimingData, [
       'navigation'
     ], {
@@ -193,20 +193,30 @@ describe('reduce', function() {
     });
   });
 
-  it('mapReduce', function(done) {
+  it('mapReduce to calculate unique visitors', function(done) {
     reduce.mapReduce(navigationTimingData, [
-      'navigation'
+      'unique'
     ], {
       start: moment(new Date()).subtract('days', 30),
-      end: moment(),
-      navigation: {
-        calculate: ['25', '50', '75']
-      }
+      end: moment()
     }).then(function(data) {
-      console.log('processing time 25, 50, 75: %s ms', data.processing_time);
-      assert.ok(data.navigation['25']);
-      assert.ok(data.navigation['50']);
-      assert.ok(data.navigation['75']);
+      assert.equal(data.unique, 8);
+
+      done();
+    }).error(function(err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
+
+  it('mapReduce to calculate returning visitors', function(done) {
+    reduce.mapReduce(navigationTimingData, [
+      'returning'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function(data) {
+      assert.equal(data.returning, 1);
 
       done();
     }).error(function(err) {

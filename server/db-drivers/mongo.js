@@ -137,7 +137,8 @@ const pageLoadSchema = new Schema({
       timestamp: Number
     }
   ],
-  tags: [ String ]
+  tags: [ String ],
+  returning: Boolean
 });
 
 pageLoadSchema.plugin(mongooseTimestamps);
