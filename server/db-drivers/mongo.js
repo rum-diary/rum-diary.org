@@ -10,20 +10,18 @@ const Schema = mongoose.Schema;
 
 const logger = require('../lib/logger');
 
-var PageLoad;
+var PageView;
 
 exports.save = function (item, done) {
   /*console.log("saving item: %s", JSON.stringify(item));*/
-  connect(function (err) {
-    if (err) return done(err);
-    var pageLoad = createPageLoad(item);
-    pageLoad.save(done);
-  });
+  connect().then(function () {
+    var pageView = createPageView(item);
+    pageView.save(done);
+  })
+  .then(null, done);
 };
 
 exports.get = function (searchBy, done) {
-  var resolver = Promise.defer();
-
   var startTime = new Date();
   if ( ! done && typeof searchBy === "function") {
     done = searchBy;
@@ -44,26 +42,22 @@ exports.get = function (searchBy, done) {
     };
   }
 
-  connect(function (err) {
-    if (err) return;
-      logger.info("searching: %s", JSON.stringify(searchBy));
-      var query = PageLoad.find(searchBy);
-      query.exec()
-        .onResolve(computeDuration)
-        .then(function(models) {
-          if (done) done(null, models);
-          resolver.resolve(models);
-        })
-        .then(null, function(err) {
-          logger.error("Error while retreiving models: %s", String(err));
-          if (done) done(err);
-          resolver.reject(err);
-        });
-    }
-  );
-
-  return resolver.promise;
-
+  return connect().then(function() {
+    logger.info("searching: %s", JSON.stringify(searchBy));
+    var query = PageView.find(searchBy);
+    return query.exec();
+  })
+  .then(function(models) {
+    computeDuration();
+    if (done) done(null, models);
+    return models;
+  })
+  .then(null, function(err) {
+    computeDuration();
+    logger.error("Error while retreiving models: %s", String(err));
+    if (done) done(err);
+    throw err;
+  });
 
   function computeDuration() {
     var endTime = new Date();
@@ -78,10 +72,8 @@ exports.getByHostname = function (hostname, done) {
 };
 
 exports.clear = function (done) {
-  connect(function (err) {
-    if (err) return done(err);
-
-    PageLoad.find(function (err, models) {
+  connect().then(function() {
+    PageView.find(function (err, models) {
       if (err) return done(err);
 
       models.forEach(function (model) {
@@ -90,11 +82,11 @@ exports.clear = function (done) {
 
       done(null);
     });
-  });
+  }).then(null, done);
 };
 
 
-const pageLoadSchema = new Schema({
+const pageViewSchema = new Schema({
   uuid: String,
   hostname: String,
   path: String,
@@ -141,22 +133,23 @@ const pageLoadSchema = new Schema({
   returning: Boolean
 });
 
-pageLoadSchema.plugin(mongooseTimestamps);
+pageViewSchema.plugin(mongooseTimestamps);
 
-PageLoad = mongoose.model('PageLoad', pageLoadSchema);
+PageView = mongoose.model('PageView', pageViewSchema);
 
 
-function createPageLoad(data) {
-  var pageLoad = new PageLoad(data);
-  return pageLoad;
+function createPageView(data) {
+  var pageView = new PageView(data);
+  return pageView;
 }
 
 
-var connected = false;
-var connectionError;
-function connect(done) {
-  if (connectionError) return done(connectionError);
-  if (connected) return done(null);
+var connectionResolver = Promise.defer();
+var connectionResolved = false;
+function connect() {
+  if (connectionResolved) {
+    return connectionResolver.promise;
+  }
 
   mongoose.connect('mongodb://localhost/test');
   var db = mongoose.connection;
@@ -164,15 +157,17 @@ function connect(done) {
   db.on('error', function (err) {
     logger.error('Error connecting to database: %s', String(err));
 
-    connectionError = err;
-    done(err);
+    connectionResolved = true;
+    connectionResolver.reject(err);
   });
 
   db.once('open', function callback() {
     logger.info('Connected to database');
 
-    connected = true;
-    done(null, db);
+    connectionResolved = true;
+    connectionResolver.fulfill();
   });
+
+  return connectionResolver.promise;
 }
 
