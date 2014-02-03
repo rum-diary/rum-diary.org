@@ -6,10 +6,7 @@ const config = require('../lib/config');
 const logger = require('../lib/logger');
 const db = getDatabase();
 
-exports.save = db.save;
-exports.get = db.get;
-exports.clear = db.clear;
-exports.getByHostname = db.getByHostname;
+module.exports = db;
 
 function getDatabase() {
   var driver = config.get('database_driver');

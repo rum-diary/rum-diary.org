@@ -11,70 +11,33 @@ const Schema = mongoose.Schema;
 const logger = require('../lib/logger');
 
 var PageView = require('./mongo/page_view');
-/*
 var Site = require('./mongo/site');
 var User = require('./mongo/user');
-*/
 
-exports.save = function (item, done) {
-  /*console.log("saving item: %s", JSON.stringify(item));*/
-  return connect().then(function () {
-    return PageView.save(item, done);
-  });
-};
-
-exports.get = function (searchBy, done) {
-  if ( ! done && typeof searchBy === 'function') {
-    done = searchBy;
-    searchBy = {};
-  }
-
-  return connect().then(function () {
-    return PageView.get(searchBy);
-  }).then(function(models) {
-    if (done) done(null, models);
-    return models;
-  }).then(null, function(err) {
-    if (done) done(err);
-    throw err;
-  });
+exports.save = PageView.create.bind(PageView);
+exports.get = PageView.get.bind(PageView);
+exports.getOne = PageView.getOne.bind(PageView);
+exports.clear = function(done) {
+  return PageView.clear()
+    .then(function() {
+      return User.clear();
+    })
+    .then(function() {
+      return Site.clear();
+    })
+    .then(function() {
+      if (done) done(null);
+    });
 };
 
 exports.getByHostname = function (hostname, done) {
   return exports.get({ hostname: hostname }, done);
 };
 
-exports.clear = function (done) {
-  return connect().then(function () {
-    return PageView.clear(done);
-  });
+exports.user = {
+  create: User.create.bind(User),
+  get: User.get.bind(User),
+  getOne: User.getOne.bind(User),
+  clear: User.clear.bind(User)
 };
-
-
-var connectionResolver = Promise.defer();
-var connectionResolved = false;
-function connect() {
-  if (connectionResolved) {
-    return connectionResolver.promise;
-  }
-
-  mongoose.connect('mongodb://localhost/test');
-  var db = mongoose.connection;
-
-  db.on('error', function (err) {
-    logger.error('Error connecting to database: %s', String(err));
-
-    connectionResolved = true;
-    connectionResolver.reject(err);
-  });
-
-  db.once('open', function callback() {
-    logger.info('Connected to database');
-
-    connectionResolved = true;
-    connectionResolver.fulfill();
-  });
-
-  return connectionResolver.promise;
-}
 

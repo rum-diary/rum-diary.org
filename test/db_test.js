@@ -8,15 +8,15 @@ const assert = require('chai').assert;
 const db = require('../server/lib/db');
 
 
-beforeEach(function(done) {
-  db.clear(done);
-});
-
-afterEach(function(done) {
-  db.clear(done);
-});
-
 describe('database', function() {
+  beforeEach(function(done) {
+    db.clear(done);
+  });
+
+  afterEach(function(done) {
+    db.clear(done);
+  });
+
   describe('save', function() {
     it('should save without an error', function(done) {
       db.save({
@@ -136,6 +136,96 @@ describe('database', function() {
       });
     });
   });
+
+  describe('getOne', function() {
+    beforeEach(function(done) {
+      db.save({
+        hostname: 'shanetomlinson.com',
+        uuid: 'shanetomlinson-uuid',
+        referrer: 'bigsearchcompany.com',
+        tags: ['experiment1', 'tag'],
+      }, function() {
+        db.save({
+          hostname: 'shanetomlinson.com',
+          uuid: 'shanetomlinson-uuid',
+          referrer: 'bigsearchcompany.com',
+          tags: ['experiment22', 'tag'],
+        }, done);
+      });
+    });
+
+    it('returns one item', function(done) {
+      db.getOne({ hostname: 'shanetomlinson.com', tags: ['experiment1'] })
+        .then(function(item) {
+          assert.equal(item.uuid, 'shanetomlinson-uuid');
+          assert.equal(item.referrer, 'bigsearchcompany.com');
+          assert.equal(item.tags[0], 'experiment1');
+          assert.equal(item.tags[1], 'tag');
+          done();
+        }).then(null, function(err) {
+          done();
+        });
+    });
+  });
+
+  describe('user', function() {
+    describe('create', function () {
+      it('should create an item', function (done) {
+        db.user.create({
+          name: 'Site Administrator',
+          email: 'testuser@testuser.com'
+        }).then(done);
+      });
+    });
+
+    describe('get', function () {
+      it('should get one or more saved users', function (done) {
+        db.user.create({
+          name: 'Site Administrator',
+          email: 'testuser@testuser.com'
+        }).then(function() {
+          return db.user.create({
+            name: 'Another Administrator',
+            email: 'testuser2@testuser.com'
+          });
+        }).then(function() {
+          return db.user.get({
+            email: 'testuser2@testuser.com'
+          });
+        }).then(function(users) {
+          console.log('users', users);
+          assert.equal(users[0].name, 'Another Administrator');
+          assert.equal(users[0].email, 'testuser2@testuser.com');
+          done();
+        });
+      });
+    });
+
+    describe('getOne', function () {
+      it('should get a saved user', function (done) {
+        db.user.create({
+          name: 'Site Administrator',
+          email: 'testuser@testuser.com'
+        }).then(function() {
+          return db.user.create({
+            name: 'Another Administrator',
+            email: 'testuser2@testuser.com'
+          });
+        }).then(function() {
+          return db.user.getOne({
+            email: 'testuser@testuser.com'
+          });
+        }).then(function(user) {
+          /*
+          assert.equal(user.name, 'Site Administrator');
+          assert.equal(user.email, 'testuser@testuser.com');
+          */
+          done();
+        });
+      });
+    });
+  });
+
 
 });
 

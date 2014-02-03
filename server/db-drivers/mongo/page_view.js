@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+// Page view model. Commonly referred to as a 'hit'
+
 const moment = require('moment');
 const Model = require('./model');
 const Schema = require('mongoose').Schema;
@@ -54,7 +56,7 @@ const pageViewDefinition = {
 };
 
 const PageViewModel = Object.create(Model);
-PageViewModel.create('PageView', pageViewDefinition);
+PageViewModel.init('PageView', pageViewDefinition);
 PageViewModel.getSearchBy = function (searchBy) {
   // default to a 30 day search unless overridden.
   if ( ! searchBy.updatedAt) {
