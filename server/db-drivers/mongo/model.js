@@ -15,18 +15,39 @@ const logger = require('../../lib/logger');
 
 exports.init = function (name, definition) {
   const schema = new Schema(definition);
+
   schema.plugin(mongooseTimestamps);
+
   const Model = mongoose.model(name, schema);
 
   this.name = name;
   this.Model = Model;
 };
 
-exports.create = withDatabase(function (item, done) {
-  /*console.log('saving item: %s', JSON.stringify(item));*/
+/**
+ * Create and save a model from a data item
+ */
+exports.create = function (item, done) {
+  var model = this.createModel(item);
+  return this.update(model, done);
+};
+
+/**
+ * save an already created model to the database. A slight misnomer for the
+ * sake of understandability. Most of the time, update should only be called by
+ * consumers of the API to update a model. create will call update to save the
+ * initial version of the model to the database.
+ * If the item is not yet converted to a model, use create instead.
+ */
+exports.update = withDatabase(function (model, done) {
   var resolver = Promise.defer();
 
-  var model = this.createModel(item);
+  if (! model.save) {
+    resolver.reject('attempting to save an item that is not a model. Try create instead.');
+    if (done) done(new Error('attempting to save an item that is not a model Try create instead.'));
+    return;
+  }
+
   model.save(function(err, model, numAffected) {
     if (err) {
       resolver.reject(err);

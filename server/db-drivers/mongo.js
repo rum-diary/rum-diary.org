@@ -34,8 +34,17 @@ exports.getByHostname = function (hostname, done) {
   return exports.get({ hostname: hostname }, done);
 };
 
+exports.pageView = {
+  create: PageView.create.bind(PageView),
+  update: PageView.update.bind(PageView),
+  get: PageView.get.bind(PageView),
+  getOne: PageView.getOne.bind(PageView),
+  clear: PageView.clear.bind(PageView)
+};
+
 exports.user = {
   create: User.create.bind(User),
+  update: User.update.bind(User),
   get: User.get.bind(User),
   getOne: User.getOne.bind(User),
   clear: User.clear.bind(User)
@@ -43,8 +52,10 @@ exports.user = {
 
 exports.site = {
   create: Site.create.bind(Site),
+  update: Site.update.bind(Site),
   get: Site.get.bind(Site),
   getOne: Site.getOne.bind(Site),
-  clear: Site.clear.bind(Site)
+  clear: Site.clear.bind(Site),
+  hit: Site.hit.bind(Site)
 };
 

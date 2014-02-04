@@ -233,17 +233,19 @@ describe('database', function() {
     });
 
     describe('getOne', function () {
-      it('should get one matched hostname', function (done) {
+      beforeEach(function (done) {
         db.site.create({
           hostname: 'testsite.com'
         }).then(function() {
           return db.site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(function() {
-          return db.site.getOne({
-            hostname: 'testsite.com'
-          });
+        }).then(done);
+      });
+
+      it('should get one matched hostname', function (done) {
+        db.site.getOne({
+          hostname: 'testsite.com'
         }).then(function(site) {
           assert.equal(site.hostname, 'testsite.com');
           assert.equal(site.total_hits, 0);
@@ -253,16 +255,18 @@ describe('database', function() {
     });
 
     describe('get', function () {
-      it('should return one or more matches', function (done) {
+      beforeEach(function (done) {
         db.site.create({
           hostname: 'testsite.com'
         }).then(function() {
           return db.site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(function() {
-          return db.site.get({});
-        }).then(function(sites) {
+        }).then(done);
+      });
+
+      it('should return one or more matches', function (done) {
+        db.site.get({}).then(function(sites) {
           assert.equal(sites.length, 2);
           assert.equal(sites[0].hostname, 'testsite.com');
           assert.equal(sites[0].total_hits, 0);
@@ -270,6 +274,35 @@ describe('database', function() {
           assert.equal(sites[1].total_hits, 0);
           done();
         });
+      });
+    });
+
+    describe('hit', function () {
+      beforeEach(function (done) {
+        db.site.create({
+          hostname: 'testsite.com'
+        }).then(function() {
+          return db.site.create({
+            hostname: 'rum-diary.org'
+          });
+        }).then(done);
+      });
+
+      it('should increment the hit_count of the model by one', function (done) {
+        db.site.hit({ hostname: 'testsite.com' })
+          .then(function() {
+            return db.site.hit({ hostname: 'testsite.com' })
+          })
+          .then(function() {
+            return db.site.get({});
+          }).then(function(sites) {
+            assert.equal(sites.length, 2);
+            assert.equal(sites[0].hostname, 'testsite.com');
+            assert.equal(sites[0].total_hits, 2);
+            assert.equal(sites[1].hostname, 'rum-diary.org');
+            assert.equal(sites[1].total_hits, 0);
+            done();
+          });
       });
     });
   });
