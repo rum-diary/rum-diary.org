@@ -24,8 +24,21 @@ exports.init = function (name, definition) {
 
 exports.create = withDatabase(function (item, done) {
   /*console.log('saving item: %s', JSON.stringify(item));*/
+  var resolver = Promise.defer();
+
   var model = this.createModel(item);
-  return model.save(done);
+  model.save(function(err, model, numAffected) {
+    if (err) {
+      resolver.reject(err);
+      if (done) done(err);
+      return;
+    }
+
+    resolver.fulfill(null, model);
+    if (done) done(null, model);
+  });
+
+  return resolver.promise;
 });
 
 exports.get = withDatabase(function (searchBy, done) {
@@ -95,16 +108,12 @@ exports.getOne = withDatabase(function (searchBy, done) {
 exports.clear = withDatabase(function (done) {
   var resolver = Promise.defer();
 
-  return this.Model.find(function (err, models) {
+  this.Model.remove(function (err) {
     if (err) {
       if (done) done(err);
       resolver.reject(err);
       return;
     }
-
-    models.forEach(function (model) {
-      model.remove();
-    });
 
     if (done) done(null);
     resolver.fulfill();

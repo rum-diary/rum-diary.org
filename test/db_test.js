@@ -193,7 +193,6 @@ describe('database', function() {
             email: 'testuser2@testuser.com'
           });
         }).then(function(users) {
-          console.log('users', users);
           assert.equal(users[0].name, 'Another Administrator');
           assert.equal(users[0].email, 'testuser2@testuser.com');
           done();
@@ -216,10 +215,8 @@ describe('database', function() {
             email: 'testuser@testuser.com'
           });
         }).then(function(user) {
-          /*
           assert.equal(user.name, 'Site Administrator');
           assert.equal(user.email, 'testuser@testuser.com');
-          */
           done();
         });
       });
