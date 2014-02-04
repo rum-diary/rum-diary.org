@@ -41,3 +41,10 @@ exports.user = {
   clear: User.clear.bind(User)
 };
 
+exports.site = {
+  create: Site.create.bind(Site),
+  get: Site.get.bind(Site),
+  getOne: Site.getOne.bind(Site),
+  clear: Site.clear.bind(Site)
+};
+

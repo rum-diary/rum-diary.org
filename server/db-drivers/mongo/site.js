@@ -9,7 +9,11 @@ const Schema = require('mongoose').Schema;
 
 const siteDefinition = {
   hostname: String,
-  total_hits: Number
+  total_hits: {
+    type: Number,
+    default: 0
+  }
+
 };
 
 const SiteModel = Object.create(Model);

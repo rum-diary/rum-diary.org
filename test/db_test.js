@@ -223,6 +223,57 @@ describe('database', function() {
     });
   });
 
+  describe('site', function() {
+    describe('create', function () {
+      it('should create an item', function (done) {
+        db.site.create({
+          hostname: 'testsite.com'
+        }).then(done);
+      });
+    });
+
+    describe('getOne', function () {
+      it('should get one matched hostname', function (done) {
+        db.site.create({
+          hostname: 'testsite.com'
+        }).then(function() {
+          return db.site.create({
+            hostname: 'rum-diary.org'
+          });
+        }).then(function() {
+          return db.site.getOne({
+            hostname: 'testsite.com'
+          });
+        }).then(function(site) {
+          assert.equal(site.hostname, 'testsite.com');
+          assert.equal(site.total_hits, 0);
+          done();
+        });
+      });
+    });
+
+    describe('get', function () {
+      it('should return one or more matches', function (done) {
+        db.site.create({
+          hostname: 'testsite.com'
+        }).then(function() {
+          return db.site.create({
+            hostname: 'rum-diary.org'
+          });
+        }).then(function() {
+          return db.site.get({});
+        }).then(function(sites) {
+          assert.equal(sites.length, 2);
+          assert.equal(sites[0].hostname, 'testsite.com');
+          assert.equal(sites[0].total_hits, 0);
+          assert.equal(sites[1].hostname, 'rum-diary.org');
+          assert.equal(sites[1].total_hits, 0);
+          done();
+        });
+      });
+    });
+  });
+
 
 });
 
