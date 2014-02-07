@@ -127,6 +127,7 @@ exports.getOne = withDatabase(function (searchBy, done) {
 });
 
 exports.clear = withDatabase(function (done) {
+  logger.warn('clearing table: %s', this.name);
   var resolver = Promise.defer();
 
   this.Model.remove(function (err) {

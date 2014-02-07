@@ -25,6 +25,7 @@ exports.save = deprecated('save', 'pageView.create', PageView.create.bind(PageVi
 exports.get = deprecated('get', 'pageView.get', PageView.get.bind(PageView));
 exports.getOne = deprecated('getOne', 'pageView.getOne', PageView.getOne.bind(PageView));
 exports.clear = function(done) {
+  logger.warn('clearing database');
   return PageView.clear()
     .then(function() {
       return User.clear();
