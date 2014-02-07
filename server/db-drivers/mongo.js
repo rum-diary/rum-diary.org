@@ -17,7 +17,7 @@ var User = require('./mongo/user');
 function deprecated(oldName, newName, callback) {
   return function() {
     logger.warn('mongo.js->:%s is deprecated, please use %s', oldName, newName);
-    callback.apply(null, arguments);
+    return callback.apply(null, arguments);
   }
 };
 

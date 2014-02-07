@@ -47,7 +47,7 @@ main {
   margin: 0 50px 0 auto;
 }
 
-.row-right{
+.row-right {
   float: left;
   width: 600px;
   margin: 0 auto 0 50px;
@@ -56,6 +56,11 @@ main {
 .row-center {
   width: 650px;
   margin: 0 auto;
+}
+
+.half {
+  width: 50%;
+  margin: 0;
 }
 
 #navigation-timing {
@@ -95,6 +100,21 @@ main {
   margin: .5em 0;
 }
 
+.list-unstyled {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navigation-timing-item {
+  margin: .35em 0;
+}
+
+
+svg {
+  font: 10px sans-serif;
+}
+
 .axis path, .axis line {
   fill: none;
   stroke: #000;
@@ -104,3 +124,14 @@ main {
 .area {
   fill: steelblue;
 }
+
+.bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.bar text {
+  fill: #fff;
+}
+
+
