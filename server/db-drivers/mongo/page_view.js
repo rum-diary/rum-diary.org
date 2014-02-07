@@ -56,7 +56,9 @@ const pageViewDefinition = {
 };
 
 const PageViewModel = Object.create(Model);
-PageViewModel.init('PageView', pageViewDefinition);
+// use PageLoad as the name of the collection instead of PageView
+// so that we do not lose the production data. :/
+PageViewModel.init('PageLoad', pageViewDefinition);
 PageViewModel.getSearchBy = function (searchBy) {
   // default to a 30 day search unless overridden.
   if ( ! searchBy.updatedAt) {
