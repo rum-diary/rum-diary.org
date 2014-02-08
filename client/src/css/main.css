@@ -67,15 +67,6 @@ main {
 }
 
 
-.axis-label {
-  font-size: 0.8em;
-}
-
-.axis-label-x {
-  transform: rotate(70deg) translateX(2.75em) translateY(-1em);
-}
-
-
 .tooltip {
   background-color: #fff;
   border: 1px solid #555;
@@ -114,6 +105,29 @@ main {
 svg {
   font: 10px sans-serif;
 }
+
+path {
+    stroke: steelblue;      /* the line colour for paths is steelblue */
+    stroke-width: 2;      /* the line width for paths is 2 pixels */
+    fill: none;         /* don't fill the area bounded by any path elements */
+}
+
+.axis-label {
+  font-size: 0.8em;
+}
+
+.axis-label-x {
+  transform: rotate(70deg) translateX(2.75em) translateY(-1em);
+}
+
+.axis path,
+.axis line {
+    fill: none;         /* don't fill areas bounded by the axis line */
+    stroke: grey;       /* make the axis line grey */
+    stroke-width: 1;      /* make the width of the axis lines 1 pixel */
+    shape-rendering: crispEdges;/* make the edges sharp */
+}
+
 
 .axis path, .axis line {
   fill: none;
