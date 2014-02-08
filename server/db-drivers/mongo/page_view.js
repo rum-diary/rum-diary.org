@@ -6,7 +6,9 @@
 
 const moment = require('moment');
 const Model = require('./model');
-const Schema = require('mongoose').Schema;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const ObjectId = mongoose.Types.ObjectId;
 
 const pageViewDefinition = {
   uuid: String,
@@ -62,10 +64,22 @@ const PageViewModel = Object.create(Model);
 PageViewModel.init('PageLoad', pageViewDefinition);
 PageViewModel.getSearchBy = function (searchBy) {
   // default to a 30 day search unless overridden.
-  if ( ! searchBy.updatedAt) {
-    searchBy.updatedAt = {
+  if ( ! searchBy.createdAt) {
+    searchBy.createdAt = {
       $gte: moment().subtract('days', 30).toDate()
     };
+  }
+
+  // mongo does not have a createdAt, instead the id contains a timestamp.
+  // convert createdAt to the timestamp.
+  if ( ! searchBy._id && searchBy.createdAt) {
+    searchBy._id = {};
+
+    for (var key in searchBy.createdAt) {
+      searchBy._id[key] = objectIdWithTimestamp(searchBy.createdAt[key]);
+    }
+
+    delete searchBy.createdAt;
   }
 
   if (searchBy.tags) {
@@ -77,6 +91,22 @@ PageViewModel.getSearchBy = function (searchBy) {
 
   return searchBy;
 };
+
+
+// This function returns an ObjectId embedded with a given datetime
+// Accepts both Date object and string input
+
+function objectIdWithTimestamp(timestamp)
+{
+    // Convert date object to hex seconds since Unix epoch
+    var hexSeconds = Math.floor(timestamp.getTime()/1000).toString(16);
+
+    // Create an ObjectId with that hex timestamp
+    var constructedObjectId = new ObjectId(hexSeconds + "0000000000000000");
+
+    return constructedObjectId
+}
+
 
 
 module.exports = PageViewModel;

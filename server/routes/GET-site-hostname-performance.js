@@ -19,8 +19,8 @@ exports.verb = 'get';
 exports.handler = function(req, res) {
   console.log('handler kicked in');
   var query = getQuery(req);
-  var start = moment(query.updatedAt['$gte']);
-  var end = moment(query.updatedAt['$lte']);
+  var start = moment(query.createdAt['$gte']);
+  var end = moment(query.createdAt['$lte']);
 
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;

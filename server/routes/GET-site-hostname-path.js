@@ -15,8 +15,8 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query.updatedAt['$gte']);
-  var end = moment(query.updatedAt['$lte']);
+  var start = moment(query.createdAt['$gte']);
+  var end = moment(query.createdAt['$lte']);
 
   var hostname = req.params[0];
   var path = req.params[1] || 'index';

@@ -191,4 +191,3 @@ function connect() {
   return connectionResolver.promise;
 }
 
-

@@ -62,7 +62,7 @@ function latestDate(data, dateName) {
 }
 
 function updatePageHit(hitsPerDay, options, hit) {
-  var date = new Date(hit.updatedAt);
+  var date = new Date(hit.createdAt);
 
   if (hit.path) {
     ensurePageInfo(hitsPerDay, hit.path, options.start, options.end);

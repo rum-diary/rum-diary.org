@@ -7,10 +7,17 @@
 // a little inefficient script to go through the database and count all
 // uncounted pageViews that have not been added to the site's hit count.
 
+const moment = require('moment');
 const Promise = require('bluebird');
 const db = require('../server/lib/db');
 
- db.pageView.get({})
+const sites = {};
+
+db.pageView.get({
+    createdAt: {
+      $gte: moment('2010-01-01').toDate()
+    }
+  })
   .then(function(sites) {
     return sites.filter(function(site) {
       if (!site.is_counted) return site;
@@ -25,26 +32,44 @@ const db = require('../server/lib/db');
       var next = uncounted.shift();
       if (!next) return resolver.fulfill();
 
-      db.site.getOne({ hostname: next.hostname })
-        .then(function(site) {
-          if ( ! site) {
-            return db.site.create({
-              hostname: next.hostname
-            });
-          }
-
-          return site;
-        })
-        .then(function(site) {
-          return db.site.hit({ hostname: next.hostname });
-        })
+      next.is_counted = true;
+      db.pageView.update(next)
         .then(function() {
-          next.is_counted = true;
-          return db.pageView.update(next);
+          var hostname = next.hostname;
+
+          if (hostname) {
+            if (!(hostname in sites)) {
+              sites[hostname] = 0;
+            }
+
+            sites[hostname]++;
+          }
         })
         .then(countNext);
     }
     countNext();
+
+    return resolver.promise;
+  })
+  .then(function() {
+    var resolver = Promise.defer();
+
+    console.log('counts: %s', JSON.stringify(sites));
+    var hostnames = Object.keys(sites);
+
+    function updateNext() {
+      var hostname = hostnames.shift();
+      if (!hostname) return resolver.fulfill();
+
+      db.site.ensureExists(hostname)
+                .then(function(site) {
+                  site.total_hits += sites[hostname];
+                  console.log('%s total hits: %s', hostname, site.total_hits);
+                  return db.site.update(site);
+                })
+                .then(updateNext);
+    }
+    updateNext();
 
     return resolver.promise;
   })
