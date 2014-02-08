@@ -11,7 +11,7 @@ exports.path = '/navigation';
 exports.verb = 'post';
 exports.enable_cors = true;
 
-exports.handler = function(req, res) {
+exports.handler = function (req, res) {
   // don't wanna me hanging around for a response.
   res.send(200, { success: true });
 
@@ -48,7 +48,12 @@ exports.handler = function(req, res) {
     minor: ua.minor
   };
 
-  db.save(data, function() {
-    logger.info('data saved');
-  });
+  return db.site.hit(data.hostname)
+            .then(function () {
+              data.is_counted = true;
+              return db.pageView.create(data)
+            })
+            .then(function () {
+              logger.info('data saved');
+            });
 };

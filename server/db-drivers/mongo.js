@@ -66,6 +66,7 @@ exports.site = {
   get: Site.get.bind(Site),
   getOne: Site.getOne.bind(Site),
   clear: Site.clear.bind(Site),
-  hit: Site.hit.bind(Site)
+  hit: Site.hit.bind(Site),
+  ensureExists: Site.ensureExists.bind(Site)
 };
 

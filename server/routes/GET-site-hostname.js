@@ -14,10 +14,10 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query.updatedAt['$gte']);
-  var end = moment(query.updatedAt['$lte']);
+  var start = moment(query.createdAt['$gte']);
+  var end = moment(query.createdAt['$lte']);
 
-  db.get(query, function(err, hits) {
+  db.pageView.get(query, function(err, hits) {
     if (err) return res.send(500);
 
     var reductionStart = new Date();

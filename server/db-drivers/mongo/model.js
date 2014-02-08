@@ -55,7 +55,7 @@ exports.update = withDatabase(function (model, done) {
       return;
     }
 
-    resolver.fulfill(null, model);
+    resolver.fulfill(model);
     if (done) done(null, model);
   });
 
@@ -190,5 +190,4 @@ function connect() {
 
   return connectionResolver.promise;
 }
-
 

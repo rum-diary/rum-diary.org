@@ -24,7 +24,7 @@ module.exports = function(req) {
     end = moment().endOf('day');
   }
 
-  query.updatedAt = {
+  query.createdAt = {
     '$gte': start.toDate(),
     '$lte': end.toDate()
   };
