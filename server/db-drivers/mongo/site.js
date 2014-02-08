@@ -18,12 +18,23 @@ const siteDefinition = {
 
 const SiteModel = Object.create(Model);
 SiteModel.init('Site', siteDefinition);
-SiteModel.hit = function(params) {
-  var self = this;
-  return this.getOne(params)
-            .then(function(model) {
-              if (! model) throw new Error('no matching site: %s', params);
 
+SiteModel.ensureExists = function(hostname) {
+  var self = this;
+  return this.getOne({ hostname: hostname })
+              .then(function(model) {
+                if (model) return model;
+
+                return self.create({
+                  hostname: hostname
+                });
+              });
+};
+
+SiteModel.hit = function(hostname) {
+  var self = this;
+  return this.ensureExists(hostname)
+            .then(function(model) {
               model.total_hits++;
               return self.update(model);
             });

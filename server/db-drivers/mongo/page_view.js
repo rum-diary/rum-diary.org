@@ -52,7 +52,8 @@ const pageViewDefinition = {
     }
   ],
   tags: [ String ],
-  returning: Boolean
+  returning: Boolean,
+  is_counted: Boolean
 };
 
 const PageViewModel = Object.create(Model);
