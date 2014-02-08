@@ -19,7 +19,7 @@ describe('database', function() {
 
   describe('save', function() {
     it('should save without an error', function(done) {
-      db.save({
+      db.pageView.create({
         uuid: 'the-first-uuid'
       }, function(err) {
         assert.isNull(err);
@@ -30,13 +30,13 @@ describe('database', function() {
 
   describe('get', function() {
     beforeEach(function(done) {
-      db.save({
+      db.pageView.create({
         uuid: 'another-uuid'
       }, done);
     });
 
     it('should get saved data', function(done) {
-      db.get(function(err, data) {
+      db.pageView.get(function(err, data) {
         assert.isNull(err);
         assert.equal(data.length, 1);
         var item = data[0];
@@ -50,7 +50,7 @@ describe('database', function() {
 
   describe('getByHostname', function() {
     beforeEach(function(done) {
-      db.save({
+      db.pageView.create({
         hostname: 'shanetomlinson.com',
         uuid: 'shanetomlinson-uuid',
         referrer: 'https://bigsearchcompany.com/search',
@@ -61,7 +61,7 @@ describe('database', function() {
     });
 
     it('should return data for the specified hostname', function(done) {
-      db.getByHostname('shanetomlinson.com', function(err, data) {
+      db.pageView.getByHostname('shanetomlinson.com', function(err, data) {
         assert.isNull(err);
         assert.equal(data.length, 1);
         assert.equal(data[0].uuid, 'shanetomlinson-uuid');
@@ -76,13 +76,13 @@ describe('database', function() {
 
   describe('get with tags', function() {
     beforeEach(function(done) {
-      db.save({
+      db.pageView.create({
         hostname: 'shanetomlinson.com',
         uuid: 'shanetomlinson-uuid',
         referrer: 'bigsearchcompany.com',
         tags: ['experiment1', 'tag'],
       }, function() {
-        db.save({
+        db.pageView.create({
           hostname: 'shanetomlinson.com',
           uuid: 'shanetomlinson-uuid',
           referrer: 'bigsearchcompany.com',
@@ -92,7 +92,7 @@ describe('database', function() {
     });
 
     it('returns item if tag is stored', function(done) {
-      db.get({ hostname: 'shanetomlinson.com', tags: ['experiment1'] }, function(err, data) {
+      db.pageView.get({ hostname: 'shanetomlinson.com', tags: ['experiment1'] }, function(err, data) {
         assert.equal(data.length, 1);
         assert.equal(data[0].uuid, 'shanetomlinson-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
@@ -103,7 +103,7 @@ describe('database', function() {
     });
 
     it('returns item if other tag is stored', function(done) {
-      db.get({ tags: ['tag'] }, function(err, data) {
+      db.pageView.get({ tags: ['tag'] }, function(err, data) {
         assert.equal(data.length, 2);
         assert.equal(data[0].uuid, 'shanetomlinson-uuid');
         assert.equal(data[0].tags[1], 'tag');
@@ -112,7 +112,7 @@ describe('database', function() {
     });
 
     it('returns item if both tags are specified', function(done) {
-      db.get({ tags: ['tag', 'experiment1'] }, function(err, data) {
+      db.pageView.get({ tags: ['tag', 'experiment1'] }, function(err, data) {
         assert.equal(data.length, 1);
         assert.equal(data[0].uuid, 'shanetomlinson-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
@@ -123,14 +123,14 @@ describe('database', function() {
     });
 
     it('returns no items if any tag is invalid', function(done) {
-      db.get({ tags: ['tag', 'not_valid'] }, function(err, data) {
+      db.pageView.get({ tags: ['tag', 'not_valid'] }, function(err, data) {
         assert.equal(data.length, 0);
         done();
       });
     });
 
     it('returns no items if tag is not found', function(done) {
-      db.get({ tags: 'not_valid' }, function(err, data) {
+      db.pageView.get({ tags: 'not_valid' }, function(err, data) {
         assert.equal(data.length, 0);
         done();
       });
@@ -139,13 +139,13 @@ describe('database', function() {
 
   describe('getOne', function() {
     beforeEach(function(done) {
-      db.save({
+      db.pageView.create({
         hostname: 'shanetomlinson.com',
         uuid: 'shanetomlinson-uuid',
         referrer: 'bigsearchcompany.com',
         tags: ['experiment1', 'tag'],
       }, function() {
-        db.save({
+        db.pageView.create({
           hostname: 'shanetomlinson.com',
           uuid: 'shanetomlinson-uuid',
           referrer: 'bigsearchcompany.com',
@@ -155,7 +155,7 @@ describe('database', function() {
     });
 
     it('returns one item', function(done) {
-      db.getOne({ hostname: 'shanetomlinson.com', tags: ['experiment1'] })
+      db.pageView.getOne({ hostname: 'shanetomlinson.com', tags: ['experiment1'] })
         .then(function(item) {
           assert.equal(item.uuid, 'shanetomlinson-uuid');
           assert.equal(item.referrer, 'bigsearchcompany.com');
@@ -233,17 +233,19 @@ describe('database', function() {
     });
 
     describe('getOne', function () {
-      it('should get one matched hostname', function (done) {
+      beforeEach(function (done) {
         db.site.create({
           hostname: 'testsite.com'
         }).then(function() {
           return db.site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(function() {
-          return db.site.getOne({
-            hostname: 'testsite.com'
-          });
+        }).then(done);
+      });
+
+      it('should get one matched hostname', function (done) {
+        db.site.getOne({
+          hostname: 'testsite.com'
         }).then(function(site) {
           assert.equal(site.hostname, 'testsite.com');
           assert.equal(site.total_hits, 0);
@@ -253,16 +255,18 @@ describe('database', function() {
     });
 
     describe('get', function () {
-      it('should return one or more matches', function (done) {
+      beforeEach(function (done) {
         db.site.create({
           hostname: 'testsite.com'
         }).then(function() {
           return db.site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(function() {
-          return db.site.get({});
-        }).then(function(sites) {
+        }).then(done);
+      });
+
+      it('should return one or more matches', function (done) {
+        db.site.get({}).then(function(sites) {
           assert.equal(sites.length, 2);
           assert.equal(sites[0].hostname, 'testsite.com');
           assert.equal(sites[0].total_hits, 0);
@@ -270,6 +274,35 @@ describe('database', function() {
           assert.equal(sites[1].total_hits, 0);
           done();
         });
+      });
+    });
+
+    describe('hit', function () {
+      beforeEach(function (done) {
+        db.site.create({
+          hostname: 'testsite.com'
+        }).then(function() {
+          return db.site.create({
+            hostname: 'rum-diary.org'
+          });
+        }).then(done);
+      });
+
+      it('should increment the hit_count of the model by one', function (done) {
+        db.site.hit({ hostname: 'testsite.com' })
+          .then(function() {
+            return db.site.hit({ hostname: 'testsite.com' })
+          })
+          .then(function() {
+            return db.site.get({});
+          }).then(function(sites) {
+            assert.equal(sites.length, 2);
+            assert.equal(sites[0].hostname, 'testsite.com');
+            assert.equal(sites[0].total_hits, 2);
+            assert.equal(sites[1].hostname, 'rum-diary.org');
+            assert.equal(sites[1].total_hits, 0);
+            done();
+          });
       });
     });
   });

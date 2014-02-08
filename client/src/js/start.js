@@ -59,12 +59,14 @@
 
     var graph = RD.Graphs.NavigationTiming.create();
     graph.init({
-      root: '#navigation-timing-1q-graph',
+      root: '#navigation-timing-graph',
       data: [
         navigationTiming1QData,
         navigationTiming2QData,
         navigationTiming3QData
-      ]
+      ],
+      width: DOMinator('#navigation-timing-graph').nth(0).clientWidth,
+      height: '250'
     });
     graph.render();
 
@@ -100,7 +102,9 @@
     histogram.init({
       root: '#histogram-graph',
       data: histogramData,
-      ticks: Math.min(histogramData.length, 75)
+      ticks: Math.min(histogramData.length, 75),
+      width: DOMinator('#histogram-graph').nth(0).clientWidth,
+      height: '350'
     });
     histogram.render();
 
@@ -138,7 +142,9 @@
     var cdf = RD.Graphs.CDF.create();
     cdf.init({
       root: '#cdf-graph',
-      data: cdfData
+      data: cdfData,
+      width: DOMinator('#cdf-graph').nth(0).clientWidth,
+      height: '350'
     });
     cdf.render();
 

@@ -18,5 +18,15 @@ const siteDefinition = {
 
 const SiteModel = Object.create(Model);
 SiteModel.init('Site', siteDefinition);
+SiteModel.hit = function(params) {
+  var self = this;
+  return this.getOne(params)
+            .then(function(model) {
+              if (! model) throw new Error('no matching site: %s', params);
+
+              model.total_hits++;
+              return self.update(model);
+            });
+};
 
 module.exports = SiteModel;

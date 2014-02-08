@@ -14,10 +14,18 @@ var PageView = require('./mongo/page_view');
 var Site = require('./mongo/site');
 var User = require('./mongo/user');
 
-exports.save = PageView.create.bind(PageView);
-exports.get = PageView.get.bind(PageView);
-exports.getOne = PageView.getOne.bind(PageView);
+function deprecated(oldName, newName, callback) {
+  return function() {
+    logger.warn('mongo.js->:%s is deprecated, please use %s', oldName, newName);
+    return callback.apply(null, arguments);
+  }
+};
+
+exports.save = deprecated('save', 'pageView.create', PageView.create.bind(PageView));
+exports.get = deprecated('get', 'pageView.get', PageView.get.bind(PageView));
+exports.getOne = deprecated('getOne', 'pageView.getOne', PageView.getOne.bind(PageView));
 exports.clear = function(done) {
+  logger.warn('clearing database');
   return PageView.clear()
     .then(function() {
       return User.clear();
@@ -30,12 +38,23 @@ exports.clear = function(done) {
     });
 };
 
-exports.getByHostname = function (hostname, done) {
-  return exports.get({ hostname: hostname }, done);
+exports.pageView = {
+  create: PageView.create.bind(PageView),
+  update: PageView.update.bind(PageView),
+  get: PageView.get.bind(PageView),
+  getOne: PageView.getOne.bind(PageView),
+  getByHostname: function (hostname, done) {
+    return PageView.get({ hostname: hostname }, done);
+  },
+  clear: PageView.clear.bind(PageView)
 };
+
+exports.getByHostname = deprecated('getByHostname', 'pageView.getByHostname', exports.pageView.getByHostname);
+
 
 exports.user = {
   create: User.create.bind(User),
+  update: User.update.bind(User),
   get: User.get.bind(User),
   getOne: User.getOne.bind(User),
   clear: User.clear.bind(User)
@@ -43,8 +62,10 @@ exports.user = {
 
 exports.site = {
   create: Site.create.bind(Site),
+  update: Site.update.bind(Site),
   get: Site.get.bind(Site),
   getOne: Site.getOne.bind(Site),
-  clear: Site.clear.bind(Site)
+  clear: Site.clear.bind(Site),
+  hit: Site.hit.bind(Site)
 };
 
