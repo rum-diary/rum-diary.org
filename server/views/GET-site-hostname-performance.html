@@ -1,7 +1,15 @@
 {% extends "layout.html" %}
 {% block title %}{{ hostname }} - Performance{% endblock %}
 
+{% block navigation %}
+  <ul>
+    <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
+    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
+  </ul>
+{% endblock %}
+
 {% block body %}
+
 <header>
   <h1>{{ statName }}</h1>
   <h2 class="small">{{ hostname }} - {{ startDate }} to {{ endDate }}</h2>

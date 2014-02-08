@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block title %}{{ hostname }} info{% endblock %}
+
+{% block navigation %}
+  <ul>
+    <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
+    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
+  </ul>
+{% endblock %}
+
+{% block body %}
+<header>
+  <h1>{{ hostname }} Demographics - {{ startDate }} to {{ endDate }}</h2>
+</header>
+
+<section class="row">
+  Browser, OS, mobile vs tablet vs desktop stats go here.
+
+</section>
+
+{% endblock %}
+
+

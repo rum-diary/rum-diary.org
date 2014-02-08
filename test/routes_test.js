@@ -22,6 +22,7 @@ var ROUTES = {
   'GET /site/localhost?start=2013-12-25&end=2014-01-05'
                                       : 200,
   'GET /site/localhost/performance'   : 200,
+  'GET /site/localhost/demographics'  : 200,
   'GET /site/localhost/all'           : 200,
   'GET /site/localhost/navigation'    : 200,
   'GET /site/localhost/navigation/medians'
