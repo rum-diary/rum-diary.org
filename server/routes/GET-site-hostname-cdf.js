@@ -22,7 +22,7 @@ exports.handler = function(req, res) {
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;
 
-  db.get(query)
+  db.pageView.get(query)
     .then(function(data) {
       return filterNavigationTimingStats(data, statName);
     })

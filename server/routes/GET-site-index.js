@@ -10,7 +10,7 @@ exports.path = '/site';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
-  db.get(function(err, data) {
+  db.pageView.get(function(err, data) {
     if (err) {
       return logger.error('DB.get error', String(err));
     }

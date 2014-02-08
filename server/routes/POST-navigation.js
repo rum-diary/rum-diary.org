@@ -48,7 +48,7 @@ exports.handler = function(req, res) {
     minor: ua.minor
   };
 
-  db.save(data, function() {
+  db.pageView.save(data, function() {
     logger.info('data saved');
   });
 };

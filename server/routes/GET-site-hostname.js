@@ -17,7 +17,7 @@ exports.handler = function(req, res) {
   var start = moment(query.updatedAt['$gte']);
   var end = moment(query.updatedAt['$lte']);
 
-  db.get(query, function(err, hits) {
+  db.pageView.get(query, function(err, hits) {
     if (err) return res.send(500);
 
     var reductionStart = new Date();

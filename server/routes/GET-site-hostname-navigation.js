@@ -10,7 +10,7 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  db.get(query, function(err, data) {
+  db.pageView.get(query, function(err, data) {
     if (err) return res.send(500);
 
     // TODO - filter this info!

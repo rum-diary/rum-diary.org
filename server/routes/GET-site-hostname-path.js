@@ -29,7 +29,7 @@ exports.handler = function(req, res) {
   query.hostname = hostname;
   query.path = path;
 
-  db.get(query, function(err, hits) {
+  db.pageView.get(query, function(err, hits) {
     var reductionStart = new Date();
 
     reduce.mapReduce(hits, [
