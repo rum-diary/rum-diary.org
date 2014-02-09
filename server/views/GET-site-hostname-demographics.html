@@ -19,16 +19,14 @@
   <h2>Browser breakdown</h2>
   <div id="browsers-graph"></div>
 
-  <div>
-    <table id="browsers-data">
-      {% for browser, count in browsers %}
-        <tr class="browsers-data-browser">
-          <td class="browsers-data-browser">{{ browser }}</td>
-          <td class="browsers-data-count">{{ count }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  </div>
+  <table id="browsers-data">
+    {% for browser, count in browsers %}
+      <tr class="browsers-data-item">
+        <td class="browsers-data-browser">{{ browser }}</td>
+        <td class="browsers-data-count">{{ count }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 </section>
 
 {% endblock %}

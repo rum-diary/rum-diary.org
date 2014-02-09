@@ -10,6 +10,7 @@
     navigationTimingGraph();
     histogramGraph();
     cdfGraph();
+    browsersGraph();
 
   }, false);
 
@@ -151,6 +152,38 @@
     DOMinator('#cdf-data').hide();
   }
 
+  function browsersGraph() {
+    var browsersDataEls = DOMinator('.browsers-data-item');
+    if (! browsersDataEls.length) return;
+    var browsersData = [];
+
+    browsersDataEls.forEach(function(rowEl) {
+      var x = DOMinator(rowEl).find('.browsers-data-browser').inner().trim();
+      if (! x.length) return;
+
+      var y = DOMinator(rowEl).find('.browsers-data-count').inner().trim();
+      if (! y.length) return;
+      if (isNaN(y)) return;
+
+      browsersData.push({
+        title: x,
+        value: parseInt(y, 10)
+      });
+    });
+
+    console.log('browsers data', JSON.stringify(browsersData));
+
+    var browsers = RD.Graphs.Pie.create();
+    browsers.init({
+      root: '#browsers-graph',
+      data: browsersData,
+      width: DOMinator('#browsers-graph').nth(0).clientWidth,
+      height: '500'
+    });
+    browsers.render();
+
+    DOMinator('#browsers-data').hide();
+  }
 
 
 }());
