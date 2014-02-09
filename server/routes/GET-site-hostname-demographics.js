@@ -19,11 +19,18 @@ exports.handler = function(req, res) {
 
   db.pageView.get(query)
     .then(function(hits) {
+      return reduce.mapReduce(hits, [ 'browsers' ], {
+        start: start,
+        end: end
+      });
+    })
+    .then(function(data) {
       res.render('GET-site-hostname-demographics.html', {
         hostname: req.params.hostname,
         resources: clientResources('rum-diary.min.js'),
         startDate: start.format('MMM DD'),
-        endDate: end.format('MMM DD')
+        endDate: end.format('MMM DD'),
+        browsers: data.browsers
       });
     }).catch(function(err) {
       logger.error(String(err));

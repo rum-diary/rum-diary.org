@@ -300,6 +300,19 @@ function updateHitsPerPage(hitsPerPage, hit) {
   hitsPerPage[path]++;
 }
 
+function updateBrowser(browsers, hit) {
+  if (hit.browser && hit.browser.family) {
+    var family = hit.browser.family;
+
+    if (! (family in browsers)) {
+      browsers[family] = 0;
+    }
+
+    browsers[family]++;
+  }
+}
+
+
 exports.mapReduce = function(hits, fields, options, done) {
   var startTime = new Date();
   return Promise.attempt(function() {
@@ -340,6 +353,9 @@ exports.mapReduce = function(hits, fields, options, done) {
     var doReturningVisitors = fields.indexOf('returning') > -1;
     if (doReturningVisitors) data.returning = 0;
 
+    var doBrowsers = fields.indexOf('browsers') > -1;
+    if (doBrowsers) data.browsers = {};
+
     hits.forEach(function(hit) {
       if (doHostnames) updateHostname(data.hostnames, hit);
       if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
@@ -348,6 +364,7 @@ exports.mapReduce = function(hits, fields, options, done) {
       if (doHitsPerDay) updatePageHit(data.hits_per_day, options, hit);
       if (doUniqueVisitors) if (! hit.returning) data.unique++;
       if (doReturningVisitors) if (hit.returning) data.returning++;
+      if (doBrowsers) updateBrowser(data.browsers, hit);
     });
 
     if (doReferrers) {
