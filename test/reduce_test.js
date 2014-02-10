@@ -10,6 +10,8 @@ const navigationTimingData = require('./data/navigation-timing.json');
 
 const reduce = require('../server/lib/reduce');
 
+/*global describe, it */
+
 describe('reduce', function () {
   /*
   it('findMedianNavigationTimes', function (done) {
@@ -233,6 +235,21 @@ describe('reduce', function () {
       end: moment()
     }).then(function (data) {
       assert.equal(data.browsers.Firefox, 9);
+      done();
+    }).error(function (err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
+
+  it('mapReduce to calculate operating systems', function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'os'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function (data) {
+      assert.equal(data.os['Mac OS X 10.9'], 9);
       done();
     }).error(function (err) {
       assert.isTrue(false, err);

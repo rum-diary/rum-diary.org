@@ -312,6 +312,17 @@ function updateBrowser(browsers, hit) {
   }
 }
 
+function updateOs(os, hit) {
+  if (hit.os) {
+    var family = hit.os;
+
+    if (! (family in os)) {
+      os[family] = 0;
+    }
+
+    os[family]++;
+  }
+}
 
 exports.mapReduce = function(hits, fields, options, done) {
   var startTime = new Date();
@@ -356,6 +367,9 @@ exports.mapReduce = function(hits, fields, options, done) {
     var doBrowsers = fields.indexOf('browsers') > -1;
     if (doBrowsers) data.browsers = {};
 
+    var doOs = fields.indexOf('os') > -1;
+    if (doOs) data.os = {};
+
     hits.forEach(function(hit) {
       if (doHostnames) updateHostname(data.hostnames, hit);
       if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
@@ -365,6 +379,7 @@ exports.mapReduce = function(hits, fields, options, done) {
       if (doUniqueVisitors) if (! hit.returning) data.unique++;
       if (doReturningVisitors) if (hit.returning) data.returning++;
       if (doBrowsers) updateBrowser(data.browsers, hit);
+      if (doOs) updateOs(data.os, hit);
     });
 
     if (doReferrers) {

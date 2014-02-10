@@ -11,6 +11,7 @@
     histogramGraph();
     cdfGraph();
     browsersGraph();
+    osGraph();
 
   }, false);
 
@@ -183,6 +184,39 @@
     browsers.render();
 
     DOMinator('#browsers-data').hide();
+  }
+
+  function osGraph() {
+    var osDataEls = DOMinator('.os-data-item');
+    if (! osDataEls.length) return;
+    var osData = [];
+
+    osDataEls.forEach(function(rowEl) {
+      var x = DOMinator(rowEl).find('.os-data-name').inner().trim();
+      if (! x.length) return;
+
+      var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+      if (! y.length) return;
+      if (isNaN(y)) return;
+
+      osData.push({
+        title: x,
+        value: parseInt(y, 10)
+      });
+    });
+
+    console.log('os data', JSON.stringify(osData));
+
+    var os = RD.Graphs.Pie.create();
+    os.init({
+      root: '#os-graph',
+      data: osData,
+      width: DOMinator('#os-graph').nth(0).clientWidth,
+      height: '300'
+    });
+    os.render();
+
+    DOMinator('#os-data').hide();
   }
 
 

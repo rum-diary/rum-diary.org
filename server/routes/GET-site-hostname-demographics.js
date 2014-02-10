@@ -19,18 +19,23 @@ exports.handler = function(req, res) {
 
   db.pageView.get(query)
     .then(function(hits) {
-      return reduce.mapReduce(hits, [ 'browsers' ], {
+      return reduce.mapReduce(hits, [
+        'browsers',
+        'os'
+      ], {
         start: start,
         end: end
       });
     })
     .then(function(data) {
+      logger.info('os data', JSON.stringify(data.os));
       res.render('GET-site-hostname-demographics.html', {
         hostname: req.params.hostname,
         resources: clientResources('rum-diary.min.js'),
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD'),
-        browsers: data.browsers
+        browsers: data.browsers,
+        os: data.os
       });
     }).catch(function(err) {
       logger.error(String(err));

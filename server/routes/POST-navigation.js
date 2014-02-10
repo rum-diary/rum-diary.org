@@ -41,7 +41,13 @@ exports.handler = function (req, res) {
   }
 
   var ua = useragent.parse(req.get('user-agent'));
-  data.os = ua.os;
+  data.os = ua.os.toString();
+  data.os_parsed = {
+    family: ua.os.family,
+    major: ua.os.major,
+    minor: ua.os.minor
+  }
+
   data.browser = {
     family: ua.family,
     major: ua.major,

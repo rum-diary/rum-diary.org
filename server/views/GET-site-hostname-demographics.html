@@ -15,7 +15,10 @@
 
 <section>
   Browser, OS, mobile vs tablet vs desktop stats go here.
+</section>
 
+
+<article>
   <h2>Browser breakdown</h2>
   <div id="browsers-graph"></div>
 
@@ -27,7 +30,21 @@
       </tr>
     {% endfor %}
   </table>
-</section>
+</article>
+
+<article>
+  <h2>OS breakdown</h2>
+  <div id="os-graph"></div>
+
+  <table id="os-data">
+    {% for name, count in os %}
+      <tr class="os-data-item">
+        <td class="os-data-name">{{ name }}</td>
+        <td class="os-data-count">{{ count }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</article>
 
 {% endblock %}
 
