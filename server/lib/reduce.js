@@ -313,15 +313,19 @@ function updateBrowser(browsers, hit) {
 }
 
 function updateOs(os, hit) {
-  if (hit.os) {
-    var family = hit.os;
-
-    if (! (family in os)) {
-      os[family] = 0;
-    }
-
-    os[family]++;
+  var family;
+  if (hit.os_parsed && hit.os_parsed.family) {
+    family = hit.os_parsed.family;
   }
+  else if (hit.os) {
+    family = hit.os;
+  }
+
+  if (! (family in os)) {
+    os[family] = 0;
+  }
+
+  os[family]++;
 }
 
 exports.mapReduce = function(hits, fields, options, done) {

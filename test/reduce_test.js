@@ -249,7 +249,9 @@ describe('reduce', function () {
       start: moment(new Date()).subtract('days', 30),
       end: moment()
     }).then(function (data) {
-      assert.equal(data.os['Mac OS X 10.9'], 9);
+      // tests for both parsed and unparsed OS'
+      assert.equal(data.os['Mac OS X'], 1);
+      assert.equal(data.os['Windows 7'], 8);
       done();
     }).error(function (err) {
       assert.isTrue(false, err);
