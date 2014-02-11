@@ -316,6 +316,10 @@ function updateOs(os, hit) {
   var family;
   if (hit.os_parsed && hit.os_parsed.family) {
     family = hit.os_parsed.family;
+    // only add the major # if it is not 0. The default major # is 0
+    if (hit.os_parsed.major) {
+      family += (' ' + hit.os_parsed.major);
+    }
   }
   else if (hit.os) {
     family = hit.os;

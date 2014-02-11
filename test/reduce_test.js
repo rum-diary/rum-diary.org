@@ -250,7 +250,7 @@ describe('reduce', function () {
       end: moment()
     }).then(function (data) {
       // tests for both parsed and unparsed OS'
-      assert.equal(data.os['Mac OS X'], 1);
+      assert.equal(data.os['Mac OS X 10'], 1);
       assert.equal(data.os['Windows 7'], 8);
       done();
     }).error(function (err) {
