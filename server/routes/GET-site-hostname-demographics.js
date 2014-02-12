@@ -21,7 +21,8 @@ exports.handler = function(req, res) {
     .then(function(hits) {
       return reduce.mapReduce(hits, [
         'browsers',
-        'os'
+        'os',
+        'os:form'
       ], {
         start: start,
         end: end
@@ -35,7 +36,8 @@ exports.handler = function(req, res) {
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD'),
         browsers: data.browsers,
-        os: data.os
+        os: data.os,
+        os_form: data['os:form']
       });
     }).catch(function(err) {
       logger.error(String(err));

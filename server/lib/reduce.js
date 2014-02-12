@@ -9,6 +9,7 @@ const SortedArray = require('sarray');
 const Promise = require('bluebird');
 const EasierObject = require('easierobject').easierObject;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const logger = require('./logger');
 
 function ensurePageInfo(returnedData, page, startDate, endDate) {
   if ( ! (page in returnedData)) {
@@ -332,6 +333,32 @@ function updateOs(os, hit) {
   os[family]++;
 }
 
+function updateOsForm(os, hit) {
+  var family;
+  if (hit.os_parsed && hit.os_parsed.family) {
+    family = hit.os_parsed.family;
+    // only add the major # if it is not 0. The default major # is 0
+    if (hit.os_parsed.major) {
+      family += (' ' + hit.os_parsed.major);
+    }
+  }
+  else if (hit.os) {
+    family = hit.os;
+  }
+
+  var formFactor = isMobileOS(family) ? 'mobile' : 'desktop';
+
+  if (! (family in os[formFactor])) {
+    os[formFactor][family] = 0;
+  }
+
+  os[formFactor][family]++;
+}
+
+function isMobileOS(os) {
+  return /(mobile|iOS|android)/ig.test(os);
+}
+
 exports.mapReduce = function(hits, fields, options, done) {
   var startTime = new Date();
   return Promise.attempt(function() {
@@ -378,6 +405,12 @@ exports.mapReduce = function(hits, fields, options, done) {
     var doOs = fields.indexOf('os') > -1;
     if (doOs) data.os = {};
 
+    var doOsForm = fields.indexOf('os:form') > -1;
+    if (doOsForm) data['os:form'] = {
+      mobile: {},
+      desktop: {}
+    };
+
     hits.forEach(function(hit) {
       if (doHostnames) updateHostname(data.hostnames, hit);
       if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
@@ -388,6 +421,7 @@ exports.mapReduce = function(hits, fields, options, done) {
       if (doReturningVisitors) if (hit.returning) data.returning++;
       if (doBrowsers) updateBrowser(data.browsers, hit);
       if (doOs) updateOs(data.os, hit);
+      if (doOsForm) updateOsForm(data['os:form'], hit);
     });
 
     if (doReferrers) {

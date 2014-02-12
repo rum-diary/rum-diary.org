@@ -12,6 +12,7 @@
     cdfGraph();
     browsersGraph();
     osGraph();
+    deviceTypeGraph();
 
   }, false);
 
@@ -217,6 +218,51 @@
     os.render();
 
     DOMinator('#os-data').hide();
+  }
+
+  function deviceTypeGraph() {
+    var deviceTypeData = {
+      mobile: 0,
+      desktop: 0
+    };
+
+    countDeviceType('mobile');
+    countDeviceType('desktop');
+
+    console.log('deviceType data', JSON.stringify(deviceType));
+
+    var deviceTypeArray = Object.keys(deviceTypeData).map(function(key) {
+      return {
+        title: key,
+        value: deviceTypeData[key]
+      };
+    });
+
+    var deviceType = RD.Graphs.Pie.create();
+    deviceType.init({
+      root: '#device-type-graph',
+      data: deviceTypeArray,
+      width: DOMinator('#device-type-graph').nth(0).clientWidth,
+      height: '300'
+    });
+    deviceType.render();
+
+    DOMinator('#os-data-mobile').hide();
+    DOMinator('#os-data-desktop').hide();
+
+    function countDeviceType(type) {
+      var osDataEls = DOMinator('.os-data-item-' + type);
+      if (! osDataEls.length) return;
+
+      osDataEls.forEach(function(rowEl) {
+        var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+        if (! y.length) return;
+        if (isNaN(y)) return;
+
+        deviceTypeData[type] += parseInt(y, 10);
+      });
+    }
+
   }
 
 

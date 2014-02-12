@@ -234,7 +234,9 @@ describe('reduce', function () {
       start: moment(new Date()).subtract('days', 30),
       end: moment()
     }).then(function (data) {
-      assert.equal(data.browsers.Firefox, 9);
+      assert.equal(data.browsers.Firefox, 7);
+      assert.equal(data.browsers['Mobile Safari'], 1);
+      assert.equal(data.browsers['Chrome Mobile'], 1);
       done();
     }).error(function (err) {
       assert.isTrue(false, err);
@@ -251,7 +253,28 @@ describe('reduce', function () {
     }).then(function (data) {
       // tests for both parsed and unparsed OS'
       assert.equal(data.os['Mac OS X 10'], 1);
-      assert.equal(data.os['Windows 7'], 8);
+      assert.equal(data.os['Windows 7'], 6);
+      assert.equal(data.os['iOS 7'], 1);
+      assert.equal(data.os['Android 4.4'], 1);
+      done();
+    }).error(function (err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
+
+  it('mapReduce to calculate operating systems based on form factor (mobile vs desktop)',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'os:form'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function (data) {
+      assert.equal(data['os:form'].desktop['Mac OS X 10'], 1);
+      assert.equal(data['os:form'].desktop['Windows 7'], 6);
+      assert.equal(data['os:form'].mobile['iOS 7'], 1);
+      assert.equal(data['os:form'].mobile['Android 4.4'], 1);
       done();
     }).error(function (err) {
       assert.isTrue(false, err);
