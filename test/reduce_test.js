@@ -281,5 +281,24 @@ describe('reduce', function () {
       done();
     });
   });
+
+  it('mapReduce to find tags',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'tags'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function (data) {
+      assert.equal(data.tags.nginx, 2);
+      assert.equal(data.tags.node, 2);
+      assert.equal(data.tags['spdy3.1'], 1);
+      assert.equal(data.tags['spdy2.0'], 3);
+      done();
+    }).error(function (err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
 });
 

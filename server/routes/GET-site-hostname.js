@@ -35,7 +35,8 @@ exports.handler = function(req, res) {
         'hits_per_page',
         'referrers',
         'unique',
-        'returning'
+        'returning',
+        'tags'
       ], {
         start: start,
         end: end
@@ -47,6 +48,7 @@ exports.handler = function(req, res) {
       var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
       logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
+      console.log('tags', data.tags);
       res.render('GET-site-hostname.html', {
         root_url: req.url.replace(/\?.*/, ''),
         hostname: req.params.hostname,
@@ -62,7 +64,8 @@ exports.handler = function(req, res) {
           today: data.hits_per_day.__all[data.hits_per_day.__all.length - 1].hits,
           unique: data.unique,
           repeat: data.returning
-        }
+        },
+        tags: Object.keys(data.tags)
       });
     }).catch(function(err) {
       logger.error(String(err));
