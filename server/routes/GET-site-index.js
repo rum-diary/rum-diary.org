@@ -10,19 +10,18 @@ exports.path = '/site';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
-  db.pageView.get(function(err, data) {
-    if (err) {
-      return logger.error('DB.get error', String(err));
-    }
-
-    reduce.findHostnames(data, function(err, sites) {
-      if (err) {
-        return logger.error('reduce.findHostnames error', String(err));
-      }
+  db.site.get({})
+    .then(function(sites) {
+      var hostnames = sites.map(function(site) {
+                        return site.hostname;
+                      });
 
       res.render('GET-site-index.html', {
-        sites: Object.keys(sites)
+        sites: hostnames
       });
+    })
+    .then(null, function(err) {
+      logger.error('DB.get error', String(err));
+      res.send(500);
     });
-  });
 };
