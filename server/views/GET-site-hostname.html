@@ -1,45 +1,39 @@
 {% extends "layout.html" %}
 {% block title %}{{ hostname }} info{% endblock %}
 
-{% block inlinecss %}
-path {
-    stroke: steelblue;      /* the line colour for paths is steelblue */
-    stroke-width: 2;      /* the line width for paths is 2 pixels */
-    fill: none;         /* don't fill the area bounded by any path elements */
-}
-
-.axis path,
-.axis line {
-    fill: none;         /* don't fill areas bounded by the axis line */
-    stroke: grey;       /* make the axis line grey */
-    stroke-width: 1;      /* make the width of the axis lines 1 pixel */
-    shape-rendering: crispEdges;/* make the edges sharp */
-}
-
+{% block navigation %}
+  <ul>
+    <li><a href="/site/">All sites</a></li>
+    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
+    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
+  </ul>
 {% endblock %}
 
 {% block body %}
+
 <header>
-  <h1>{{ hostname }} - {{ startDate }} to {{ endDate }}</h1>
+  <h1>{{ hostname }} - {{ startDate }} to {{ endDate }}</h2>
 </header>
 
 <section class="row">
-  <section id="overview" class="row-left">
+  <article id="overview" class="row-left">
     <h2>Overview</h2>
     <dl>
-      <dt class="overview-name small">Today</dt>
-      <dd class="overview-stat">{{ hits.today }}</dd>
       <dt class="overview-name small">Total</dt>
       <dd class="overview-stat">{{ hits.total }}</dd>
+      <dt class="overview-name small">Today</dt>
+      <dd class="overview-stat">{{ hits.today }}</dd>
+      <dt class="overview-name small">Period</dt>
+      <dd class="overview-stat">{{ hits.period }}</dd>
       <dt class="overview-name small">Unique</dt>
       <dd class="overview-stat">{{ hits.unique }}</dd>
       <dt class="overview-name small">Repeat</dt>
       <dd class="overview-stat">{{ hits.repeat }}</dd>
     </dl>
 
-  </section>
+  </article>
 
-  <section id="daily-hits" class="row-right">
+  <article id="daily-hits" class="row-right">
     <h2>Daily hits</h2>
     <div id="hits-graph" data-hostname="{{ hostname }}"></div>
     <table id="hits-data">
@@ -50,12 +44,12 @@ path {
         </tr>
       {% endfor %}
     </table>
-  </section>
+  </article>
 </section>
 
 
 <section class="row">
-  <section id="referrers" class="row-left">
+  <article id="referrers" class="row-left">
     <h2>Top referrers</h2>
     <dl id="referrers">
       {% for referrer in referrers %}
@@ -63,9 +57,9 @@ path {
         <dd class="referrers-count small">{{ referrer.count }}</dd>
       {% endfor %}
     </dl>
-  </section>
+  </article>
 
-  <section id="top-pages" class="row-right">
+  <article id="top-pages" class="row-right">
     <h2>Top Pages</h2>
     <dl id="page-views">
       {% for page in pageHitsPerPage %}
@@ -75,7 +69,7 @@ path {
         {% endif %}
       {% endfor %}
     </dl>
-  </section>
+  </article>
 
 </section>
 

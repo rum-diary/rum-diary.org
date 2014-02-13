@@ -14,27 +14,32 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query.createdAt['$gte']);
-  var end = moment(query.createdAt['$lte']);
+  var start = moment(query.createdAt.$gte);
+  var end = moment(query.createdAt.$lte);
+  var reductionStart;
+  var totalHits = 0;
 
-  db.pageView.get(query, function(err, hits) {
-    if (err) return res.send(500);
+  db.site.getOne({
+    hostname: query.hostname
+  })
+  .then(function(site) {
+    if (site) totalHits = site.total_hits;
+  })
+  .then(function() {
+    return db.pageView.get(query);
+  }).then(function(hits) {
+      reductionStart = new Date();
 
-    var reductionStart = new Date();
-
-    reduce.mapReduce(hits, [
-      'hits_per_day',
-      'hits_per_page',
-      'referrers',
-      'navigation',
-      'unique',
-      'returning'
-    ], {
-      start: start,
-      end: end,
-      navigation: {
-        calculate: ['25', '50', '75']
-      }
+      return reduce.mapReduce(hits, [
+        'hits_per_day',
+        'hits_per_page',
+        'referrers',
+        'unique',
+        'returning'
+      ], {
+        start: start,
+        end: end
+      });
     }).then(function(data) {
       var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
 
@@ -52,8 +57,9 @@ exports.handler = function(req, res) {
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD'),
         hits: {
+          total: totalHits,
+          period: pageHitsPerPageSorted[0].hits,
           today: data.hits_per_day.__all[data.hits_per_day.__all.length - 1].hits,
-          total: pageHitsPerPageSorted[0].hits,
           unique: data.unique,
           repeat: data.returning
         }
@@ -62,8 +68,6 @@ exports.handler = function(req, res) {
       logger.error(String(err));
       res.send(500);
     });
-  });
-
 };
 
 function sortPageHitsPerPage(pageHitsPerPage) {

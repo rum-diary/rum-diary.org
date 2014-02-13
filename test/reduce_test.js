@@ -10,10 +10,12 @@ const navigationTimingData = require('./data/navigation-timing.json');
 
 const reduce = require('../server/lib/reduce');
 
-describe('reduce', function() {
+/*global describe, it */
+
+describe('reduce', function () {
   /*
-  it('findMedianNavigationTimes', function(done) {
-    reduce.findMedianNavigationTimes(navigationTimingData, function(err, medianInfo) {
+  it('findMedianNavigationTimes', function (done) {
+    reduce.findMedianNavigationTimes(navigationTimingData, function (err, medianInfo) {
       assert.isNull(err);
 
       assert.isNumber(medianInfo.unloadEventStart);
@@ -58,11 +60,11 @@ describe('reduce', function() {
   });
 */
 
-  it('findNavigationTimingStats', function(done) {
+  it('findNavigationTimingStats', function (done) {
     reduce.findNavigationTimingStats(
       navigationTimingData,
       ['range', 'median', 'amean', 'stddev'],
-      function(err, stats) {
+      function (err, stats) {
       assert.isNull(err);
 
       var medianInfo = stats.median;
@@ -105,10 +107,10 @@ describe('reduce', function() {
   });
 
   /*
-  it('findReferrers', function(done) {
+  it('findReferrers', function (done) {
     reduce.findReferrers(
       navigationTimingData,
-      function(err, data) {
+      function (err, data) {
 
       assert.isNull(err);
 
@@ -121,10 +123,10 @@ describe('reduce', function() {
   });
 */
 
-  it('findHostnames', function(done) {
+  it('findHostnames', function (done) {
     reduce.findHostnames(
       navigationTimingData,
-      function(err, data) {
+      function (err, data) {
 
       assert.isNull(err);
 
@@ -134,7 +136,7 @@ describe('reduce', function() {
     });
   });
 
-  it('mapReduce', function(done) {
+  it('mapReduce', function (done) {
     var copy = [];
 
     // give us a respectable amount of data
@@ -142,7 +144,7 @@ describe('reduce', function() {
       copy = copy.concat(navigationTimingData);
     }
 
-    copy.forEach(function(item, index) {
+    copy.forEach(function (item, index) {
       // test to make sure items that were saved with
       // only referrer are handled correctly.
       if (index > 1000) {
@@ -162,16 +164,16 @@ describe('reduce', function() {
       navigation: {
         calculate: ['median']
       }
-    }).then(function(data) {
+    }).then(function (data) {
       console.log('processing time full: %s ms', data.processing_time);
       done();
-    }).error(function(err) {
+    }).error(function (err) {
       assert.isTrue(false, err);
       done();
     });
   });
 
-  it('mapReduce with navigation quartiles', function(done) {
+  it('mapReduce with navigation quartiles', function (done) {
     reduce.mapReduce(navigationTimingData, [
       'navigation'
     ], {
@@ -180,46 +182,101 @@ describe('reduce', function() {
       navigation: {
         calculate: ['quartiles']
       }
-    }).then(function(data) {
+    }).then(function (data) {
       console.log('processing time quartiles: %s ms', data.processing_time);
       assert.ok(data.navigation['25']);
       assert.ok(data.navigation['50']);
       assert.ok(data.navigation['75']);
 
       done();
-    }).error(function(err) {
+    }).error(function (err) {
       assert.isTrue(false, err);
       done();
     });
   });
 
-  it('mapReduce to calculate unique visitors', function(done) {
+  it('mapReduce to calculate unique visitors', function (done) {
     reduce.mapReduce(navigationTimingData, [
       'unique'
     ], {
       start: moment(new Date()).subtract('days', 30),
       end: moment()
-    }).then(function(data) {
+    }).then(function (data) {
       assert.equal(data.unique, 8);
 
       done();
-    }).error(function(err) {
+    }).error(function (err) {
       assert.isTrue(false, err);
       done();
     });
   });
 
-  it('mapReduce to calculate returning visitors', function(done) {
+  it('mapReduce to calculate returning visitors', function (done) {
     reduce.mapReduce(navigationTimingData, [
       'returning'
     ], {
       start: moment(new Date()).subtract('days', 30),
       end: moment()
-    }).then(function(data) {
+    }).then(function (data) {
       assert.equal(data.returning, 1);
 
       done();
-    }).error(function(err) {
+    }).error(function (err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
+
+  it('mapReduce to calculate browsers', function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'browsers'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function (data) {
+      assert.equal(data.browsers.Firefox, 7);
+      assert.equal(data.browsers['Mobile Safari'], 1);
+      assert.equal(data.browsers['Chrome Mobile'], 1);
+      done();
+    }).error(function (err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
+
+  it('mapReduce to calculate operating systems', function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'os'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function (data) {
+      // tests for both parsed and unparsed OS'
+      assert.equal(data.os['Mac OS X 10'], 1);
+      assert.equal(data.os['Windows 7'], 6);
+      assert.equal(data.os['iOS 7'], 1);
+      assert.equal(data.os['Android 4.4'], 1);
+      done();
+    }).error(function (err) {
+      assert.isTrue(false, err);
+      done();
+    });
+  });
+
+  it('mapReduce to calculate operating systems based on form factor (mobile vs desktop)',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'os:form'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function (data) {
+      assert.equal(data['os:form'].desktop['Mac OS X 10'], 1);
+      assert.equal(data['os:form'].desktop['Windows 7'], 6);
+      assert.equal(data['os:form'].mobile['iOS 7'], 1);
+      assert.equal(data['os:form'].mobile['Android 4.4'], 1);
+      done();
+    }).error(function (err) {
       assert.isTrue(false, err);
       done();
     });

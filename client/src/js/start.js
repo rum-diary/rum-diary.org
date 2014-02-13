@@ -10,6 +10,9 @@
     navigationTimingGraph();
     histogramGraph();
     cdfGraph();
+    browsersGraph();
+    osGraph();
+    deviceTypeGraph();
 
   }, false);
 
@@ -151,6 +154,116 @@
     DOMinator('#cdf-data').hide();
   }
 
+  function browsersGraph() {
+    var browsersDataEls = DOMinator('.browsers-data-item');
+    if (! browsersDataEls.length) return;
+    var browsersData = [];
+
+    browsersDataEls.forEach(function(rowEl) {
+      var x = DOMinator(rowEl).find('.browsers-data-browser').inner().trim();
+      if (! x.length) return;
+
+      var y = DOMinator(rowEl).find('.browsers-data-count').inner().trim();
+      if (! y.length) return;
+      if (isNaN(y)) return;
+
+      browsersData.push({
+        title: x,
+        value: parseInt(y, 10)
+      });
+    });
+
+    console.log('browsers data', JSON.stringify(browsersData));
+
+    var browsers = RD.Graphs.Pie.create();
+    browsers.init({
+      root: '#browsers-graph',
+      data: browsersData,
+      width: DOMinator('#browsers-graph').nth(0).clientWidth,
+      height: '500'
+    });
+    browsers.render();
+
+    DOMinator('#browsers-data').hide();
+  }
+
+  function osGraph() {
+    var osDataEls = DOMinator('.os-data-item');
+    if (! osDataEls.length) return;
+    var osData = [];
+
+    osDataEls.forEach(function(rowEl) {
+      var x = DOMinator(rowEl).find('.os-data-name').inner().trim();
+      if (! x.length) return;
+
+      var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+      if (! y.length) return;
+      if (isNaN(y)) return;
+
+      osData.push({
+        title: x,
+        value: parseInt(y, 10)
+      });
+    });
+
+    console.log('os data', JSON.stringify(osData));
+
+    var os = RD.Graphs.Pie.create();
+    os.init({
+      root: '#os-graph',
+      data: osData,
+      width: DOMinator('#os-graph').nth(0).clientWidth,
+      height: '300'
+    });
+    os.render();
+
+    DOMinator('#os-data').hide();
+  }
+
+  function deviceTypeGraph() {
+    var deviceTypeData = {
+      mobile: 0,
+      desktop: 0
+    };
+
+    countDeviceType('mobile');
+    countDeviceType('desktop');
+
+    console.log('deviceType data', JSON.stringify(deviceType));
+
+    var deviceTypeArray = Object.keys(deviceTypeData).map(function(key) {
+      return {
+        title: key,
+        value: deviceTypeData[key]
+      };
+    });
+
+    var deviceType = RD.Graphs.Pie.create();
+    deviceType.init({
+      root: '#device-type-graph',
+      data: deviceTypeArray,
+      width: DOMinator('#device-type-graph').nth(0).clientWidth,
+      height: '300'
+    });
+    deviceType.render();
+
+    DOMinator('#os-data-mobile').hide();
+    DOMinator('#os-data-desktop').hide();
+
+    function countDeviceType(type) {
+      var osDataEls = DOMinator('.os-data-item-' + type);
+      if (! osDataEls.length) return;
+
+      osDataEls.forEach(function(rowEl) {
+        var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+        if (! y.length) return;
+        if (isNaN(y)) return;
+
+        deviceTypeData[type] += parseInt(y, 10);
+      });
+    }
+
+  }
 
 
 }());

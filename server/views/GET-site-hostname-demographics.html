@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% block title %}{{ hostname }} info{% endblock %}
+
+{% block navigation %}
+  <ul>
+    <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
+    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
+  </ul>
+{% endblock %}
+
+{% block body %}
+<header>
+  <h1>{{ hostname }} Demographics - {{ startDate }} to {{ endDate }}</h2>
+</header>
+
+<section>
+  Browser, OS, mobile vs tablet vs desktop stats go here.
+</section>
+
+
+<article>
+  <h2>Browser breakdown</h2>
+  <div id="browsers-graph"></div>
+
+  <table id="browsers-data">
+    {% for browser, count in browsers %}
+      <tr class="browsers-data-item">
+        <td class="browsers-data-browser">{{ browser }}</td>
+        <td class="browsers-data-count">{{ count }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</article>
+
+<section class="row">
+  <article class="row-left half">
+    <h2>OS breakdown</h2>
+    <div id="os-graph"></div>
+
+    <table id="os-data">
+      {% for name, count in os %}
+        <tr class="os-data-item">
+          <td class="os-data-name">{{ name }}</td>
+          <td class="os-data-count">{{ count }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </article>
+
+  <article class="row-right half">
+    <h2>Device type</h2>
+    <div id="device-type-graph"></div>
+
+    <table id="os-data-mobile">
+      {% for name, count in os_form.mobile %}
+        <tr class="os-data-item-mobile">
+          <td class="os-data-name">{{ name }}</td>
+          <td class="os-data-count">{{ count }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+
+    <table id="os-data-desktop">
+      {% for name, count in os_form.desktop %}
+        <tr class="os-data-item-desktop">
+          <td class="os-data-name">{{ name }}</td>
+          <td class="os-data-count">{{ count }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </article>
+</section>
+
+{% endblock %}
+
+

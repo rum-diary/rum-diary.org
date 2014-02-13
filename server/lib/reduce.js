@@ -9,6 +9,7 @@ const SortedArray = require('sarray');
 const Promise = require('bluebird');
 const EasierObject = require('easierobject').easierObject;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const logger = require('./logger');
 
 function ensurePageInfo(returnedData, page, startDate, endDate) {
   if ( ! (page in returnedData)) {
@@ -300,6 +301,64 @@ function updateHitsPerPage(hitsPerPage, hit) {
   hitsPerPage[path]++;
 }
 
+function updateBrowser(browsers, hit) {
+  if (hit.browser && hit.browser.family) {
+    var family = hit.browser.family;
+
+    if (! (family in browsers)) {
+      browsers[family] = 0;
+    }
+
+    browsers[family]++;
+  }
+}
+
+function updateOs(os, hit) {
+  var family;
+  if (hit.os_parsed && hit.os_parsed.family) {
+    family = hit.os_parsed.family;
+    // only add the major # if it is not 0. The default major # is 0
+    if (hit.os_parsed.major) {
+      family += (' ' + hit.os_parsed.major);
+    }
+  }
+  else if (hit.os) {
+    family = hit.os;
+  }
+
+  if (! (family in os)) {
+    os[family] = 0;
+  }
+
+  os[family]++;
+}
+
+function updateOsForm(os, hit) {
+  var family;
+  if (hit.os_parsed && hit.os_parsed.family) {
+    family = hit.os_parsed.family;
+    // only add the major # if it is not 0. The default major # is 0
+    if (hit.os_parsed.major) {
+      family += (' ' + hit.os_parsed.major);
+    }
+  }
+  else if (hit.os) {
+    family = hit.os;
+  }
+
+  var formFactor = isMobileOS(family) ? 'mobile' : 'desktop';
+
+  if (! (family in os[formFactor])) {
+    os[formFactor][family] = 0;
+  }
+
+  os[formFactor][family]++;
+}
+
+function isMobileOS(os) {
+  return /(mobile|iOS|android)/ig.test(os);
+}
+
 exports.mapReduce = function(hits, fields, options, done) {
   var startTime = new Date();
   return Promise.attempt(function() {
@@ -340,6 +399,18 @@ exports.mapReduce = function(hits, fields, options, done) {
     var doReturningVisitors = fields.indexOf('returning') > -1;
     if (doReturningVisitors) data.returning = 0;
 
+    var doBrowsers = fields.indexOf('browsers') > -1;
+    if (doBrowsers) data.browsers = {};
+
+    var doOs = fields.indexOf('os') > -1;
+    if (doOs) data.os = {};
+
+    var doOsForm = fields.indexOf('os:form') > -1;
+    if (doOsForm) data['os:form'] = {
+      mobile: {},
+      desktop: {}
+    };
+
     hits.forEach(function(hit) {
       if (doHostnames) updateHostname(data.hostnames, hit);
       if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
@@ -348,6 +419,9 @@ exports.mapReduce = function(hits, fields, options, done) {
       if (doHitsPerDay) updatePageHit(data.hits_per_day, options, hit);
       if (doUniqueVisitors) if (! hit.returning) data.unique++;
       if (doReturningVisitors) if (hit.returning) data.returning++;
+      if (doBrowsers) updateBrowser(data.browsers, hit);
+      if (doOs) updateOs(data.os, hit);
+      if (doOsForm) updateOsForm(data['os:form'], hit);
     });
 
     if (doReferrers) {

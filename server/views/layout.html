@@ -15,6 +15,11 @@
 </head>
 <body>
   <main>
+    <nav>
+      {% block navigation %}
+      {% endblock %}
+    </nav>
+
     {% block body %}
       We need a body!
     {% endblock %}
