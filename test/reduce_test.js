@@ -294,6 +294,7 @@ describe('reduce', function () {
       assert.equal(data.tags.node, 2);
       assert.equal(data.tags['spdy3.1'], 1);
       assert.equal(data.tags['spdy2.0'], 3);
+      assert.isUndefined(data.tags['']);
       done();
     }).error(function (err) {
       assert.isTrue(false, err);

@@ -363,6 +363,8 @@ function updateTags(tags, hit) {
   if (! hit.tags) return;
 
   hit.tags.forEach(function(tag) {
+    tag = tag.trim();
+    if (! tag.length) return;
     if (! (tag in tags)) {
       tags[tag] = 0;
     }
