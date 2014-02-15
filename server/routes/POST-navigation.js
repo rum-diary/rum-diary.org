@@ -47,7 +47,7 @@ exports.handler = function (req, res) {
     family: ua.os.family,
     major: ua.os.major,
     minor: ua.os.minor
-  }
+  };
 
   data.browser = {
     family: ua.family,
@@ -55,15 +55,22 @@ exports.handler = function (req, res) {
     minor: ua.minor
   };
 
-  logger.info('tags', data.tags);
+  if (data.tags) {
+    data.tags = data.tags.reduce(function(tags, tag) {
+      tag = tag && tag.trim();
+      if (tag && tag.length) tags.push(tag);
+      return tags;
+    }, []);
+  }
+
   return db.site.hit(data.hostname)
             .then(function () {
               data.is_counted = true;
-              return db.pageView.create(data)
+              return db.pageView.create(data);
             })
             .then(function () {
               var resolver = Promise.defer();
-              var outstanding = data.tags.length;;
+              var outstanding = data.tags.length;
 
               data.tags.forEach(function(tag) {
                 db.tags.hit({
