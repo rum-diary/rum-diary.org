@@ -18,21 +18,36 @@ exports.handler = function(req, res) {
   var end = moment(query.createdAt.$lte);
   var reductionStart;
   var totalHits = 0;
+  var queryTags = req.query.tags && req.query.tags.split(',') || 0;
   var tags;
 
-  db.site.getOne({
+  db.tags.get({
     hostname: query.hostname
-  })
-  .then(function(site) {
-    if (site) totalHits = site.total_hits;
-  })
-  .then(function() {
-    return db.tags.get({
-             hostname: query.hostname
-           });
   })
   .then(function (_tags) {
     tags = _tags.map(function(tag) { return tag.name });
+
+    // tags are specified as a filter, count the
+    // total hits for the matching tags.
+    // This does not work for the "not" tag.
+    if (queryTags.length) {
+      totalHits = _tags.reduce(function(totalHits, tag) {
+        if (queryTags.indexOf(tag.name) > -1) totalHits += tag.total_hits;
+        return totalHits;
+      }, 0);
+    }
+  })
+  .then(function () {
+    // only use the grand total number of hits if a set of tags is not
+    // specified as a filter.
+    if (! queryTags.length) {
+      return db.site.getOne({
+        hostname: query.hostname
+      })
+      .then(function(site) {
+        if (site) totalHits = site.total_hits;
+      });
+    }
   })
   .then(function() {
     return db.pageView.get(query);
