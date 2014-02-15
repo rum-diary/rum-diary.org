@@ -52,7 +52,7 @@ describe('database', function () {
     beforeEach(function (done) {
       db.pageView.create({
         hostname: 'shanetomlinson.com',
-        uuid: 'shanetomlinson-uuid',
+        uuid: 'first-uuid',
         referrer: 'https://bigsearchcompany.com/search',
         referrer_hostname: 'bigsearchcompany.com',
         referrer_path: '/search',
@@ -64,7 +64,7 @@ describe('database', function () {
       db.pageView.getByHostname('shanetomlinson.com', function (err, data) {
         assert.isNull(err);
         assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].referrer, 'https://bigsearchcompany.com/search');
         assert.equal(data[0].referrer_hostname, 'bigsearchcompany.com');
         assert.equal(data[0].referrer_path, '/search');
@@ -78,13 +78,13 @@ describe('database', function () {
     beforeEach(function (done) {
       db.pageView.create({
         hostname: 'shanetomlinson.com',
-        uuid: 'shanetomlinson-uuid',
+        uuid: 'first-uuid',
         referrer: 'bigsearchcompany.com',
         tags: ['experiment1', 'tag'],
       }, function () {
         db.pageView.create({
           hostname: 'shanetomlinson.com',
-          uuid: 'shanetomlinson-uuid',
+          uuid: 'second-uuid',
           referrer: 'bigsearchcompany.com',
           tags: ['experiment22', 'tag'],
         }, done);
@@ -92,11 +92,22 @@ describe('database', function () {
     });
 
     it('returns item if tag is stored', function (done) {
-      db.pageView.get({ hostname: 'shanetomlinson.com', tags: ['experiment1'] }, function (err, data) {
+      db.pageView.get({ hostname: 'shanetomlinson.com', tags: 'experiment1' }, function (err, data) {
         assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
         assert.equal(data[0].tags[0], 'experiment1');
+        assert.equal(data[0].tags[1], 'tag');
+        done();
+      });
+    });
+
+    it('returns nom matching items if $ne is specified', function (done) {
+      db.pageView.get({ hostname: 'shanetomlinson.com', tags: { $ne: 'experiment1' } }, function (err, data) {
+        assert.equal(data.length, 1);
+        assert.equal(data[0].uuid, 'second-uuid');
+        assert.equal(data[0].referrer, 'bigsearchcompany.com');
+        assert.equal(data[0].tags[0], 'experiment22');
         assert.equal(data[0].tags[1], 'tag');
         done();
       });
@@ -105,7 +116,7 @@ describe('database', function () {
     it('returns item if other tag is stored', function (done) {
       db.pageView.get({ tags: ['tag'] }, function (err, data) {
         assert.equal(data.length, 2);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].tags[1], 'tag');
         done();
       });
@@ -114,7 +125,7 @@ describe('database', function () {
     it('returns item if both tags are specified', function (done) {
       db.pageView.get({ tags: ['tag', 'experiment1'] }, function (err, data) {
         assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
         assert.equal(data[0].tags[0], 'experiment1');
         assert.equal(data[0].tags[1], 'tag');
@@ -141,13 +152,13 @@ describe('database', function () {
     beforeEach(function (done) {
       db.pageView.create({
         hostname: 'shanetomlinson.com',
-        uuid: 'shanetomlinson-uuid',
+        uuid: 'first-uuid',
         referrer: 'bigsearchcompany.com',
         tags: ['experiment1', 'tag'],
       }, function () {
         db.pageView.create({
           hostname: 'shanetomlinson.com',
-          uuid: 'shanetomlinson-uuid',
+          uuid: 'second-uuid',
           referrer: 'bigsearchcompany.com',
           tags: ['experiment22', 'tag'],
         }, done);
@@ -157,7 +168,7 @@ describe('database', function () {
     it('returns one item', function (done) {
       db.pageView.getOne({ hostname: 'shanetomlinson.com', tags: ['experiment1'] })
         .then(function (item) {
-          assert.equal(item.uuid, 'shanetomlinson-uuid');
+          assert.equal(item.uuid, 'first-uuid');
           assert.equal(item.referrer, 'bigsearchcompany.com');
           assert.equal(item.tags[0], 'experiment1');
           assert.equal(item.tags[1], 'tag');
