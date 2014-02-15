@@ -359,6 +359,20 @@ function isMobileOS(os) {
   return /(mobile|iOS|android)/ig.test(os);
 }
 
+function updateTags(tags, hit) {
+  if (! hit.tags) return;
+
+  hit.tags.forEach(function(tag) {
+    tag = tag.trim();
+    if (! tag.length) return;
+    if (! (tag in tags)) {
+      tags[tag] = 0;
+    }
+
+    tags[tag]++;
+  });
+}
+
 exports.mapReduce = function(hits, fields, options, done) {
   var startTime = new Date();
   return Promise.attempt(function() {
@@ -405,6 +419,9 @@ exports.mapReduce = function(hits, fields, options, done) {
     var doOs = fields.indexOf('os') > -1;
     if (doOs) data.os = {};
 
+    var doTags = fields.indexOf('tags') > -1;
+    if (doTags) data.tags = {};
+
     var doOsForm = fields.indexOf('os:form') > -1;
     if (doOsForm) data['os:form'] = {
       mobile: {},
@@ -422,6 +439,7 @@ exports.mapReduce = function(hits, fields, options, done) {
       if (doBrowsers) updateBrowser(data.browsers, hit);
       if (doOs) updateOs(data.os, hit);
       if (doOsForm) updateOsForm(data['os:form'], hit);
+      if (doTags) updateTags(data.tags, hit);
     });
 
     if (doReferrers) {

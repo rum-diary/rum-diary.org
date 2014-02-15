@@ -221,6 +221,9 @@
   }
 
   function deviceTypeGraph() {
+    var rootEl = DOMinator('#device-type-graph');
+    if (! rootEl.length) return;
+
     var deviceTypeData = {
       mobile: 0,
       desktop: 0

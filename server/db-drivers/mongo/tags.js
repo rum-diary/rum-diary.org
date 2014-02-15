@@ -2,41 +2,47 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// Site model
+// Tags model. Tags are scoped to an individual site.
 
 const Model = require('./model');
 const Schema = require('mongoose').Schema;
 
-const siteDefinition = {
+const definition = {
+  name: String,
   hostname: String,
   total_hits: {
     type: Number,
-    default: 0
+    'default': 0
   }
 };
 
-const SiteModel = Object.create(Model);
-SiteModel.init('Site', siteDefinition);
+const TagsModel = Object.create(Model);
+TagsModel.init('Tags', definition);
 
-SiteModel.ensureExists = function(hostname) {
+TagsModel.ensureExists = function(options) {
   var self = this;
-  return this.getOne({ hostname: hostname })
+  return this.getOne({
+                name: options.name,
+                hostname: options.hostname
+              })
               .then(function(model) {
                 if (model) return model;
 
                 return self.create({
-                  hostname: hostname
+                  name: options.name,
+                  hostname: options.hostname
                 });
               });
 };
 
-SiteModel.hit = function(hostname) {
+TagsModel.hit = function(options) {
   var self = this;
-  return this.ensureExists(hostname)
+  return this.ensureExists(options)
             .then(function(model) {
               model.total_hits++;
               return self.update(model);
             });
 };
 
-module.exports = SiteModel;
+
+module.exports = TagsModel;

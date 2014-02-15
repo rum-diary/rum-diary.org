@@ -7,6 +7,17 @@
     <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
     <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
   </ul>
+
+  {% if tags.length %}
+    <h4>Tags</h4>
+    <ul>
+      <li><a href="{{ root_url }}">None</a></li>
+      {% for tag in tags %}
+        <li><a href="{{ root_url }}?tags={{ tag }}">{{ tag }}</a></li>
+        <li><a href="{{ root_url }}?tags=!{{ tag }}">!{{ tag }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endblock %}
 
 {% block body %}

@@ -45,12 +45,12 @@ describe('site-query', function() {
     var query = getQuery({
       params: { hostname: 'testdomain.org' },
       query: {
-        tags: 'experiment1,experiment2'
+        tags: 'experiment1,!experiment2'
       }
     });
 
-    assert.ok(query.tags[0], 'experiment1');
-    assert.ok(query.tags[1], 'experiment2');
+    assert.deepEqual(query.tags.$in, ['experiment1']);
+    assert.deepEqual(query.tags.$nin, ['experiment2']);
   });
 
   it('should add referrer, when specified', function() {

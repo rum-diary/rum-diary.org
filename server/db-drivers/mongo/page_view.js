@@ -5,10 +5,11 @@
 // Page view model. Commonly referred to as a 'hit'
 
 const moment = require('moment');
-const Model = require('./model');
+const _ = require('underscore');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
+const Model = require('./model');
 
 const pageViewDefinition = {
   uuid: String,
@@ -87,8 +88,9 @@ PageViewModel.getSearchBy = function (searchBy) {
     delete searchBy.createdAt;
   }
 
-  if (searchBy.tags) {
-    // If the $all is not specified, then it matches tags in order
+  if (searchBy.tags && _.isArray(searchBy.tags)) {
+    // If the $all is not specified, then tag order is important. If tags are
+    // not specified in the same order as stored in db, match is not made.
     searchBy.tags = {
       $all: searchBy.tags
     };

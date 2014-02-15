@@ -30,7 +30,8 @@
     "connect-gzip-static": "git://github.com/shane-tomlinson/connect-gzip-static.git#3625997d2a8f83ef8040632c20e8ae3e9bf9fced",
     "helmet": "0.1.2",
     "connect-cachify": "0.0.15",
-    "think-stats": "git://github.com/shane-tomlinson/think-stats.git#1c96d3c7"
+    "think-stats": "git://github.com/shane-tomlinson/think-stats.git#1c96d3c7",
+    "underscore": "~1.6.0"
   },
   "devDependencies": {
     "mocha": "~1.16.1",

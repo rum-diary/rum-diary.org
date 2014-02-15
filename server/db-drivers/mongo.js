@@ -13,13 +13,14 @@ const logger = require('../lib/logger');
 var PageView = require('./mongo/page_view');
 var Site = require('./mongo/site');
 var User = require('./mongo/user');
+var Tags = require('./mongo/tags');
 
 function deprecated(oldName, newName, callback) {
   return function() {
     logger.warn('mongo.js->:%s is deprecated, please use %s', oldName, newName);
     return callback.apply(null, arguments);
-  }
-};
+  };
+}
 
 exports.save = deprecated('save', 'pageView.create', PageView.create.bind(PageView));
 exports.get = deprecated('get', 'pageView.get', PageView.get.bind(PageView));
@@ -32,6 +33,9 @@ exports.clear = function(done) {
     })
     .then(function() {
       return Site.clear();
+    })
+    .then(function() {
+      return Tags.clear();
     })
     .then(function() {
       if (done) done(null);
@@ -68,5 +72,15 @@ exports.site = {
   clear: Site.clear.bind(Site),
   hit: Site.hit.bind(Site),
   ensureExists: Site.ensureExists.bind(Site)
+};
+
+exports.tags = {
+  create: Tags.create.bind(Tags),
+  update: Tags.update.bind(Tags),
+  get: Tags.get.bind(Tags),
+  getOne: Tags.getOne.bind(Tags),
+  clear: Tags.clear.bind(Tags),
+  hit: Tags.hit.bind(Tags),
+  ensureExists: Tags.ensureExists.bind(Tags)
 };
 

@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/*global describe, beforeEach, afterEach, it*/
+
 const mocha = require('mocha');
 const assert = require('chai').assert;
 
@@ -52,7 +54,7 @@ describe('database', function () {
     beforeEach(function (done) {
       db.pageView.create({
         hostname: 'shanetomlinson.com',
-        uuid: 'shanetomlinson-uuid',
+        uuid: 'first-uuid',
         referrer: 'https://bigsearchcompany.com/search',
         referrer_hostname: 'bigsearchcompany.com',
         referrer_path: '/search',
@@ -64,7 +66,7 @@ describe('database', function () {
       db.pageView.getByHostname('shanetomlinson.com', function (err, data) {
         assert.isNull(err);
         assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].referrer, 'https://bigsearchcompany.com/search');
         assert.equal(data[0].referrer_hostname, 'bigsearchcompany.com');
         assert.equal(data[0].referrer_path, '/search');
@@ -78,25 +80,36 @@ describe('database', function () {
     beforeEach(function (done) {
       db.pageView.create({
         hostname: 'shanetomlinson.com',
-        uuid: 'shanetomlinson-uuid',
+        uuid: 'first-uuid',
         referrer: 'bigsearchcompany.com',
-        tags: ['experiment1', 'tag'],
+        tags: ['experiment1', 'tag']
       }, function () {
         db.pageView.create({
           hostname: 'shanetomlinson.com',
-          uuid: 'shanetomlinson-uuid',
+          uuid: 'second-uuid',
           referrer: 'bigsearchcompany.com',
-          tags: ['experiment22', 'tag'],
+          tags: ['experiment22', 'tag']
         }, done);
       });
     });
 
     it('returns item if tag is stored', function (done) {
-      db.pageView.get({ hostname: 'shanetomlinson.com', tags: ['experiment1'] }, function (err, data) {
+      db.pageView.get({ hostname: 'shanetomlinson.com', tags: 'experiment1' }, function (err, data) {
         assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
         assert.equal(data[0].tags[0], 'experiment1');
+        assert.equal(data[0].tags[1], 'tag');
+        done();
+      });
+    });
+
+    it('returns nom matching items if $ne is specified', function (done) {
+      db.pageView.get({ hostname: 'shanetomlinson.com', tags: { $ne: 'experiment1' } }, function (err, data) {
+        assert.equal(data.length, 1);
+        assert.equal(data[0].uuid, 'second-uuid');
+        assert.equal(data[0].referrer, 'bigsearchcompany.com');
+        assert.equal(data[0].tags[0], 'experiment22');
         assert.equal(data[0].tags[1], 'tag');
         done();
       });
@@ -105,7 +118,7 @@ describe('database', function () {
     it('returns item if other tag is stored', function (done) {
       db.pageView.get({ tags: ['tag'] }, function (err, data) {
         assert.equal(data.length, 2);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].tags[1], 'tag');
         done();
       });
@@ -114,7 +127,7 @@ describe('database', function () {
     it('returns item if both tags are specified', function (done) {
       db.pageView.get({ tags: ['tag', 'experiment1'] }, function (err, data) {
         assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'shanetomlinson-uuid');
+        assert.equal(data[0].uuid, 'first-uuid');
         assert.equal(data[0].referrer, 'bigsearchcompany.com');
         assert.equal(data[0].tags[0], 'experiment1');
         assert.equal(data[0].tags[1], 'tag');
@@ -141,15 +154,15 @@ describe('database', function () {
     beforeEach(function (done) {
       db.pageView.create({
         hostname: 'shanetomlinson.com',
-        uuid: 'shanetomlinson-uuid',
+        uuid: 'first-uuid',
         referrer: 'bigsearchcompany.com',
-        tags: ['experiment1', 'tag'],
+        tags: ['experiment1', 'tag']
       }, function () {
         db.pageView.create({
           hostname: 'shanetomlinson.com',
-          uuid: 'shanetomlinson-uuid',
+          uuid: 'second-uuid',
           referrer: 'bigsearchcompany.com',
-          tags: ['experiment22', 'tag'],
+          tags: ['experiment22', 'tag']
         }, done);
       });
     });
@@ -157,12 +170,12 @@ describe('database', function () {
     it('returns one item', function (done) {
       db.pageView.getOne({ hostname: 'shanetomlinson.com', tags: ['experiment1'] })
         .then(function (item) {
-          assert.equal(item.uuid, 'shanetomlinson-uuid');
+          assert.equal(item.uuid, 'first-uuid');
           assert.equal(item.referrer, 'bigsearchcompany.com');
           assert.equal(item.tags[0], 'experiment1');
           assert.equal(item.tags[1], 'tag');
           done();
-        }).then(null, function (err) {
+        }).then(null, function () {
           done();
         });
     });
@@ -275,7 +288,7 @@ describe('database', function () {
             hostname: 'rum-diary.org'
           });
         }).then(function () {
-          done()
+          done();
         });
       });
 
@@ -298,7 +311,7 @@ describe('database', function () {
             assert.equal(siteReturned.hostname, 'testsite.com');
             assert.equal(siteReturned.total_hits, 0);
           }).then(function () {
-            return db.site.getOne({ hostname: 'testsite.com' })
+            return db.site.getOne({ hostname: 'testsite.com' });
           })
           .then(function (siteFetched) {
             assert.equal(siteFetched.hostname, 'testsite.com');
@@ -312,7 +325,7 @@ describe('database', function () {
       it('should increment the hit_count of the model by one', function (done) {
         db.site.hit('testsite.com')
           .then(function () {
-            return db.site.hit('testsite.com')
+            return db.site.hit('testsite.com');
           })
           .then(function () {
             return db.site.get({});
@@ -324,6 +337,134 @@ describe('database', function () {
       });
     });
   });
+
+  describe('tags', function () {
+    describe('create', function () {
+      it('should create an item', function (done) {
+        db.tags.create({
+          name: 'tag',
+          hostname: 'testsite.com'
+        }).then(function (tags) {
+          assert.equal(tags.hostname, 'testsite.com');
+          assert.equal(tags.total_hits, 0);
+
+          done();
+        });
+      });
+    });
+
+    describe('getOne', function () {
+      beforeEach(function (done) {
+        db.tags.create({
+          name: 'tag',
+          hostname: 'testsite.com'
+        }).then(function () {
+          return db.tags.create({
+            name: 'tag2',
+            hostname: 'testsite.org'
+          });
+        }).then(function () {
+          return db.tags.create({
+            name: 'tag',
+            hostname: 'anothersite.org'
+          });
+        }).then(function () {
+          done();
+        });
+      });
+
+      it('should get one matched hostname', function (done) {
+        db.tags.getOne({
+          name: 'tag',
+          hostname: 'testsite.com'
+        }).then(function (tag) {
+          assert.equal(tag.name, 'tag');
+          assert.equal(tag.hostname, 'testsite.com');
+          assert.equal(tag.total_hits, 0);
+          done();
+        });
+      });
+    });
+
+    describe('get', function () {
+      beforeEach(function (done) {
+        db.tags.create({
+          tag: 'tag',
+          hostname: 'testsite.com'
+        }).then(function () {
+          return db.tags.create({
+            tag: 'tag2',
+            hostname: 'testsite.com'
+          });
+        }).then(function () {
+          return db.tags.create({
+            name: 'tag',
+            hostname: 'anothersite.org'
+          });
+        }).then(function () {
+          done();
+        });
+      });
+
+      it('should return one or more matches', function (done) {
+        db.tags.get({ hostname: 'testsite.com' }).then(function (tags) {
+          assert.equal(tags.length, 2);
+          /*
+          assert.equal(tags[0].name, 'tag');
+          assert.equal(tags[0].hostname, 'testsite.com');
+          assert.equal(tags[0].total_hits, 0);
+          assert.equal(tags[0].name, 'tag2');
+          assert.equal(tags[1].hostname, 'testsite.com');
+          assert.equal(tags[1].total_hits, 0);
+          */
+          done();
+        });
+      });
+    });
+
+    describe('ensureExists', function () {
+      it('ensures the tags exists', function (done) {
+        db.tags.ensureExists({
+            name: 'tag',
+            hostname: 'testsite.com'
+          })
+          .then(function (tagsReturned) {
+            assert.equal(tagsReturned.name, 'tag');
+            assert.equal(tagsReturned.hostname, 'testsite.com');
+            assert.equal(tagsReturned.total_hits, 0);
+          }).then(function () {
+            return db.tags.getOne({ hostname: 'testsite.com' });
+          })
+          .then(function (tagsFetched) {
+            assert.equal(tagsFetched.name, 'tag');
+            assert.equal(tagsFetched.hostname, 'testsite.com');
+            assert.equal(tagsFetched.total_hits, 0);
+          })
+          .then(done);
+      });
+    });
+
+    describe('hit', function () {
+      it('should increment the hit_count of the model by one', function (done) {
+        db.tags.hit('testsite.com')
+          .then(function () {
+            return db.tags.hit({
+              name: 'tag',
+              hostname: 'testsite.com'
+            });
+          })
+          .then(function () {
+            return db.tags.get({ name: 'tag', hostname: 'testsite.com' });
+          }).then(function (tags) {
+            assert.equal(tags[0].name, 'tag');
+            assert.equal(tags[0].hostname, 'testsite.com');
+            assert.equal(tags[0].total_hits, 1);
+            done();
+          });
+      });
+    });
+  });
+
 
 
 });
