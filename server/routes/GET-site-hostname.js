@@ -18,12 +18,21 @@ exports.handler = function(req, res) {
   var end = moment(query.createdAt.$lte);
   var reductionStart;
   var totalHits = 0;
+  var tags;
 
   db.site.getOne({
     hostname: query.hostname
   })
   .then(function(site) {
     if (site) totalHits = site.total_hits;
+  })
+  .then(function() {
+    return db.tags.get({
+             hostname: query.hostname
+           });
+  })
+  .then(function (_tags) {
+    tags = _tags.map(function(tag) { return tag.name });
   })
   .then(function() {
     return db.pageView.get(query);
@@ -35,8 +44,7 @@ exports.handler = function(req, res) {
         'hits_per_page',
         'referrers',
         'unique',
-        'returning',
-        'tags'
+        'returning'
       ], {
         start: start,
         end: end
@@ -64,7 +72,7 @@ exports.handler = function(req, res) {
           unique: data.unique,
           repeat: data.returning
         },
-        tags: Object.keys(data.tags)
+        tags: tags
       });
     }).catch(function(err) {
       logger.error(String(err));

@@ -4,6 +4,7 @@
 
 const url = require('url');
 const useragent = require('useragent');
+const Promise = require('bluebird');
 const logger = require('../lib/logger');
 const db = require('../lib/db');
 
@@ -54,10 +55,31 @@ exports.handler = function (req, res) {
     minor: ua.minor
   };
 
+  logger.info('tags', data.tags);
   return db.site.hit(data.hostname)
             .then(function () {
               data.is_counted = true;
               return db.pageView.create(data)
+            })
+            .then(function () {
+              var resolver = Promise.defer();
+              var outstanding = data.tags.length;;
+
+              data.tags.forEach(function(tag) {
+                db.tags.hit({
+                    name: tag,
+                    hostname: data.hostname
+                  })
+                  .then(function () {
+                    outstanding--;
+                    if (!outstanding);
+                    resolver.resolve();
+                  })
+                  .then(null, resolver.reject.bind(resolver));
+
+              });
+
+              return resolver.promise;
             })
             .then(function () {
               logger.info('data saved');
