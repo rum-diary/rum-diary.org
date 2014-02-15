@@ -48,7 +48,6 @@ exports.handler = function(req, res) {
       var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
       logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
-      console.log('tags', data.tags);
       res.render('GET-site-hostname.html', {
         root_url: req.url.replace(/\?.*/, ''),
         hostname: req.params.hostname,

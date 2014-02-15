@@ -32,7 +32,7 @@ module.exports = function(req) {
 
   if (req.query.tags) {
     var tags = req.query.tags.split(',');
-    query.tags = tags;
+    query.tags = tagsToMongoSelector(tags);
   }
 
   if (req.query.referrer) {
@@ -41,4 +41,29 @@ module.exports = function(req) {
 
   return query;
 };
+
+function tagsToMongoSelector(tags) {
+  var $in = [];
+  var $nin = [];
+
+  tags.forEach(function (tag) {
+    if (isNotTag(tag)) return $nin.push(tag.replace(/^!/, ''));
+    $in.push(tag);
+  });
+
+  var selector = {};
+  if ($in.length) {
+    selector.$in = $in;
+  }
+
+  if ($nin.length) {
+    selector.$nin = $nin;
+  }
+
+  return selector;
+}
+
+function isNotTag(tag) {
+  return /^!/.test(tag);
+}
 
