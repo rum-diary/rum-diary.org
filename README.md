@@ -15,8 +15,8 @@ Real user metrics with ethics.
 
 ## Installation
 
-1. Clone [the repo](https://github.com/shane-tomlinson/rum-diary.org) from GitHub - https://github.com/shane-tomlinson/rum-diary.org.git
-2. run `npm install`
+1. Fork and clone [the repo](https://github.com/shane-tomlinson/rum-diary.org) from GitHub - https://github.com/shane-tomlinson/rum-diary.org/
+2. `npm install`
 
 ## Run the server
 
