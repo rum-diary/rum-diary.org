@@ -1,9 +1,12 @@
 {% extends "layout.html" %}
 {% block title %}Site list{% endblock %}
 
+{% block header %}
+  Sites
+{% endblock %}
+
 {% block body %}
 <section>
-  <h2>Sites</h2>
   <ul>
     {% for hostname in sites %}
       <li>

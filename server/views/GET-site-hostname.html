@@ -3,28 +3,31 @@
 
 {% block navigation %}
   <ul>
-    <li><a href="/site/">All sites</a></li>
+    <li><a href="/site/">Site list</a></li>
     <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
     <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
   </ul>
 
-  {% if tags.length %}
-    <h4>Tags</h4>
-    <ul>
-      <li><a href="{{ root_url }}">None</a></li>
-      {% for tag in tags %}
-        <li><a href="{{ root_url }}?tags={{ tag }}">{{ tag }}</a></li>
-        <li><a href="{{ root_url }}?tags=!{{ tag }}">!{{ tag }}</a></li>
-      {% endfor %}
-    </ul>
-  {% endif %}
 {% endblock %}
 
-{% block body %}
+{% block header %}
+  {{ hostname }} - {{ startDate }} to {{ endDate }}
+{% endblock %}
 
-<header>
-  <h1>{{ hostname }} - {{ startDate }} to {{ endDate }}</h2>
-</header>
+
+{% block body %}
+  {% if tags.length %}
+    <nav id="tags">
+      <h4>Tags</h4>
+      <ul>
+        <li><a href="{{ root_url }}">None</a></li>
+        {% for tag in tags %}
+          <li><a href="{{ root_url }}?tags={{ tag }}">{{ tag }}</a></li>
+          <li><a href="{{ root_url }}?tags=!{{ tag }}">!{{ tag }}</a></li>
+        {% endfor %}
+      </ul>
+    </nav>
+  {% endif %}
 
 <section class="row">
   <article id="overview" class="row-left">

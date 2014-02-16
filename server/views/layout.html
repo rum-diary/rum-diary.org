@@ -5,6 +5,7 @@
   <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0" />
   <title>RUM Diary - {% block title %}{% endblock %}</title>
   <link href="/en/vera-regular/fonts.css" type="text/css" rel="stylesheet" />
+  <link href="{{ "/css/normalize.css" | cachify }}" type="text/css" rel="stylesheet" />
   <link href="{{ "/css/main.css" | cachify }}" type="text/css" rel="stylesheet" />
   {% block headercss %}
   {% endblock %}
@@ -14,16 +15,31 @@
   </style>
 </head>
 <body>
-  <main>
-    <nav>
-      {% block navigation %}
-      {% endblock %}
-    </nav>
+  <header>
+    <div class="content-width">
+      <h1>rum-diary.org</h1>
+      <h2>Metrics with ethics</h2>
+      <h3>{% block header %}{% endblock %}</h3>
+      <nav>
+        {% block navigation %}
+        {% endblock %}
+      </nav>
+    </div>
+  </header>
 
+  <main class="content-width">
     {% block body %}
       We need a body!
     {% endblock %}
   </main>
+
+  <footer>
+    <div class="content-width">
+      Site created by <a href="https://shanetomlinson.com/" target="_blank">Shane Tomlinson</a>.
+      Licensed under the MPL 2.0 - Source available on
+      <a href="https://github.com/shane-tomlinson/rum-diary.org" target="_blank">GitHub</a>.
+    </div>
+  </footer>
 <script defer src="/include.js" data-tags="experimental,zopfli,cache"></script>
 {% block footerjs %}
   {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
