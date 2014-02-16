@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block title %}{{ hostname }} info{% endblock %}
 
+{% block header %}
+  {{ hostname }} Demographics - {{ startDate }} to {{ endDate }}
+{% endblock %}
+
 {% block navigation %}
   <ul>
     <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
@@ -9,9 +13,6 @@
 {% endblock %}
 
 {% block body %}
-<header>
-  <h1>{{ hostname }} Demographics - {{ startDate }} to {{ endDate }}</h2>
-</header>
 
 <section>
   Browser, OS, mobile vs tablet vs desktop stats go here.

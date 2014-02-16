@@ -17,6 +17,7 @@ module.exports = function (grunt) {
     'selectconfig:dist',
     'jshint',
     'preprocess',
+    'sass',
     /*'mocha',*/
     'clean',
     'copy',
@@ -45,6 +46,7 @@ module.exports = function (grunt) {
       selectConfig,
       'jshint',
       'preprocess',
+      'sass',
       'serverproc'
     ]);
   });

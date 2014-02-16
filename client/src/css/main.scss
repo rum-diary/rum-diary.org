@@ -1,16 +1,119 @@
-body {
-  font-family: "Bitstream Vera Sans", "sans-serif", "serif";
+@import "variables";
+
+/* border box everything! */
+*:before,
+*:after {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
        -o-box-sizing: border-box;
           box-sizing: border-box;
-  color: #333;
+}
+
+
+body {
+  font-family: $font-family;
+  color: $body-text-color;
+  margin: 0;
+  font-size: 18px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  padding: 0;
+}
+
+header, footer {
+  background-color: $header-footer-background-color;
+  color: $header-footer-color;
+  padding: 1rem;
+
+  a {
+    color: $header-footer-color;
+  }
+
+  h1, h2 {
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+
+  h2:before {
+    content: '-';
+    margin: 0 1rem;
+  }
+
+  h3 {
+    margin-bottom: .5rem;
+  }
+
+  nav li {
+    > a {
+      color: $navigation-text-color;
+      font-size: .8rem;
+    }
+
+    > a:active, > a:hover, a:focus {
+      color: $navigation-text-focus-color;
+    }
+  }
+}
+
+header {
+  margin-bottom: 3rem;
+}
+
+footer {
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  > li {
+    list-style: none;
+    display: inline-block;
+    margin: 0 0.5rem 0 0;
+    padding: 0;
+  }
+}
+
+
+#tags {
+  margin-bottom: 3rem;
+
+  > h4 {
+    display: inline-block;
+    margin-right: 1rem;
+  }
+
+  ul {
+    display: inline-block;
+  }
+
+  li {
+    > a {
+      color: $tags-text-color;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+
+    > a:active, > a:hover, > a:focus {
+      border-bottom: 1px dotted;
+      color: $tags-text-focus-color;
+    }
+  }
+}
+
+.content-width {
+  margin: 0 auto;
+  width: 960px;
 }
 
 main {
   display: block;
-  margin: 0 auto 10em auto;
-  width: 960px;
+  margin: 0 auto 10rem auto;
 }
 
 #overview {
@@ -61,9 +164,6 @@ main {
 .half {
   width: 50%;
   margin: 0;
-}
-
-#navigation-timing {
 }
 
 

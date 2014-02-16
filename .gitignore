@@ -2,3 +2,4 @@ node_modules/
 client/dist/
 client/src/include.js
 server/var
+client/src/css/main.css
