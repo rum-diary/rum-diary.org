@@ -1,11 +1,10 @@
 {
-  "name": "speed-trap-record",
-  "version": "0.0.0",
-  "description": "Data recorder for speed-trap",
+  "name": "rum-diary.org",
+  "version": "0.0.1",
+  "description": "web site real user metrics with ethics",
   "scripts": {
     "start": "scripts/run_locally.js",
-    "test_mongo": "DATABASE_DRIVER=mongo mocha test/",
-    "test": "DATABASE_DRIVER=json mocha test/"
+    "test": "DATABASE_DRIVER=mongo mocha test/"
   },
   "author": "Shane Tomlinson <shane@shanetomlinson.com>",
   "license": "MPL 2.0",
@@ -31,7 +30,7 @@
     "helmet": "0.1.2",
     "connect-cachify": "0.0.15",
     "think-stats": "git://github.com/shane-tomlinson/think-stats.git#1c96d3c7",
-    "underscore": "~1.6.0"
+    "underscore": "1.6.0"
   },
   "devDependencies": {
     "mocha": "~1.16.1",
