@@ -26,6 +26,16 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
 }
 
+/* 
+ * wrapper is set to min-height: 100% to allow the footer 
+ * to be placed at the bottom of the page.
+ */
+#wrapper {
+  min-height: 100%;
+  position: relative;
+}
+
+
 header, footer {
   background-color: $header-footer-background-color;
   color: $header-footer-color;
@@ -65,16 +75,11 @@ header {
   margin-bottom: 3rem;
 }
 
-main {
-  display: block;
-  padding-bottom: 48px;
-}
-
 footer {
-  bottom: 0;
+  bottom: 0; 
   font-size: 0.8rem;
   left: 0;
-  position: fixed;
+  position: absolute;
   right: 0;
   text-align: center;
 }
@@ -145,6 +150,11 @@ nav.multi-column-nav {
       text-decoration: underline;
     }
   }
+}
+
+main {
+  /* allow the footer to occupy this space */
+  padding-bottom: 48px;
 }
 
 .content-width {
