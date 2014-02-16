@@ -108,14 +108,41 @@ nav.horizontal-nav {
 
   li {
     > a {
-      color: $tags-text-color;
+      color: $horizontal-nav-text-color;
       font-size: 1rem;
       text-decoration: none;
     }
 
     > a:active, > a:hover, > a:focus, > a.selected {
       border-bottom: 1px dotted;
-      color: $tags-text-focus-color;
+      color: $horizontal-nav-text-focus-color;
+    }
+  }
+}
+
+nav.multi-column-nav {
+  ul {
+    list-style: none;
+  }
+  li {
+    margin-left: -1rem;
+
+    > a {
+      color: $vertical-nav-text-color;
+      display: inline-block;
+      font-size: 1rem;
+      overflow: hidden;
+      padding: 1rem;
+      text-decoration: none;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 18rem;
+    }
+
+    > a:active, > a:hover, > a:focus, > a.selected {
+      background-color: $vertical-nav-background-color;
+      color: $vertical-nav-text-focus-color;
+      text-decoration: underline;
     }
   }
 }
