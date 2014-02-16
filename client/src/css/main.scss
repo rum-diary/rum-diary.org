@@ -9,18 +9,32 @@
           box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+}
 
 body {
-  font-family: $font-family;
   color: $body-text-color;
-  margin: 0;
+  font-family: $font-family;
   font-size: 18px;
+  height: 100%;
+  margin: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
   padding: 0;
 }
+
+/* 
+ * wrapper is set to min-height: 100% to allow the footer 
+ * to be placed at the bottom of the page.
+ */
+#wrapper {
+  min-height: 100%;
+  position: relative;
+}
+
 
 header, footer {
   background-color: $header-footer-background-color;
@@ -62,9 +76,14 @@ header {
 }
 
 footer {
+  bottom: 0; 
   font-size: 0.8rem;
+  left: 0;
+  position: absolute;
+  right: 0;
   text-align: center;
 }
+
 
 nav ul {
   list-style: none;
@@ -80,7 +99,7 @@ nav ul {
 }
 
 
-#tags {
+nav.horizontal-nav {
   margin-bottom: 3rem;
 
   > h4 {
@@ -94,26 +113,54 @@ nav ul {
 
   li {
     > a {
-      color: $tags-text-color;
+      color: $horizontal-nav-text-color;
       font-size: 1rem;
       text-decoration: none;
     }
 
-    > a:active, > a:hover, > a:focus {
+    > a:active, > a:hover, > a:focus, > a.selected {
       border-bottom: 1px dotted;
-      color: $tags-text-focus-color;
+      color: $horizontal-nav-text-focus-color;
     }
   }
 }
 
-.content-width {
-  margin: 0 auto;
-  width: 960px;
+nav.multi-column-nav {
+  ul {
+    list-style: none;
+  }
+  li {
+    margin-left: -1rem;
+
+    > a {
+      color: $vertical-nav-text-color;
+      display: inline-block;
+      font-size: 1rem;
+      overflow: hidden;
+      padding: 1rem;
+      text-decoration: none;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 18rem;
+    }
+
+    > a:active, > a:hover, > a:focus, > a.selected {
+      background-color: $vertical-nav-background-color;
+      color: $vertical-nav-text-focus-color;
+      text-decoration: underline;
+    }
+  }
 }
 
 main {
-  display: block;
-  margin: 0 auto 10rem auto;
+  /* allow the footer to occupy this space */
+  padding-bottom: 48px;
+}
+
+.content-width {
+  margin-left: auto;
+  margin-right: auto;
+  width: 960px;
 }
 
 #overview {
@@ -198,7 +245,7 @@ main {
 }
 
 .navigation-timing-item {
-  margin: .35em 0;
+  margin: .25rem .35rem .25rem 0;
 }
 
 

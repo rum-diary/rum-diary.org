@@ -15,6 +15,17 @@
 {% endblock %}
 
 {% block body %}
+<nav class="horizontal-nav">
+  <h4>Events</h4>
+  <ul class="list-unstyled">
+    {% for field in navigationTimingFields %}
+    <li class="navigation-timing-item">
+      <a {% if field == statName %} class="selected {% endif %} href="{{ baseURL }}?plot={{ field }}">{{ field }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+
 
 <section class="row">
   <section id="histogram" class="row-left half">
@@ -41,17 +52,7 @@
 </section>
 
 <section class="row">
-  <section class="row-left half">
-    <ul class="list-unstyled">
-      {% for field in navigationTimingFields %}
-      <li class="navigation-timing-item">
-        <a href="{{ baseURL }}?plot={{ field }}">{{ field }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
-
-  <section id="navigation-timing" class="row-right half">
+  <section id="navigation-timing" class="row-left half">
     <h3>Navigation timing quartiles</h3>
 
     <div class="navigation-timing-graph" id="navigation-timing-graph"></div>

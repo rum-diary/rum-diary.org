@@ -14,7 +14,7 @@ exports.handler = function(req, res) {
     .then(function(sites) {
       var hostnames = sites.map(function(site) {
                         return site.hostname;
-                      });
+                      }).sort();
 
       res.render('GET-site-index.html', {
         sites: hostnames
