@@ -17,7 +17,6 @@ exports.path = '/site/:hostname/performance';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
-  console.log('handler kicked in');
   var query = getQuery(req);
   var start = moment(query.createdAt['$gte']);
   var end = moment(query.createdAt['$lte']);

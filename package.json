@@ -21,7 +21,6 @@
     "mongoose-timestamp": "0.1.1",
     "fast-stats": "0.0.2",
     "mkdirp": "0.3.5",
-    "sarray": "0.0.5",
     "connect-fonts-bitstream-vera-sans": "0.0.1",
     "connect-fonts": "0.0.12",
     "bluebird": "0.11.5-1",
@@ -29,7 +28,7 @@
     "connect-gzip-static": "git://github.com/shane-tomlinson/connect-gzip-static.git#3625997d2a8f83ef8040632c20e8ae3e9bf9fced",
     "helmet": "0.1.2",
     "connect-cachify": "0.0.15",
-    "think-stats": "git://github.com/shane-tomlinson/think-stats.git#1c96d3c7",
+    "think-stats": "git://github.com/shane-tomlinson/think-stats.git#8cea433c",
     "underscore": "1.6.0"
   },
   "devDependencies": {

@@ -4,17 +4,17 @@
 
 const moment = require('moment');
 const Stats = require('fast-stats').Stats;
+const ThinkStats = require('think-stats');
 const url = require('url');
-const SortedArray = require('sarray');
 const Promise = require('bluebird');
 const EasierObject = require('easierobject').easierObject;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const logger = require('./logger');
 
 function ensurePageInfo(returnedData, page, startDate, endDate) {
-  if ( ! (page in returnedData)) {
+  if ( ! returnedData.hasOwnProperty(page)) {
     var numDays = diffDays(startDate, endDate);
-    returnedData[page] = [];
+    returnedData[page] = new Array(numDays);
     // <= to include both the start and end date
     for (var i = 0; i <= numDays; ++i) {
       var date = new Date();
@@ -30,18 +30,20 @@ function ensurePageInfo(returnedData, page, startDate, endDate) {
 }
 
 function diffDays(startDate, date) {
-  return Math.floor((date - startDate) / MS_PER_DAY);
+  // Math.floor is really slow, so do
+  // Math.floor using bit operations.
+  return ((date - startDate) / MS_PER_DAY) << 0;
 }
 
-function getPageDateInfo(returnedData, page, startDate, date) {
+function getPageInfoOnDate(pageInfo, page, startDate, date) {
   var index = diffDays(startDate, date);
-  return returnedData[page][index];
+  return pageInfo[page][index];
 }
 
 function incrementDailyPageHit(returnedData, page, startDate, date) {
-  var pageDateInfo = getPageDateInfo(returnedData, page, startDate, date);
-  if ( ! pageDateInfo) return new Error('invalid date range');
-  pageDateInfo.hits++;
+  var pageInfoOnDate = getPageInfoOnDate(returnedData, page, startDate, date);
+  if ( ! pageInfoOnDate) return new Error('invalid date range');
+  pageInfoOnDate.hits++;
 }
 
 function earliestDate(data, dateName) {
@@ -63,7 +65,7 @@ function latestDate(data, dateName) {
 }
 
 function updatePageHit(hitsPerDay, options, hit) {
-  var date = new Date(hit.createdAt);
+  var date = new Date(hit.createdAt).getTime();
 
   if (hit.path) {
     ensurePageInfo(hitsPerDay, hit.path, options.start, options.end);
@@ -146,18 +148,20 @@ exports.findNavigationTimingStats = function (hits, statsToFind, options, done) 
 };
 
 function sortHostnamesByCount(countByHostname) {
-  var sortedByCount = SortedArray(function(a, b) {
-    return b.count - a.count;
+  var sortedByCount = new ThinkStats({
+    compare: function(a, b) {
+      return b.count - a.count;
+    }
   });
 
   Object.keys(countByHostname).forEach(function(hostname) {
-    sortedByCount.add({
+    sortedByCount.push({
       hostname: hostname,
       count: countByHostname[hostname]
     });
   });
 
-  return sortedByCount.items;
+  return sortedByCount.sorted();
 }
 
 function createStat(options) {
