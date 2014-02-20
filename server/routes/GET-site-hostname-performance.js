@@ -27,17 +27,20 @@ exports.handler = function(req, res) {
   var hitsData;
   var cdfData;
   var histogramData;
-  var navigationTimingData;
+  var requestedStatData;
   db.pageView.get(query)
-    .then(function(data) {
+    .then(function(hits) {
+      hitsData = hits;
+      requestedStatData = hitsToStats(hits, statName);
+    })
+    .then(function(stats) {
       logger.info('calculating histogram');
-      hitsData = data;
-      return filterNavigationTimingHistogram(hitsData, statName);
+      return filterNavigationTimingHistogram(requestedStatData);
     })
     .then(function(data) {
       logger.info('calculating cdf');
       histogramData = data;
-      return filterNavigationTimingCdf(hitsData, statName);
+      return filterNavigationTimingCdf(requestedStatData);
     })
     .then(function(data) {
       logger.info('calculating quartiles');
@@ -52,8 +55,7 @@ exports.handler = function(req, res) {
         }
       });
     })
-    .then(function(data) {
-      navigationTimingData = data;
+    .then(function(navigationTimingData) {
 
       res.render('GET-site-hostname-performance.html', {
         baseURL: req.url.replace(/\?.*/, ''),
@@ -69,9 +71,11 @@ exports.handler = function(req, res) {
         second_q: navigationTimingData.navigation['50'],
         third_q: navigationTimingData.navigation['75']
       });
+      hitsData = requestedStatData =cdfData = histogramData = null;
     })
     .then(null, function(err) {
-      return res.send(500);
+      res.send(500);
+      logger.error('error! %s', String(err));
     });
 };
 
@@ -101,17 +105,20 @@ function getNavigationTimingFields() {
   });
 }
 
-function filterNavigationTimingCdf(hits, stat) {
-  console.log('statName', stat);
+function hitsToStats(hits, stat) {
+  var stats = new ThinkStats();
+
+  hits.forEach(function(hit) {
+    var value = hit.navigationTiming[stat] || NaN;
+    if (isNaN(value) || value === null || value === Infinity) return;
+    stats.push(value);
+  });
+
+  return stats;
+}
+
+function filterNavigationTimingCdf(stats) {
   return Promise.attempt(function() {
-    var stats = new ThinkStats();
-
-    hits.forEach(function(hit) {
-      var value = hit.navigationTiming[stat] || NaN;
-      if (isNaN(value) || value === null || value === Infinity) return;
-      stats.push(value);
-    });
-
     try {
       return stats.cdf();
     } catch(e) {
@@ -120,38 +127,24 @@ function filterNavigationTimingCdf(hits, stat) {
   });
 }
 
-function filterNavigationTimingHistogram(hits, stat) {
-  console.log('statName', stat);
+function filterNavigationTimingHistogram(stats) {
   return Promise.attempt(function() {
-    var stats = new Stats();
+    var twentyFifthPercentile = stats.percentile(25);
+    var startIndex = stats.percentileIndex(25);
 
-    hits.forEach(function(hit) {
-      var value = hit.navigationTiming[stat] || NaN;
-      if (isNaN(value) || value === null || value === Infinity) return;
-      stats.push(value);
-    });
+    var seventyFifthPercentile = stats.percentile(75);
+    var endIndex = stats.percentileIndex(75);
 
-    var iqr = stats.iqr();
-    if (iqr.length === 0) return [];
-    var range = iqr.range();
+    var buckets = Math.min(endIndex - startIndex, 75) || 1;
 
-    var start = range[0] || 0;
-    var end = range[1] || (stats.length - 1);
+    // slice's endIndex is exclusive, add one to include the endIndex.
+    var iqrHits = stats.sorted().slice(startIndex, endIndex + 1);
 
-    var buckets = Math.min(iqr.length, 75) || 1;
-    var precision = Math.ceil((end - start) / buckets);
-    var bucketed = new Stats({ bucket_precision: precision });
-
-    hits.forEach(function(hit) {
-      var value = hit.navigationTiming[stat] || NaN;
-      if (isNaN(value) || value === null || value === Infinity) return;
-      if (start <= value && value <= end) {
-        bucketed.push(value);
-      }
-    });
+    var bucketed = new ThinkStats();
+    bucketed.push(iqrHits);
 
     var values = [];
-    var d = bucketed.distribution();
+    var d = bucketed.bucket(buckets);
     d.forEach(function(bucket) {
       for (var i = 0; i < bucket.count; ++i) {
         values.push(bucket.bucket);

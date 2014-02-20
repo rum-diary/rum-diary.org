@@ -165,7 +165,7 @@ function sortHostnamesByCount(countByHostname) {
 }
 
 function createStat(options) {
-  return new Stats(options);
+  return new ThinkStats(options);
 }
 
 function getNavigationTimingAccumulators(options) {
@@ -228,9 +228,15 @@ function updateNavigationTiming(stats, hit) {
     var navTiming = hit.navigationTiming;
 
     for (var key in navTiming) {
-      if (stats.hasOwnProperty(key)) stats[key].push(navTiming[key]);
+      if (stats.hasOwnProperty(key)) {
+        var value = navTiming[key];
+        if (!(isNaN(value) || value === null || value === Infinity)) {
+          stats[key].push(navTiming[key]);
+        }
+      }
     }
 
+    /*
     stats.redirectDuration.push(
               navTiming.redirectEnd - navTiming.redirectStart);
 
@@ -254,6 +260,7 @@ function updateNavigationTiming(stats, hit) {
 
     stats.processingDuration.push(
               navTiming.loadEventEnd - navTiming.domLoading);
+    */
 }
 
 exports.findHostnames = function(hits, done) {
