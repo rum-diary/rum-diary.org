@@ -3,13 +3,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const moment = require('moment');
-const Stats = require('fast-stats').Stats;
 const ThinkStats = require('think-stats');
 const url = require('url');
 const Promise = require('bluebird');
 const EasierObject = require('easierobject').easierObject;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const logger = require('./logger');
+
+// keep this around to facilitate debugging memory leaks when needed.
+if (false) {
+  const memwatch = require('memwatch');
+  memwatch.on('leak', function(info) {
+    logger.error('memory leak: %s', JSON.stringify(info, null, 2));
+  });
+  memwatch.on('stats', function(info) {
+    logger.warn('memory stats: %s', JSON.stringify(info, null, 2));
+  });
+}
 
 function ensurePageInfo(returnedData, page, startDate, endDate) {
   if ( ! returnedData.hasOwnProperty(page)) {
@@ -179,7 +189,7 @@ function getNavigationTimingAccumulators(options) {
     // redirect - only visible if redirecting from the same domain.
     redirectStart: createStat(options),
     redirectEnd: createStat(options),
-    redirectDuration: createStat(options),
+    /*redirectDuration: createStat(options),*/
 
     // App cache
     fetchStart: createStat(options),
@@ -187,41 +197,49 @@ function getNavigationTimingAccumulators(options) {
     // DNS - will be the same as fetchStart if DNS is already resolved.
     domainLookupStart: createStat(options),
     domainLookupEnd: createStat(options),
-    domainLookupDuration: createStat(options),
+    /*domainLookupDuration: createStat(options),*/
 
     // TCP - will be the same as domainLookupDuration if reusing a connection.
     connectStart: createStat(options),
     secureConnectionStart: createStat(options),
     connectEnd: createStat(options),
-    connectDuration: createStat(options),
+    /*connectDuration: createStat(options),*/
 
     // request & response
     requestStart: createStat(options),
     responseStart: createStat(options),
     responseEnd: createStat(options),
-    requestResponseDuration: createStat(options),
+    /*requestResponseDuration: createStat(options),*/
 
     // unload previous page - only valid previous page was on the same domain.
     unloadEventStart: createStat(options),
     unloadEventEnd: createStat(options),
-    unloadEventDuration: createStat(options),
+    /*unloadEventDuration: createStat(options),*/
 
     // processing
     domLoading: createStat(options),
     domInteractive: createStat(options),
     domContentLoadedEventStart: createStat(options),
     domContentLoadedEventEnd: createStat(options),
-    domContentLoadedEventDuration: createStat(options),
+    /*domContentLoadedEventDuration: createStat(options),*/
     domComplete: createStat(options),
 
     // load
     loadEventStart: createStat(options),
     loadEventEnd: createStat(options),
-    loadEventDuration: createStat(options),
-    processingDuration: createStat(options)
+    /*loadEventDuration: createStat(options),*/
+    /*processingDuration: createStat(options)*/
   };
 
   return stats;
+}
+
+function freeNavigationTimingAccumulators(accumulators) {
+  for (var key in accumulators) {
+    accumulators[key].destroy();
+    accumulators[key] = null;
+    delete accumulators[key];
+  }
 }
 
 function updateNavigationTiming(stats, hit) {
@@ -287,6 +305,8 @@ function updateReferrer(referrers, hit) {
   var hostname = hit.referrer_hostname;
   if ( ! hostname) {
     try {
+      // XXX this is exceptionally slow, check if all referrers have been
+      // converted to hostnames and remove this.
       var parsed = url.parse(hit.referrer);
       hostname = parsed.hostname;
     } catch(e) {
@@ -384,6 +404,11 @@ function updateTags(tags, hit) {
   });
 }
 
+/**
+ * This is a cluster.
+ *
+ * Take hits data, convert to data that can be displayed to the user.
+ */
 exports.mapReduce = function(hits, fields, options, done) {
   var startTime = new Date();
   return Promise.attempt(function() {
@@ -463,6 +488,13 @@ exports.mapReduce = function(hits, fields, options, done) {
     return calculateNavigationTimingStats(
         data.navigation_accumulators, options.navigation.calculate)
       .then(function(navigationTimingStats) {
+
+        // free the accumulator references, they are no longer needed.
+        // The accumulators cause the heap to grow to the point of OOM.
+        freeNavigationTimingAccumulators(data.navigation_accumulators);
+        data.navigation_accumulators = null;
+        delete data.navigation_accumulators;
+
         data.navigation = navigationTimingStats;
         return data;
       });
