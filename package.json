@@ -16,7 +16,7 @@
     "spdy": "1.17.10",
     "convict": "0.4.1",
     "intel": "0.4.0",
-    "mongoose": "3.8.3",
+    "mongoose": "3.8.7",
     "moment": "2.4.0",
     "mongoose-timestamp": "0.1.1",
     "fast-stats": "0.0.2",
