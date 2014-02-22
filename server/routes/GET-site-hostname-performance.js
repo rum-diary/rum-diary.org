@@ -24,14 +24,26 @@ exports.handler = function(req, res) {
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;
 
-  var hitsData;
-  var cdfData;
-  var histogramData;
-  var requestedStatData;
-  db.pageView.get(query)
-    .then(function(hits) {
-      hitsData = hits;
-      requestedStatData = hitsToStats(hits, statName);
+  var hitsData = [];
+
+  // streams are *much* more memory efficient than one huge get.
+  db.pageView.getStream(query)
+    .then(function (stream) {
+      stream.on('data', function (doc) {
+        hitsData.push(doc);
+      });
+
+      stream.on('close', complete);
+    });
+
+
+  function complete() {
+    var cdfData;
+    var histogramData;
+    var requestedStatData;
+
+    Promise.attempt(function() {
+      requestedStatData = hitsToStats(hitsData, statName);
     })
     .then(function(stats) {
       logger.info('calculating histogram');
@@ -56,7 +68,6 @@ exports.handler = function(req, res) {
       });
     })
     .then(function(navigationTimingData) {
-
       res.render('GET-site-hostname-performance.html', {
         baseURL: req.url.replace(/\?.*/, ''),
         histogram: histogramData,
@@ -77,6 +88,8 @@ exports.handler = function(req, res) {
       res.send(500);
       logger.error('error! %s', String(err));
     });
+  }
+
 };
 
 function getNavigationTimingFields() {

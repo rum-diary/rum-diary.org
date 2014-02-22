@@ -48,7 +48,7 @@ exports.update = withDatabase(function (model, done) {
     return;
   }
 
-  model.save(function(err, model, numAffected) {
+  model.save(function(err, model) {
     if (err) {
       resolver.reject(err);
       if (done) done(err);
@@ -85,6 +85,33 @@ exports.get = withDatabase(function (searchBy, done) {
     if (done) done(err);
     throw err;
   });
+
+  function computeDuration() {
+    var endTime = new Date();
+    var duration = endTime.getDate() - startTime.getDate();
+    logger.info('%s->get query time for %s: %s ms',
+                    name, JSON.stringify(searchBy), duration);
+  }
+});
+
+exports.getStream = withDatabase(function (searchBy) {
+  var startTime = new Date();
+  var name = this.name;
+
+  searchBy = this.getSearchBy(searchBy);
+
+  logger.info('%s->getStream: %s', name, JSON.stringify(searchBy));
+
+  var stream = this.Model.find(searchBy).stream();
+
+  stream.on('err', function(err) {
+    computeDuration();
+    logger.error('%s->getStream error: %s', name, String(err));
+  });
+
+  stream.on('close', computeDuration);
+
+  return stream;
 
   function computeDuration() {
     var endTime = new Date();
