@@ -74,7 +74,8 @@ function latestDate(data, dateName) {
           }, null);
 }
 
-function updatePageHit(hitsPerDay, options, hit) {
+function updatePageHit(data, hit, options) {
+  var hitsPerDay = data.hits_per_day;
   var date = new Date(hit.createdAt).getTime();
 
   if (hit.path) {
@@ -236,7 +237,8 @@ function freeNavigationTimingAccumulators(accumulators) {
   }
 }
 
-function updateNavigationTiming(stats, hit) {
+function updateNavigationTiming(data, hit) {
+    var stats = data.navigation_accumulators;
     var navTiming = hit.navigationTiming;
 
     for (var key in navTiming) {
@@ -283,7 +285,8 @@ exports.findHostnames = function (hits) {
 };
 
 
-function updateHostname(hostnames, hit) {
+function updateHostname(data, hit) {
+  var hostnames = data.hostnames;
   if (hit.hostname) {
     if ( ! (hit.hostname in hostnames)) {
       hostnames[hit.hostname] = 0;
@@ -293,7 +296,8 @@ function updateHostname(hostnames, hit) {
   }
 }
 
-function updateReferrer(referrers, hit) {
+function updateReferrer(data, hit) {
+  var referrers = data.referrers.by_hostname;
   if ( ! hit.referrer) return;
 
   var hostname = hit.referrer_hostname;
@@ -315,7 +319,9 @@ function updateReferrer(referrers, hit) {
   referrers[hostname]++;
 }
 
-function updateHitsPerPage(hitsPerPage, hit) {
+function updateHitsPerPage(data, hit) {
+  var hitsPerPage = data.hits_per_page;
+
   hitsPerPage.__all++;
 
   var path = hit.path;
@@ -326,7 +332,9 @@ function updateHitsPerPage(hitsPerPage, hit) {
   hitsPerPage[path]++;
 }
 
-function updateBrowser(browsers, hit) {
+function updateBrowser(data, hit) {
+  var browsers = data.browsers;
+
   if (hit.browser && hit.browser.family) {
     var family = hit.browser.family;
 
@@ -338,7 +346,8 @@ function updateBrowser(browsers, hit) {
   }
 }
 
-function updateOs(os, hit) {
+function updateOs(data, hit) {
+  var os = data.os;
   var family;
   if (hit.os_parsed && hit.os_parsed.family) {
     family = hit.os_parsed.family;
@@ -358,7 +367,8 @@ function updateOs(os, hit) {
   os[family]++;
 }
 
-function updateOsForm(os, hit) {
+function updateOsForm(data, hit) {
+  var os = data['os:form'];
   var family;
   if (hit.os_parsed && hit.os_parsed.family) {
     family = hit.os_parsed.family;
@@ -384,7 +394,8 @@ function isMobileOS(os) {
   return (/(mobile|iOS|android)/ig).test(os);
 }
 
-function updateTags(tags, hit) {
+function updateTags(data, hit) {
+  var tags = data.tags;
   if (! hit.tags) return;
 
   hit.tags.forEach(function (tag) {
@@ -396,6 +407,14 @@ function updateTags(tags, hit) {
 
     tags[tag]++;
   });
+}
+
+function updateUniqueVisitors(data, hit) {
+  if (! hit.returning) data.unique++;
+}
+
+function updateReturningVisitors(data, hit) {
+  if (hit.returning) data.returning++;
 }
 
 /**
@@ -410,17 +429,31 @@ exports.mapReduce = function (hits, fields, options) {
 
     var data = {};
 
+    var mappers = [];
+
     var doHostnames = fields.indexOf('hostnames') > -1;
-    if (doHostnames) data.hostnames = {};
+    if (doHostnames) {
+      data.hostnames = {};
+      mappers.push(updateHostname);
+    }
 
     var doHitsPerPage = fields.indexOf('hits_per_page') > -1;
-    if (doHitsPerPage) data.hits_per_page = { __all: 0 };
+    if (doHitsPerPage) {
+      data.hits_per_page = { __all: 0 };
+      mappers.push(updateHitsPerPage);
+    }
 
     var doReferrers = fields.indexOf('referrers') > -1;
-    if (doReferrers) data.referrers = { by_hostname: {} };
+    if (doReferrers) {
+      data.referrers = { by_hostname: {} };
+      mappers.push(updateReferrer);
+    }
 
     var doNavigation = fields.indexOf('navigation') > -1;
-    if (doNavigation) data.navigation_accumulators = getNavigationTimingAccumulators(options);
+    if (doNavigation) {
+      data.navigation_accumulators = getNavigationTimingAccumulators(options);
+      mappers.push(updateNavigationTiming);
+    }
 
     var doHitsPerDay = fields.indexOf('hits_per_day') > -1;
     if (doHitsPerDay) {
@@ -432,41 +465,52 @@ exports.mapReduce = function (hits, fields, options) {
 
       data.hits_per_day = {};
       ensurePageInfo(data.hits_per_day, '__all', options.start, options.end);
+      mappers.push(updatePageHit);
     }
 
     var doUniqueVisitors = fields.indexOf('unique') > -1;
-    if (doUniqueVisitors) data.unique = 0;
+    if (doUniqueVisitors) {
+      data.unique = 0;
+      mappers.push(updateUniqueVisitors);
+    }
 
     var doReturningVisitors = fields.indexOf('returning') > -1;
-    if (doReturningVisitors) data.returning = 0;
+    if (doReturningVisitors) {
+      data.returning = 0;
+      mappers.push(updateReturningVisitors);
+    }
 
     var doBrowsers = fields.indexOf('browsers') > -1;
-    if (doBrowsers) data.browsers = {};
+    if (doBrowsers) {
+      data.browsers = {};
+      mappers.push(updateBrowser);
+    }
 
     var doOs = fields.indexOf('os') > -1;
-    if (doOs) data.os = {};
-
-    var doTags = fields.indexOf('tags') > -1;
-    if (doTags) data.tags = {};
+    if (doOs) {
+      data.os = {};
+      mappers.push(updateOs);
+    }
 
     var doOsForm = fields.indexOf('os:form') > -1;
-    if (doOsForm) data['os:form'] = {
-      mobile: {},
-      desktop: {}
-    };
+    if (doOsForm) {
+      data['os:form'] = {
+        mobile: {},
+        desktop: {}
+      };
+      mappers.push(updateOsForm);
+    }
+
+    var doTags = fields.indexOf('tags') > -1;
+    if (doTags) {
+      data.tags = {};
+      mappers.push(updateTags);
+    }
 
     hits.forEach(function (hit) {
-      if (doHostnames) updateHostname(data.hostnames, hit);
-      if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
-      if (doReferrers) updateReferrer(data.referrers.by_hostname, hit);
-      if (doNavigation) updateNavigationTiming(data.navigation_accumulators, hit);
-      if (doHitsPerDay) updatePageHit(data.hits_per_day, options, hit);
-      if (doUniqueVisitors) if (! hit.returning) data.unique++;
-      if (doReturningVisitors) if (hit.returning) data.returning++;
-      if (doBrowsers) updateBrowser(data.browsers, hit);
-      if (doOs) updateOs(data.os, hit);
-      if (doOsForm) updateOsForm(data['os:form'], hit);
-      if (doTags) updateTags(data.tags, hit);
+      mappers.forEach(function(mapper) {
+        mapper(data, hit, options);
+      });
     });
 
     if (doReferrers) {
