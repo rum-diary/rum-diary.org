@@ -10,7 +10,7 @@ const clientResources = require('../lib/client-resources');
 const getQuery = require('../lib/site-query');
 
 
-exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)?)\/path\/([\w\d-]+(?:\/[\w\d-]+)*\/?)$/;
+exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)?)\/path\/([\w\d-]+(?:\/[\w\d-]+)*\/?)?$/;
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
@@ -23,16 +23,18 @@ exports.handler = function(req, res) {
   logger.info('get information for %s/%s', hostname, path);
 
   if ( ! /^\//.test(path)) {
-    path = "/" + path;
+    path = '/' + path;
   }
 
   query.hostname = hostname;
   query.path = path;
 
-  db.pageView.get(query, function(err, hits) {
-    var reductionStart = new Date();
+  var reductionStart;
 
-    reduce.mapReduce(hits, [
+  db.pageView.get(query).then(function(hits) {
+    reductionStart = new Date();
+
+    return reduce.mapReduce(hits, [
       'hits_per_day',
       'hits_per_page',
       'referrers',
@@ -43,28 +45,29 @@ exports.handler = function(req, res) {
       navigation: {
         calculate: ['median']
       }
-    }, function(err, data) {
-      var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
-
-      var reductionEnd = new Date();
-      var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
-      logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
-
-      res.render('GET-site-hostname-path.html', {
-        root_url: req.url.replace(/\?.*/, ''),
-        path: path,
-        hostname: req.params.hostname,
-        resources: clientResources('rum-diary.min.js'),
-        pageHitsPerPage: pageHitsPerPageSorted,
-        pageHitsPerDay: data.hits_per_day.__all,
-        median: data.navigation.median,
-        referrers: data.referrers.by_count.slice(0, 20),
-        startDate: start.format('MMM DD'),
-        endDate: end.format('MMM DD')
-      });
     });
-  });
+  }).then(function(data) {
+    var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
 
+    var reductionEnd = new Date();
+    var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
+    logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
+
+    res.render('GET-site-hostname-path.html', {
+      root_url: req.url.replace(/\?.*/, ''),
+      path: path,
+      hostname: req.params.hostname,
+      resources: clientResources('rum-diary.min.js'),
+      pageHitsPerPage: pageHitsPerPageSorted,
+      pageHitsPerDay: data.hits_per_day.__all,
+      median: data.navigation.median,
+      referrers: data.referrers.by_count.slice(0, 20),
+      startDate: start.format('MMM DD'),
+      endDate: end.format('MMM DD')
+    });
+  }, function(err) {
+    res.send(500);
+  });
 };
 
 function sortPageHitsPerPage(pageHitsPerPage) {

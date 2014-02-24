@@ -12,16 +12,17 @@ exports.verb = 'get';
 exports.handler = function(req, res) {
   var query = getQuery(req);
 
-  db.pageView.get(query, function(err, data) {
-    if (err) return res.send(500);
-
-    reduce.mapReduce(data, ['navigation'], {
-      navigation: {
-        calculate: ['median']
-      }
-    }, function(err, stats) {
-      if (err) return res.send(500);
-      res.send(stats.navigation.median);
-    });
-  });
+  db.pageView.get(query)
+      .then(function (data) {
+        return reduce.mapReduce(data, ['navigation'], {
+          navigation: {
+            calculate: ['median']
+          }
+        });
+      })
+      .then(function(stats) {
+        res.send(stats.navigation.median);
+      }, function (err) {
+        res.send(500);
+      });
 };

@@ -9,16 +9,15 @@ const getQuery = require('../lib/site-query');
 exports.path = '/site/:hostname/hits';
 exports.verb = 'get';
 
-exports.handler = function(req, res) {
+exports.handler = function (req, res) {
   var query = getQuery(req);
 
-  db.pageView.get(query, function(err, data) {
-    if (err) return res.send(500);
-
-    reduce.mapReduce(data, ['hits'], function(err, stats) {
-      if (err) return res.send(500);
-
-      res.send(200, { hits: stats.hits });
-    });
+  db.pageView.get(query).then(function (data) {
+    return reduce.mapReduce(data, ['hits'])
+  }).then(function (stats) {
+    res.send(200, { hits: stats.hits });
+  }, function (err) {
+    res.send(500);
   });
+
 };
