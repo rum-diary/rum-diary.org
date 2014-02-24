@@ -9,6 +9,18 @@ const assert = require('chai').assert;
 
 const db = require('../server/lib/db');
 
+// cPass - curried pass - call done when done.
+function cPass(done) {
+  return function () {
+    done();
+  };
+}
+
+// fail - straight up failure.
+function fail(err) {
+  assert.fail(String(err));
+}
+
 
 describe('database', function () {
   beforeEach(function (done) {
@@ -22,31 +34,50 @@ describe('database', function () {
   describe('save', function () {
     it('should save without an error', function (done) {
       db.pageView.create({
-        uuid: 'the-first-uuid'
-      }, function (err) {
-        assert.isNull(err);
-        done();
-      });
+          uuid: 'the-first-uuid'
+        }).then(cPass(done), fail);
     });
   });
 
   describe('get', function () {
     beforeEach(function (done) {
       db.pageView.create({
-        uuid: 'another-uuid'
-      }, done);
+          uuid: 'another-uuid'
+        }).then(cPass(done), fail);
     });
 
     it('should get saved data', function (done) {
-      db.pageView.get(function (err, data) {
-        assert.isNull(err);
-        assert.equal(data.length, 1);
-        var item = data[0];
-        assert.equal(item.uuid, 'another-uuid');
-        assert.isDefined(item.createdAt);
-        assert.isDefined(item.updatedAt);
-        done();
-      });
+      db.pageView.get()
+        .then(function (data) {
+          assert.equal(data.length, 1);
+          var item = data[0];
+          assert.equal(item.uuid, 'another-uuid');
+          assert.isDefined(item.createdAt);
+          assert.isDefined(item.updatedAt);
+          done();
+        }, fail);
+    });
+  });
+
+  describe('get with fields specified', function () {
+    beforeEach(function (done) {
+      db.pageView.create({
+        uuid: 'third-uuid',
+        hostname: 'hostname.com',
+        os: 'Mac OSX 10.8'
+      }).then(cPass(done), fail);
+    });
+
+    it('should get only specified fields', function (done) {
+      db.pageView.get('uuid hostname')
+        .then(function (data) {
+          assert.equal(data.length, 1);
+          var item = data[0];
+          assert.equal(item.uuid, 'third-uuid');
+          assert.equal(item.hostname, 'hostname.com');
+          assert.isUndefined(item.os);
+          done();
+        }, fail);
     });
   });
 
@@ -59,20 +90,20 @@ describe('database', function () {
         referrer_hostname: 'bigsearchcompany.com',
         referrer_path: '/search',
         returning: true
-      }, done);
+      }).then(cPass(done), fail);
     });
 
     it('should return data for the specified hostname', function (done) {
-      db.pageView.getByHostname('shanetomlinson.com', function (err, data) {
-        assert.isNull(err);
-        assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'first-uuid');
-        assert.equal(data[0].referrer, 'https://bigsearchcompany.com/search');
-        assert.equal(data[0].referrer_hostname, 'bigsearchcompany.com');
-        assert.equal(data[0].referrer_path, '/search');
-        assert.equal(data[0].returning, true);
-        done();
-      });
+      db.pageView.getByHostname('shanetomlinson.com')
+        .then(function (data) {
+          assert.equal(data.length, 1);
+          assert.equal(data[0].uuid, 'first-uuid');
+          assert.equal(data[0].referrer, 'https://bigsearchcompany.com/search');
+          assert.equal(data[0].referrer_hostname, 'bigsearchcompany.com');
+          assert.equal(data[0].referrer_path, '/search');
+          assert.equal(data[0].returning, true);
+          done();
+        }, fail);
     });
   });
 
@@ -83,70 +114,76 @@ describe('database', function () {
         uuid: 'first-uuid',
         referrer: 'bigsearchcompany.com',
         tags: ['experiment1', 'tag']
-      }, function () {
-        db.pageView.create({
+      }).then(function () {
+        return db.pageView.create({
           hostname: 'shanetomlinson.com',
           uuid: 'second-uuid',
           referrer: 'bigsearchcompany.com',
           tags: ['experiment22', 'tag']
-        }, done);
-      });
+        })
+      }).then(cPass(done), fail);
     });
 
     it('returns item if tag is stored', function (done) {
-      db.pageView.get({ hostname: 'shanetomlinson.com', tags: 'experiment1' }, function (err, data) {
-        assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'first-uuid');
-        assert.equal(data[0].referrer, 'bigsearchcompany.com');
-        assert.equal(data[0].tags[0], 'experiment1');
-        assert.equal(data[0].tags[1], 'tag');
-        done();
-      });
+      db.pageView.get({ hostname: 'shanetomlinson.com', tags: 'experiment1' })
+        .then(function (data) {
+          assert.equal(data.length, 1);
+          assert.equal(data[0].uuid, 'first-uuid');
+          assert.equal(data[0].referrer, 'bigsearchcompany.com');
+          assert.equal(data[0].tags[0], 'experiment1');
+          assert.equal(data[0].tags[1], 'tag');
+          done();
+        }, fail);
     });
 
     it('returns nom matching items if $ne is specified', function (done) {
-      db.pageView.get({ hostname: 'shanetomlinson.com', tags: { $ne: 'experiment1' } }, function (err, data) {
-        assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'second-uuid');
-        assert.equal(data[0].referrer, 'bigsearchcompany.com');
-        assert.equal(data[0].tags[0], 'experiment22');
-        assert.equal(data[0].tags[1], 'tag');
-        done();
-      });
+      db.pageView.get({ hostname: 'shanetomlinson.com', tags: { $ne: 'experiment1' } })
+        .then(function (data) {
+          assert.equal(data.length, 1);
+          assert.equal(data[0].uuid, 'second-uuid');
+          assert.equal(data[0].referrer, 'bigsearchcompany.com');
+          assert.equal(data[0].tags[0], 'experiment22');
+          assert.equal(data[0].tags[1], 'tag');
+          done();
+        }, fail);
     });
 
     it('returns item if other tag is stored', function (done) {
-      db.pageView.get({ tags: ['tag'] }, function (err, data) {
-        assert.equal(data.length, 2);
-        assert.equal(data[0].uuid, 'first-uuid');
-        assert.equal(data[0].tags[1], 'tag');
-        done();
-      });
+      db.pageView.get({ tags: ['tag'] })
+        .then(function (data) {
+          assert.equal(data.length, 2);
+          assert.equal(data[0].uuid, 'first-uuid');
+          assert.equal(data[0].tags[1], 'tag');
+          done();
+        }, fail);
     });
 
     it('returns item if both tags are specified', function (done) {
-      db.pageView.get({ tags: ['tag', 'experiment1'] }, function (err, data) {
-        assert.equal(data.length, 1);
-        assert.equal(data[0].uuid, 'first-uuid');
-        assert.equal(data[0].referrer, 'bigsearchcompany.com');
-        assert.equal(data[0].tags[0], 'experiment1');
-        assert.equal(data[0].tags[1], 'tag');
-        done();
-      });
+      db.pageView.get({ tags: ['tag', 'experiment1'] })
+        .then(function (data) {
+          assert.equal(data.length, 1);
+          assert.equal(data[0].uuid, 'first-uuid');
+          assert.equal(data[0].referrer, 'bigsearchcompany.com');
+          assert.equal(data[0].tags[0], 'experiment1');
+          assert.equal(data[0].tags[1], 'tag');
+          done();
+        }, fail);
     });
 
     it('returns no items if any tag is invalid', function (done) {
-      db.pageView.get({ tags: ['tag', 'not_valid'] }, function (err, data) {
-        assert.equal(data.length, 0);
-        done();
-      });
+      db.pageView.get({ tags: ['tag', 'not_valid'] })
+        .then(function (data) {
+          assert.equal(data.length, 0);
+          done();
+        }, fail);
     });
 
     it('returns no items if tag is not found', function (done) {
-      db.pageView.get({ tags: 'not_valid' }, function (err, data) {
-        assert.equal(data.length, 0);
-        done();
-      });
+      db.pageView.get({ tags: 'not_valid' })
+        .then(function (data) {
+          assert.equal(data.length, 0);
+          done();
+        }, fail);
     });
   });
 
@@ -157,14 +194,16 @@ describe('database', function () {
         uuid: 'first-uuid',
         referrer: 'bigsearchcompany.com',
         tags: ['experiment1', 'tag']
-      }, function () {
-        db.pageView.create({
+      })
+      .then(function () {
+        return db.pageView.create({
           hostname: 'shanetomlinson.com',
           uuid: 'second-uuid',
           referrer: 'bigsearchcompany.com',
           tags: ['experiment22', 'tag']
-        }, done);
-      });
+        });
+      })
+      .then(cPass(done), fail);
     });
 
     it('returns one item', function (done) {
@@ -175,9 +214,7 @@ describe('database', function () {
           assert.equal(item.tags[0], 'experiment1');
           assert.equal(item.tags[1], 'tag');
           done();
-        }).then(null, function () {
-          done();
-        });
+        }, fail);
     });
   });
 
@@ -192,7 +229,7 @@ describe('database', function () {
           assert.equal(user.email, 'testuser@testuser.com');
 
           done();
-        });
+        }, fail);
       });
     });
 
@@ -214,7 +251,7 @@ describe('database', function () {
           assert.equal(users[0].name, 'Another Administrator');
           assert.equal(users[0].email, 'testuser2@testuser.com');
           done();
-        });
+        }, fail);
       });
     });
 
@@ -236,7 +273,7 @@ describe('database', function () {
           assert.equal(user.name, 'Site Administrator');
           assert.equal(user.email, 'testuser@testuser.com');
           done();
-        });
+        }, fail);
       });
     });
   });
@@ -251,7 +288,7 @@ describe('database', function () {
           assert.equal(site.total_hits, 0);
 
           done();
-        });
+        }, fail);
       });
     });
 
@@ -263,9 +300,7 @@ describe('database', function () {
           return db.site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(function () {
-          done();
-        });
+        }).then(cPass(done), fail);
       });
 
       it('should get one matched hostname', function (done) {
@@ -275,7 +310,7 @@ describe('database', function () {
           assert.equal(site.hostname, 'testsite.com');
           assert.equal(site.total_hits, 0);
           done();
-        });
+        }, fail);
       });
     });
 
@@ -287,9 +322,7 @@ describe('database', function () {
           return db.site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(function () {
-          done();
-        });
+        }).then(cPass(done), fail);
       });
 
       it('should return one or more matches', function (done) {
@@ -300,7 +333,7 @@ describe('database', function () {
           assert.equal(sites[1].hostname, 'rum-diary.org');
           assert.equal(sites[1].total_hits, 0);
           done();
-        });
+        }, fail);
       });
     });
 
@@ -316,8 +349,8 @@ describe('database', function () {
           .then(function (siteFetched) {
             assert.equal(siteFetched.hostname, 'testsite.com');
             assert.equal(siteFetched.total_hits, 0);
-          })
-          .then(done);
+            done();
+          }, fail);
       });
     });
 
@@ -333,7 +366,7 @@ describe('database', function () {
             assert.equal(sites[0].hostname, 'testsite.com');
             assert.equal(sites[0].total_hits, 2);
             done();
-          });
+          }, fail);
       });
     });
   });
@@ -349,7 +382,7 @@ describe('database', function () {
           assert.equal(tags.total_hits, 0);
 
           done();
-        });
+        }, fail);
       });
     });
 
@@ -368,9 +401,7 @@ describe('database', function () {
             name: 'tag',
             hostname: 'anothersite.org'
           });
-        }).then(function () {
-          done();
-        });
+        }).then(cPass(done), fail);
       });
 
       it('should get one matched hostname', function (done) {
@@ -382,7 +413,7 @@ describe('database', function () {
           assert.equal(tag.hostname, 'testsite.com');
           assert.equal(tag.total_hits, 0);
           done();
-        });
+        }, fail);
       });
     });
 
@@ -401,9 +432,7 @@ describe('database', function () {
             name: 'tag',
             hostname: 'anothersite.org'
           });
-        }).then(function () {
-          done();
-        });
+        }).then(cPass(done), fail);
       });
 
       it('should return one or more matches', function (done) {
@@ -418,7 +447,7 @@ describe('database', function () {
           assert.equal(tags[1].total_hits, 0);
           */
           done();
-        });
+        }, fail);
       });
     });
 
@@ -439,8 +468,8 @@ describe('database', function () {
             assert.equal(tagsFetched.name, 'tag');
             assert.equal(tagsFetched.hostname, 'testsite.com');
             assert.equal(tagsFetched.total_hits, 0);
-          })
-          .then(done);
+            done();
+          }, fail);
       });
     });
 
@@ -460,7 +489,7 @@ describe('database', function () {
             assert.equal(tags[0].hostname, 'testsite.com');
             assert.equal(tags[0].total_hits, 1);
             done();
-          });
+          }, fail);
       });
     });
   });
