@@ -10,6 +10,18 @@ const navigationTimingData = require('./data/navigation-timing.json');
 
 const reduce = require('../server/lib/reduce');
 
+// cPass - curried pass - call done when done.
+function cPass(done) {
+  return function () {
+    done();
+  };
+}
+
+// fail - straight up failure.
+function fail(err) {
+  assert.fail(String(err));
+}
+
 /*global describe, it */
 
 describe('reduce', function () {
@@ -61,49 +73,45 @@ describe('reduce', function () {
 */
 
   it('findNavigationTimingStats', function (done) {
-    reduce.findNavigationTimingStats(
-      navigationTimingData,
-      ['range', 'median', 'amean', 'stddev'],
-      function (err, stats) {
-      assert.isNull(err);
+    reduce.findNavigationTimingStats(navigationTimingData,
+      ['range', 'median', 'amean', 'stddev']).then(function(stats) {
+        var medianInfo = stats.median;
+        assert.isNumber(medianInfo.requestStart);
+        assert.isNumber(medianInfo.responseStart);
+        assert.isNumber(medianInfo.responseEnd);
+        /*assert.isNumber(medianInfo.requestResponseDuration);*/
 
-      var medianInfo = stats.median;
-      assert.isNumber(medianInfo.requestStart);
-      assert.isNumber(medianInfo.responseStart);
-      assert.isNumber(medianInfo.responseEnd);
-      assert.isNumber(medianInfo.requestResponseDuration);
+        assert.isNumber(medianInfo.domLoading);
+        assert.isNumber(medianInfo.domInteractive);
+        assert.isNumber(medianInfo.domContentLoadedEventStart);
+        assert.isNumber(medianInfo.domContentLoadedEventEnd);
+        /*assert.isNumber(medianInfo.domContentLoadedEventDuration);*/
+        assert.isNumber(medianInfo.domComplete);
+        /*assert.isNumber(medianInfo.processingDuration);*/
 
-      assert.isNumber(medianInfo.domLoading);
-      assert.isNumber(medianInfo.domInteractive);
-      assert.isNumber(medianInfo.domContentLoadedEventStart);
-      assert.isNumber(medianInfo.domContentLoadedEventEnd);
-      assert.isNumber(medianInfo.domContentLoadedEventDuration);
-      assert.isNumber(medianInfo.domComplete);
-      assert.isNumber(medianInfo.processingDuration);
+        assert.isNumber(medianInfo.loadEventStart);
+        assert.isNumber(medianInfo.loadEventEnd);
+        /*assert.isNumber(medianInfo.loadEventDuration);*/
 
-      assert.isNumber(medianInfo.loadEventStart);
-      assert.isNumber(medianInfo.loadEventEnd);
-      assert.isNumber(medianInfo.loadEventDuration);
+        var rangeInfo = stats.range;
+        assert.isArray(rangeInfo.requestStart);
+        assert.isArray(rangeInfo.responseStart);
+        assert.isArray(rangeInfo.responseEnd);
+        /*assert.isArray(rangeInfo.requestResponseDuration);*/
 
-      var rangeInfo = stats.range;
-      assert.isArray(rangeInfo.requestStart);
-      assert.isArray(rangeInfo.responseStart);
-      assert.isArray(rangeInfo.responseEnd);
-      assert.isArray(rangeInfo.requestResponseDuration);
+        assert.isArray(rangeInfo.domLoading);
+        assert.isArray(rangeInfo.domInteractive);
+        assert.isArray(rangeInfo.domContentLoadedEventStart);
+        assert.isArray(rangeInfo.domContentLoadedEventEnd);
+        /*assert.isArray(rangeInfo.domContentLoadedEventDuration);*/
+        assert.isArray(rangeInfo.domComplete);
+        /*assert.isArray(rangeInfo.processingDuration);*/
 
-      assert.isArray(rangeInfo.domLoading);
-      assert.isArray(rangeInfo.domInteractive);
-      assert.isArray(rangeInfo.domContentLoadedEventStart);
-      assert.isArray(rangeInfo.domContentLoadedEventEnd);
-      assert.isArray(rangeInfo.domContentLoadedEventDuration);
-      assert.isArray(rangeInfo.domComplete);
-      assert.isArray(rangeInfo.processingDuration);
-
-      assert.isArray(rangeInfo.loadEventStart);
-      assert.isArray(rangeInfo.loadEventEnd);
-      assert.isArray(rangeInfo.loadEventDuration);
-      done();
-    });
+        assert.isArray(rangeInfo.loadEventStart);
+        assert.isArray(rangeInfo.loadEventEnd);
+        /*assert.isArray(rangeInfo.loadEventDuration);*/
+        done();
+      }, fail);
   });
 
   /*
@@ -124,16 +132,11 @@ describe('reduce', function () {
 */
 
   it('findHostnames', function (done) {
-    reduce.findHostnames(
-      navigationTimingData,
-      function (err, data) {
-
-      assert.isNull(err);
-
-      assert.equal(data.localhost, 9);
-
-      done();
-    });
+    reduce.findHostnames(navigationTimingData)
+      .then(function(data) {
+        assert.equal(data.localhost, 9);
+        done();
+      }, fail);
   });
 
   it('mapReduce', function (done) {
@@ -167,10 +170,7 @@ describe('reduce', function () {
     }).then(function (data) {
       console.log('processing time full: %s ms', data.processing_time);
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 
   it('mapReduce with navigation quartiles', function (done) {
@@ -189,10 +189,7 @@ describe('reduce', function () {
       assert.ok(data.navigation['75']);
 
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 
   it('mapReduce to calculate unique visitors', function (done) {
@@ -205,10 +202,7 @@ describe('reduce', function () {
       assert.equal(data.unique, 8);
 
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 
   it('mapReduce to calculate returning visitors', function (done) {
@@ -221,10 +215,7 @@ describe('reduce', function () {
       assert.equal(data.returning, 1);
 
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 
   it('mapReduce to calculate browsers', function (done) {
@@ -238,10 +229,7 @@ describe('reduce', function () {
       assert.equal(data.browsers['Mobile Safari'], 1);
       assert.equal(data.browsers['Chrome Mobile'], 1);
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 
   it('mapReduce to calculate operating systems', function (done) {
@@ -257,10 +245,7 @@ describe('reduce', function () {
       assert.equal(data.os['iOS 7'], 1);
       assert.equal(data.os['Android 4.4'], 1);
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 
   it('mapReduce to calculate operating systems based on form factor (mobile vs desktop)',
@@ -276,10 +261,7 @@ describe('reduce', function () {
       assert.equal(data['os:form'].mobile['iOS 7'], 1);
       assert.equal(data['os:form'].mobile['Android 4.4'], 1);
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 
   it('mapReduce to find tags',
@@ -296,10 +278,7 @@ describe('reduce', function () {
       assert.equal(data.tags['spdy2.0'], 3);
       assert.isUndefined(data.tags['']);
       done();
-    }).error(function (err) {
-      assert.isTrue(false, err);
-      done();
-    });
+    }, fail);
   });
 });
 

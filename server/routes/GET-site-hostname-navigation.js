@@ -10,11 +10,12 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  db.pageView.get(query, function(err, data) {
-    if (err) return res.send(500);
+  db.pageView.get(query)
+    .then(function (data) {
+      // TODO - filter this info!
 
-    // TODO - filter this info!
-
-    res.send(200, data);
-  });
+      res.send(200, data);
+    }, function(err) {
+      res.send(500);
+    });
 };

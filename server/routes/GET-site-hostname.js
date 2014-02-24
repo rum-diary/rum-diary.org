@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const moment = require('moment');
+const Promise = require('bluebird');
 const logger = require('../lib/logger');
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
@@ -20,12 +21,13 @@ exports.handler = function(req, res) {
   var totalHits = 0;
   var queryTags = req.query.tags && req.query.tags.split(',') || 0;
   var tags;
+  var hitsData = [];
 
   db.tags.get({
     hostname: query.hostname
   })
   .then(function (_tags) {
-    tags = _tags.map(function(tag) { return tag.name });
+    tags = _tags.map(function(tag) { return tag.name; });
 
     // tags are specified as a filter, count the
     // total hits for the matching tags.
@@ -50,11 +52,22 @@ exports.handler = function(req, res) {
     }
   })
   .then(function() {
-    return db.pageView.get(query);
-  }).then(function(hits) {
-      reductionStart = new Date();
+    // Use a stream instead of one large get for memory efficiency.
+    return db.pageView.getStream(query);
+  })
+  .then(function (stream) {
+    stream.on('data', function (doc) {
+      hitsData.push(doc);
+    });
 
-      return reduce.mapReduce(hits, [
+    stream.on('close', complete);
+  });
+
+  function complete() {
+    reductionStart = new Date();
+
+    Promise.attempt(function() {
+      return reduce.mapReduce(hitsData, [
         'hits_per_day',
         'hits_per_page',
         'referrers',
@@ -89,10 +102,12 @@ exports.handler = function(req, res) {
         },
         tags: tags
       });
+      hitsData = tags = null;
     }).catch(function(err) {
       logger.error(String(err));
       res.send(500);
     });
+  }
 };
 
 function sortPageHitsPerPage(pageHitsPerPage) {

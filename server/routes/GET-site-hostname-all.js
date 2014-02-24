@@ -11,9 +11,10 @@ exports.verb = 'get';
 exports.handler = function(req, res) {
   var query = getQuery(req);
 
-  db.pageView.get(query, function(err, data) {
-    if (err) return res.send(500);
-
-    res.send(200, data);
-  });
+  db.pageView.get(query)
+    .then(function(data) {
+      res.send(data);
+    }, function(err) {
+      res.send(500);
+    });
 };

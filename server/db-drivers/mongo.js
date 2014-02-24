@@ -47,6 +47,7 @@ exports.pageView = {
   update: PageView.update.bind(PageView),
   get: PageView.get.bind(PageView),
   getOne: PageView.getOne.bind(PageView),
+  getStream: PageView.getStream.bind(PageView),
   getByHostname: function (hostname, done) {
     return PageView.get({ hostname: hostname }, done);
   },
@@ -69,6 +70,7 @@ exports.site = {
   update: Site.update.bind(Site),
   get: Site.get.bind(Site),
   getOne: Site.getOne.bind(Site),
+  getStream: Site.getStream.bind(Site),
   clear: Site.clear.bind(Site),
   hit: Site.hit.bind(Site),
   ensureExists: Site.ensureExists.bind(Site)

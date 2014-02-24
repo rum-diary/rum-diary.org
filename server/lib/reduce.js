@@ -3,18 +3,28 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const moment = require('moment');
-const Stats = require('fast-stats').Stats;
+const ThinkStats = require('think-stats');
 const url = require('url');
-const SortedArray = require('sarray');
 const Promise = require('bluebird');
 const EasierObject = require('easierobject').easierObject;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const logger = require('./logger');
 
+// keep this around to facilitate debugging memory leaks when needed.
+if (false) {
+  const memwatch = require('memwatch');
+  memwatch.on('leak', function (info) {
+    logger.error('memory leak: %s', JSON.stringify(info, null, 2));
+  });
+  memwatch.on('stats', function (info) {
+    logger.warn('memory stats: %s', JSON.stringify(info, null, 2));
+  });
+}
+
 function ensurePageInfo(returnedData, page, startDate, endDate) {
-  if ( ! (page in returnedData)) {
+  if ( ! returnedData.hasOwnProperty(page)) {
     var numDays = diffDays(startDate, endDate);
-    returnedData[page] = [];
+    returnedData[page] = new Array(numDays);
     // <= to include both the start and end date
     for (var i = 0; i <= numDays; ++i) {
       var date = new Date();
@@ -30,22 +40,24 @@ function ensurePageInfo(returnedData, page, startDate, endDate) {
 }
 
 function diffDays(startDate, date) {
-  return Math.floor((date - startDate) / MS_PER_DAY);
+  // Math.floor is really slow, so do
+  // Math.floor using bit operations.
+  return ((date - startDate) / MS_PER_DAY) << 0;
 }
 
-function getPageDateInfo(returnedData, page, startDate, date) {
+function getPageInfoOnDate(pageInfo, page, startDate, date) {
   var index = diffDays(startDate, date);
-  return returnedData[page][index];
+  return pageInfo[page][index];
 }
 
 function incrementDailyPageHit(returnedData, page, startDate, date) {
-  var pageDateInfo = getPageDateInfo(returnedData, page, startDate, date);
-  if ( ! pageDateInfo) return new Error('invalid date range');
-  pageDateInfo.hits++;
+  var pageInfoOnDate = getPageInfoOnDate(returnedData, page, startDate, date);
+  if ( ! pageInfoOnDate) return new Error('invalid date range');
+  pageInfoOnDate.hits++;
 }
 
 function earliestDate(data, dateName) {
-  return data.reduce(function(prevStart, item) {
+  return data.reduce(function (prevStart, item) {
             var currStart = new Date(item[dateName]);
             if ( ! prevStart) return currStart;
             if (currStart < prevStart) return currStart;
@@ -54,7 +66,7 @@ function earliestDate(data, dateName) {
 }
 
 function latestDate(data, dateName) {
-  return data.reduce(function(prevEnd, item) {
+  return data.reduce(function (prevEnd, item) {
             var currEnd = new Date(item[dateName]);
             if ( ! prevEnd) return currEnd;
             if (currEnd > prevEnd) return currEnd;
@@ -63,7 +75,7 @@ function latestDate(data, dateName) {
 }
 
 function updatePageHit(hitsPerDay, options, hit) {
-  var date = new Date(hit.createdAt);
+  var date = new Date(hit.createdAt).getTime();
 
   if (hit.path) {
     ensurePageInfo(hitsPerDay, hit.path, options.start, options.end);
@@ -74,7 +86,7 @@ function updatePageHit(hitsPerDay, options, hit) {
 }
 
 function toStatsToCalculate(userDefinedStats) {
-  return userDefinedStats.reduce(function(prevValue, curr) {
+  return userDefinedStats.reduce(function (prevValue, curr) {
     if (! isNaN(curr)) {
       prevValue.push({
         name: 'percentile',
@@ -111,12 +123,12 @@ function toStatsToCalculate(userDefinedStats) {
 }
 
 function calculateNavigationTimingStats(accumulators, statsUserWants) {
-  return Promise.attempt(function() {
+  return Promise.attempt(function () {
     var statsToCalculate = toStatsToCalculate(statsUserWants);
     var returnedStats = new EasierObject();
 
     for (var key in accumulators) {
-      statsToCalculate.forEach(function(stat) {
+      statsToCalculate.forEach(function (stat) {
         var accumulator = accumulators[key];
         var value = accumulator[stat.name].apply(accumulator, stat.args);
         returnedStats.setItem(stat.outName, key, value);
@@ -127,41 +139,37 @@ function calculateNavigationTimingStats(accumulators, statsUserWants) {
   });
 }
 
-exports.findNavigationTimingStats = function (hits, statsToFind, options, done) {
-  if ( ! done && typeof options === 'function') {
-    done = options;
-    options = {};
-  }
+exports.findNavigationTimingStats = function (hits, statsToFind, options) {
+  if (! options) options = {};
 
   if ( ! options.navigation) options.navigation = {};
   options.navigation.calculate = statsToFind;
-  exports.mapReduce(hits, ['navigation'], options)
-    .then(function(data) {
-      done(null, data.navigation);
-      return data;
-    }).error(function(reason) {
-      done(reason);
-      return reason;
-    });
+
+  return exports.mapReduce(hits, ['navigation'], options)
+            .then(function (data) {
+              return data.navigation;
+            });
 };
 
 function sortHostnamesByCount(countByHostname) {
-  var sortedByCount = SortedArray(function(a, b) {
-    return b.count - a.count;
+  var sortedByCount = new ThinkStats({
+    compare: function (a, b) {
+      return b.count - a.count;
+    }
   });
 
-  Object.keys(countByHostname).forEach(function(hostname) {
-    sortedByCount.add({
+  Object.keys(countByHostname).forEach(function (hostname) {
+    sortedByCount.push({
       hostname: hostname,
       count: countByHostname[hostname]
     });
   });
 
-  return sortedByCount.items;
+  return sortedByCount.sorted();
 }
 
 function createStat(options) {
-  return new Stats(options);
+  return new ThinkStats(options);
 }
 
 function getNavigationTimingAccumulators(options) {
@@ -175,7 +183,7 @@ function getNavigationTimingAccumulators(options) {
     // redirect - only visible if redirecting from the same domain.
     redirectStart: createStat(options),
     redirectEnd: createStat(options),
-    redirectDuration: createStat(options),
+    /*redirectDuration: createStat(options),*/
 
     // App cache
     fetchStart: createStat(options),
@@ -183,50 +191,64 @@ function getNavigationTimingAccumulators(options) {
     // DNS - will be the same as fetchStart if DNS is already resolved.
     domainLookupStart: createStat(options),
     domainLookupEnd: createStat(options),
-    domainLookupDuration: createStat(options),
+    /*domainLookupDuration: createStat(options),*/
 
     // TCP - will be the same as domainLookupDuration if reusing a connection.
     connectStart: createStat(options),
     secureConnectionStart: createStat(options),
     connectEnd: createStat(options),
-    connectDuration: createStat(options),
+    /*connectDuration: createStat(options),*/
 
     // request & response
     requestStart: createStat(options),
     responseStart: createStat(options),
     responseEnd: createStat(options),
-    requestResponseDuration: createStat(options),
+    /*requestResponseDuration: createStat(options),*/
 
     // unload previous page - only valid previous page was on the same domain.
     unloadEventStart: createStat(options),
     unloadEventEnd: createStat(options),
-    unloadEventDuration: createStat(options),
+    /*unloadEventDuration: createStat(options),*/
 
     // processing
     domLoading: createStat(options),
     domInteractive: createStat(options),
     domContentLoadedEventStart: createStat(options),
     domContentLoadedEventEnd: createStat(options),
-    domContentLoadedEventDuration: createStat(options),
+    /*domContentLoadedEventDuration: createStat(options),*/
     domComplete: createStat(options),
 
     // load
     loadEventStart: createStat(options),
-    loadEventEnd: createStat(options),
-    loadEventDuration: createStat(options),
-    processingDuration: createStat(options)
+    loadEventEnd: createStat(options)/*,
+    loadEventDuration: createStat(options),*/
+    /*processingDuration: createStat(options)*/
   };
 
   return stats;
+}
+
+function freeNavigationTimingAccumulators(accumulators) {
+  for (var key in accumulators) {
+    accumulators[key].destroy();
+    accumulators[key] = null;
+    delete accumulators[key];
+  }
 }
 
 function updateNavigationTiming(stats, hit) {
     var navTiming = hit.navigationTiming;
 
     for (var key in navTiming) {
-      if (stats.hasOwnProperty(key)) stats[key].push(navTiming[key]);
+      if (stats.hasOwnProperty(key)) {
+        var value = navTiming[key];
+        if (!(isNaN(value) || value === null || value === Infinity)) {
+          stats[key].push(navTiming[key]);
+        }
+      }
     }
 
+    /*
     stats.redirectDuration.push(
               navTiming.redirectEnd - navTiming.redirectStart);
 
@@ -250,13 +272,14 @@ function updateNavigationTiming(stats, hit) {
 
     stats.processingDuration.push(
               navTiming.loadEventEnd - navTiming.domLoading);
+    */
 }
 
-exports.findHostnames = function(hits, done) {
-  exports.mapReduce(hits, ['hostnames'], function(err, data) {
-    if (err) return done(err);
-    done(null, data.hostnames);
-  });
+exports.findHostnames = function (hits) {
+  return exports.mapReduce(hits, ['hostnames'])
+            .then(function (data) {
+              return data.hostnames;
+            });
 };
 
 
@@ -276,6 +299,8 @@ function updateReferrer(referrers, hit) {
   var hostname = hit.referrer_hostname;
   if ( ! hostname) {
     try {
+      // XXX this is exceptionally slow, check if all referrers have been
+      // converted to hostnames and remove this.
       var parsed = url.parse(hit.referrer);
       hostname = parsed.hostname;
     } catch(e) {
@@ -356,13 +381,13 @@ function updateOsForm(os, hit) {
 }
 
 function isMobileOS(os) {
-  return /(mobile|iOS|android)/ig.test(os);
+  return (/(mobile|iOS|android)/ig).test(os);
 }
 
 function updateTags(tags, hit) {
   if (! hit.tags) return;
 
-  hit.tags.forEach(function(tag) {
+  hit.tags.forEach(function (tag) {
     tag = tag.trim();
     if (! tag.length) return;
     if (! (tag in tags)) {
@@ -373,13 +398,15 @@ function updateTags(tags, hit) {
   });
 }
 
-exports.mapReduce = function(hits, fields, options, done) {
+/**
+ * This is a cluster.
+ *
+ * Take hits data, convert to data that can be displayed to the user.
+ */
+exports.mapReduce = function (hits, fields, options) {
   var startTime = new Date();
-  return Promise.attempt(function() {
-    if (typeof options === 'function' && !done) {
-      done = options;
-      options = {};
-    }
+  return Promise.attempt(function () {
+    if (! options) options = {};
 
     var data = {};
 
@@ -428,7 +455,7 @@ exports.mapReduce = function(hits, fields, options, done) {
       desktop: {}
     };
 
-    hits.forEach(function(hit) {
+    hits.forEach(function (hit) {
       if (doHostnames) updateHostname(data.hostnames, hit);
       if (doHitsPerPage) updateHitsPerPage(data.hits_per_page, hit);
       if (doReferrers) updateReferrer(data.referrers.by_hostname, hit);
@@ -451,16 +478,19 @@ exports.mapReduce = function(hits, fields, options, done) {
 
     return calculateNavigationTimingStats(
         data.navigation_accumulators, options.navigation.calculate)
-      .then(function(navigationTimingStats) {
+      .then(function (navigationTimingStats) {
+
+        // free the accumulator references, they are no longer needed.
+        // The accumulators cause the heap to grow to the point of OOM.
+        freeNavigationTimingAccumulators(data.navigation_accumulators);
+        data.navigation_accumulators = null;
+        delete data.navigation_accumulators;
+
         data.navigation = navigationTimingStats;
         return data;
       });
-  }).then(function(data) {
+  }).then(function (data) {
     data.processing_time = (new Date().getTime() - startTime.getTime());
-    if (done) done(null, data);
     return data;
-  }).error(function(reason) {
-    if (done) done(reason);
-    return reason;
   });
 };

@@ -27,9 +27,9 @@ exports.init = function (name, definition) {
 /**
  * Create and save a model from a data item
  */
-exports.create = function (item, done) {
+exports.create = function (item) {
   var model = this.createModel(item);
-  return this.update(model, done);
+  return this.update(model);
 };
 
 /**
@@ -39,34 +39,31 @@ exports.create = function (item, done) {
  * initial version of the model to the database.
  * If the item is not yet converted to a model, use create instead.
  */
-exports.update = withDatabase(function (model, done) {
+exports.update = withDatabase(function (model) {
   var resolver = Promise.defer();
 
   if (! model.save) {
-    resolver.reject('attempting to save an item that is not a model. Try create instead.');
-    if (done) done(new Error('attempting to save an item that is not a model Try create instead.'));
-    return;
+    return resolver.reject('attempting to save an item that is not a model. Try create instead.');
   }
 
-  model.save(function(err, model, numAffected) {
+  model.save(function(err, model) {
     if (err) {
-      resolver.reject(err);
-      if (done) done(err);
-      return;
+      return resolver.reject(err);
     }
 
     resolver.fulfill(model);
-    if (done) done(null, model);
   });
 
   return resolver.promise;
 });
 
-exports.get = withDatabase(function (searchBy, done) {
-  if ( ! done && typeof searchBy === 'function') {
-    done = searchBy;
+exports.get = withDatabase(function (searchBy, fields) {
+  if ( ! fields && typeof searchBy === 'string') {
+    fields = searchBy;
     searchBy = {};
   }
+
+  if (!searchBy) searchBy = {};
 
   var startTime = new Date();
   var name = this.name;
@@ -74,15 +71,13 @@ exports.get = withDatabase(function (searchBy, done) {
   searchBy = this.getSearchBy(searchBy);
 
   logger.info('%s->get: %s', name, JSON.stringify(searchBy));
-  return this.Model.find(searchBy).exec().then(function(models) {
+  return this.Model.find(searchBy, fields).exec().then(function(models) {
     computeDuration();
-    if (done) done(null, models);
     return models;
   })
   .then(null, function(err) {
     computeDuration();
     logger.error('%s->get error: %s', name, String(err));
-    if (done) done(err);
     throw err;
   });
 
@@ -94,12 +89,34 @@ exports.get = withDatabase(function (searchBy, done) {
   }
 });
 
-exports.getOne = withDatabase(function (searchBy, done) {
-  if ( ! done && typeof searchBy === 'function') {
-    done = searchBy;
-    searchBy = {};
-  }
+exports.getStream = withDatabase(function (searchBy, fields) {
+  var startTime = new Date();
+  var name = this.name;
 
+  searchBy = this.getSearchBy(searchBy);
+
+  logger.info('%s->getStream: %s', name, JSON.stringify(searchBy));
+
+  var stream = this.Model.find(searchBy, fields).stream();
+
+  stream.on('err', function(err) {
+    computeDuration();
+    logger.error('%s->getStream error: %s', name, String(err));
+  });
+
+  stream.on('close', computeDuration);
+
+  return stream;
+
+  function computeDuration() {
+    var endTime = new Date();
+    var duration = endTime.getDate() - startTime.getDate();
+    logger.info('%s->get query time for %s: %s ms',
+                    name, JSON.stringify(searchBy), duration);
+  }
+});
+
+exports.getOne = withDatabase(function (searchBy) {
   var startTime = new Date();
   var name = this.name;
 
@@ -108,13 +125,11 @@ exports.getOne = withDatabase(function (searchBy, done) {
   logger.info('%s->getOne: %s', name, JSON.stringify(searchBy));
   return this.Model.findOne(searchBy).exec().then(function(model) {
     computeDuration();
-    if (done) done(null, model);
     return model;
   })
   .then(null, function(err) {
     computeDuration();
     logger.error('%s->getOne error: %s', name, String(err));
-    if (done) done(err);
     throw err;
   });
 
@@ -126,18 +141,15 @@ exports.getOne = withDatabase(function (searchBy, done) {
   }
 });
 
-exports.clear = withDatabase(function (done) {
+exports.clear = withDatabase(function () {
   logger.warn('clearing table: %s', this.name);
   var resolver = Promise.defer();
 
   this.Model.remove(function (err) {
     if (err) {
-      if (done) done(err);
-      resolver.reject(err);
-      return;
+      return resolver.reject(err);
     }
 
-    if (done) done(null);
     resolver.fulfill();
   });
 
@@ -164,12 +176,13 @@ function withDatabase(op) {
   };
 }
 
-var connectionResolver = Promise.defer();
-var connectionResolved = false;
+var connectionResolver;
 function connect() {
-  if (connectionResolved) {
+  if (connectionResolver) {
     return connectionResolver.promise;
   }
+
+  connectionResolver = Promise.defer();
 
   mongoose.connect('mongodb://localhost/test');
   var db = mongoose.connection;
@@ -177,14 +190,12 @@ function connect() {
   db.on('error', function (err) {
     logger.error('Error connecting to database: %s', String(err));
 
-    connectionResolved = true;
     connectionResolver.reject(err);
   });
 
   db.once('open', function callback() {
     logger.info('Connected to database');
 
-    connectionResolved = true;
     connectionResolver.fulfill();
   });
 
