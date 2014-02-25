@@ -10,6 +10,32 @@ const EasierObject = require('easierobject').easierObject;
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const logger = require('./logger');
 
+const OSStream = require('./reduce/os');
+const FormFactorStream = require('./reduce/form-factor');
+const TagsStream = require('./reduce/tags');
+const BrowserStream = require('./reduce/browser');
+const HostnameStream = require('./reduce/hostname');
+const HitsPerPageStream = require('./reduce/hits-per-page');
+const ReferrerStream = require('./reduce/referrer');
+const UniqueStream = require('./reduce/unique-visitor');
+const ReturningStream = require('./reduce/returning-visitor');
+const HitsPerDayStream = require('./reduce/hits-per-day');
+const NavigationStream = require('./reduce/navigation');
+
+var AvailableStreams = [
+  OSStream,
+  FormFactorStream,
+  TagsStream,
+  BrowserStream,
+  HostnameStream,
+  HitsPerPageStream,
+  ReferrerStream,
+  UniqueStream,
+  ReturningStream,
+  HitsPerDayStream,
+  NavigationStream
+];
+
 // keep this around to facilitate debugging memory leaks when needed.
 if (false) {
   const memwatch = require('memwatch');
@@ -18,125 +44,6 @@ if (false) {
   });
   memwatch.on('stats', function (info) {
     logger.warn('memory stats: %s', JSON.stringify(info, null, 2));
-  });
-}
-
-function ensurePageInfo(returnedData, page, startDate, endDate) {
-  if ( ! returnedData.hasOwnProperty(page)) {
-    var numDays = diffDays(startDate, endDate);
-    returnedData[page] = new Array(numDays);
-    // <= to include both the start and end date
-    for (var i = 0; i <= numDays; ++i) {
-      var date = new Date();
-      date.setTime(startDate + (i * MS_PER_DAY));
-      returnedData[page][i] = {
-        hits: 0,
-        date: moment(date).format('YYYY-MM-DD')
-      };
-    }
-  }
-
-  return returnedData;
-}
-
-function diffDays(startDate, date) {
-  // Math.floor is really slow, so do
-  // Math.floor using bit operations.
-  return ((date - startDate) / MS_PER_DAY) << 0;
-}
-
-function getPageInfoOnDate(pageInfo, page, startDate, date) {
-  var index = diffDays(startDate, date);
-  return pageInfo[page][index];
-}
-
-function incrementDailyPageHit(returnedData, page, startDate, date) {
-  var pageInfoOnDate = getPageInfoOnDate(returnedData, page, startDate, date);
-  if ( ! pageInfoOnDate) return new Error('invalid date range');
-  pageInfoOnDate.hits++;
-}
-
-function earliestDate(data, dateName) {
-  return data.reduce(function (prevStart, item) {
-            var currStart = new Date(item[dateName]);
-            if ( ! prevStart) return currStart;
-            if (currStart < prevStart) return currStart;
-            return prevStart;
-          }, null);
-}
-
-function latestDate(data, dateName) {
-  return data.reduce(function (prevEnd, item) {
-            var currEnd = new Date(item[dateName]);
-            if ( ! prevEnd) return currEnd;
-            if (currEnd > prevEnd) return currEnd;
-            return prevEnd;
-          }, null);
-}
-
-function updatePageHit(data, hit, options) {
-  var hitsPerDay = data.hits_per_day;
-  var date = new Date(hit.createdAt).getTime();
-
-  if (hit.path) {
-    ensurePageInfo(hitsPerDay, hit.path, options.start, options.end);
-    incrementDailyPageHit(hitsPerDay, hit.path, options.start, date);
-  }
-
-  incrementDailyPageHit(hitsPerDay, '__all', options.start, date);
-}
-
-function toStatsToCalculate(userDefinedStats) {
-  return userDefinedStats.reduce(function (prevValue, curr) {
-    if (! isNaN(curr)) {
-      prevValue.push({
-        name: 'percentile',
-        args: [ parseInt(curr, 10) ],
-        outName: curr
-      });
-    }
-    else if (curr === 'quartiles') {
-      prevValue.push({
-        name: 'percentile',
-        args: [25],
-        outName: '25'
-      });
-      prevValue.push({
-        name: 'percentile',
-        args: [50],
-        outName: '50'
-      });
-      prevValue.push({
-        name: 'percentile',
-        args: [75],
-        outName: '75'
-      });
-    }
-    else {
-      prevValue.push({
-        name: curr,
-        args: [],
-        outName: curr
-      });
-    }
-    return prevValue;
-  }, []);
-}
-
-function calculateNavigationTimingStats(accumulators, statsUserWants) {
-  return Promise.attempt(function () {
-    var statsToCalculate = toStatsToCalculate(statsUserWants);
-    var returnedStats = new EasierObject();
-
-    for (var key in accumulators) {
-      statsToCalculate.forEach(function (stat) {
-        var accumulator = accumulators[key];
-        var value = accumulator[stat.name].apply(accumulator, stat.args);
-        returnedStats.setItem(stat.outName, key, value);
-      });
-    }
-
-    return returnedStats.obj;
   });
 }
 
@@ -152,131 +59,6 @@ exports.findNavigationTimingStats = function (hits, statsToFind, options) {
             });
 };
 
-function sortHostnamesByCount(countByHostname) {
-  var sortedByCount = new ThinkStats({
-    compare: function (a, b) {
-      return b.count - a.count;
-    }
-  });
-
-  Object.keys(countByHostname).forEach(function (hostname) {
-    sortedByCount.push({
-      hostname: hostname,
-      count: countByHostname[hostname]
-    });
-  });
-
-  return sortedByCount.sorted();
-}
-
-function createStat(options) {
-  return new ThinkStats(options);
-}
-
-function getNavigationTimingAccumulators(options) {
-  // For descriptions, see:
-  // https://dvcs.w3.org/hg/webperf/raw-file/tip/specs/NavigationTiming/Overview.html#processing-model
-
-  // prompt for unload
-  var stats = {
-    navigationStart: createStat(options),
-
-    // redirect - only visible if redirecting from the same domain.
-    redirectStart: createStat(options),
-    redirectEnd: createStat(options),
-    /*redirectDuration: createStat(options),*/
-
-    // App cache
-    fetchStart: createStat(options),
-
-    // DNS - will be the same as fetchStart if DNS is already resolved.
-    domainLookupStart: createStat(options),
-    domainLookupEnd: createStat(options),
-    /*domainLookupDuration: createStat(options),*/
-
-    // TCP - will be the same as domainLookupDuration if reusing a connection.
-    connectStart: createStat(options),
-    secureConnectionStart: createStat(options),
-    connectEnd: createStat(options),
-    /*connectDuration: createStat(options),*/
-
-    // request & response
-    requestStart: createStat(options),
-    responseStart: createStat(options),
-    responseEnd: createStat(options),
-    /*requestResponseDuration: createStat(options),*/
-
-    // unload previous page - only valid previous page was on the same domain.
-    unloadEventStart: createStat(options),
-    unloadEventEnd: createStat(options),
-    /*unloadEventDuration: createStat(options),*/
-
-    // processing
-    domLoading: createStat(options),
-    domInteractive: createStat(options),
-    domContentLoadedEventStart: createStat(options),
-    domContentLoadedEventEnd: createStat(options),
-    /*domContentLoadedEventDuration: createStat(options),*/
-    domComplete: createStat(options),
-
-    // load
-    loadEventStart: createStat(options),
-    loadEventEnd: createStat(options)/*,
-    loadEventDuration: createStat(options),*/
-    /*processingDuration: createStat(options)*/
-  };
-
-  return stats;
-}
-
-function freeNavigationTimingAccumulators(accumulators) {
-  for (var key in accumulators) {
-    accumulators[key].destroy();
-    accumulators[key] = null;
-    delete accumulators[key];
-  }
-}
-
-function updateNavigationTiming(data, hit) {
-    var stats = data.navigation_accumulators;
-    var navTiming = hit.navigationTiming;
-
-    for (var key in navTiming) {
-      if (stats.hasOwnProperty(key)) {
-        var value = navTiming[key];
-        if (!(isNaN(value) || value === null || value === Infinity)) {
-          stats[key].push(navTiming[key]);
-        }
-      }
-    }
-
-    /*
-    stats.redirectDuration.push(
-              navTiming.redirectEnd - navTiming.redirectStart);
-
-    stats.domainLookupDuration.push(
-              navTiming.domainLookupEnd - navTiming.domainLookupStart);
-
-    stats.connectDuration.push(
-              navTiming.connectEnd - navTiming.connectStart);
-
-    stats.requestResponseDuration.push(
-              navTiming.responseEnd - navTiming.requestStart);
-
-    stats.unloadEventDuration.push(
-              navTiming.unloadEventEnd - navTiming.unloadEventStart);
-
-    stats.domContentLoadedEventDuration.push(
-              navTiming.domContentLoadedEventEnd - navTiming.domContentLoadedEventStart);
-
-    stats.loadEventDuration.push(
-              navTiming.loadEventEnd - navTiming.loadEventStart);
-
-    stats.processingDuration.push(
-              navTiming.loadEventEnd - navTiming.domLoading);
-    */
-}
-
 exports.findHostnames = function (hits) {
   return exports.mapReduce(hits, ['hostnames'])
             .then(function (data) {
@@ -284,137 +66,8 @@ exports.findHostnames = function (hits) {
             });
 };
 
-
-function updateHostname(data, hit) {
-  var hostnames = data.hostnames;
-  if (hit.hostname) {
-    if ( ! (hit.hostname in hostnames)) {
-      hostnames[hit.hostname] = 0;
-    }
-
-    hostnames[hit.hostname]++;
-  }
-}
-
-function updateReferrer(data, hit) {
-  var referrers = data.referrers.by_hostname;
-  if ( ! hit.referrer) return;
-
-  var hostname = hit.referrer_hostname;
-  if ( ! hostname) {
-    try {
-      // XXX this is exceptionally slow, check if all referrers have been
-      // converted to hostnames and remove this.
-      var parsed = url.parse(hit.referrer);
-      hostname = parsed.hostname;
-    } catch(e) {
-      return;
-    }
-  }
-
-  if ( ! referrers[hostname]) {
-    referrers[hostname] = 0;
-  }
-
-  referrers[hostname]++;
-}
-
-function updateHitsPerPage(data, hit) {
-  var hitsPerPage = data.hits_per_page;
-
-  hitsPerPage.__all++;
-
-  var path = hit.path;
-  if ( ! path) return;
-
-  if ( ! (path in hitsPerPage)) hitsPerPage[path] = 0;
-
-  hitsPerPage[path]++;
-}
-
-function updateBrowser(data, hit) {
-  var browsers = data.browsers;
-
-  if (hit.browser && hit.browser.family) {
-    var family = hit.browser.family;
-
-    if (! (family in browsers)) {
-      browsers[family] = 0;
-    }
-
-    browsers[family]++;
-  }
-}
-
-function updateOs(data, hit) {
-  var os = data.os;
-  var family;
-  if (hit.os_parsed && hit.os_parsed.family) {
-    family = hit.os_parsed.family;
-    // only add the major # if it is not 0. The default major # is 0
-    if (hit.os_parsed.major) {
-      family += (' ' + hit.os_parsed.major);
-    }
-  }
-  else if (hit.os) {
-    family = hit.os;
-  }
-
-  if (! (family in os)) {
-    os[family] = 0;
-  }
-
-  os[family]++;
-}
-
-function updateOsForm(data, hit) {
-  var os = data['os:form'];
-  var family;
-  if (hit.os_parsed && hit.os_parsed.family) {
-    family = hit.os_parsed.family;
-    // only add the major # if it is not 0. The default major # is 0
-    if (hit.os_parsed.major) {
-      family += (' ' + hit.os_parsed.major);
-    }
-  }
-  else if (hit.os) {
-    family = hit.os;
-  }
-
-  var formFactor = isMobileOS(family) ? 'mobile' : 'desktop';
-
-  if (! (family in os[formFactor])) {
-    os[formFactor][family] = 0;
-  }
-
-  os[formFactor][family]++;
-}
-
-function isMobileOS(os) {
-  return (/(mobile|iOS|android)/ig).test(os);
-}
-
-function updateTags(data, hit) {
-  var tags = data.tags;
-  if (! hit.tags) return;
-
-  hit.tags.forEach(function (tag) {
-    tag = tag.trim();
-    if (! tag.length) return;
-    if (! (tag in tags)) {
-      tags[tag] = 0;
-    }
-
-    tags[tag]++;
-  });
-}
-
-function updateUniqueVisitors(data, hit) {
-  if (! hit.returning) data.unique++;
-}
-
-function updateReturningVisitors(data, hit) {
-  if (hit.returning) data.returning++;
+function shouldAddStream(name, fields) {
+  return fields.indexOf(name) > -1;
 }
 
 /**
@@ -427,112 +80,26 @@ exports.mapReduce = function (hits, fields, options) {
   return Promise.attempt(function () {
     if (! options) options = {};
 
-    var data = {};
+    var addedStreams = [];
 
-    var mappers = [];
-
-    var doHostnames = fields.indexOf('hostnames') > -1;
-    if (doHostnames) {
-      data.hostnames = {};
-      mappers.push(updateHostname);
-    }
-
-    var doHitsPerPage = fields.indexOf('hits_per_page') > -1;
-    if (doHitsPerPage) {
-      data.hits_per_page = { __all: 0 };
-      mappers.push(updateHitsPerPage);
-    }
-
-    var doReferrers = fields.indexOf('referrers') > -1;
-    if (doReferrers) {
-      data.referrers = { by_hostname: {} };
-      mappers.push(updateReferrer);
-    }
-
-    var doNavigation = fields.indexOf('navigation') > -1;
-    if (doNavigation) {
-      data.navigation_accumulators = getNavigationTimingAccumulators(options);
-      mappers.push(updateNavigationTiming);
-    }
-
-    var doHitsPerDay = fields.indexOf('hits_per_day') > -1;
-    if (doHitsPerDay) {
-      if ( ! options.start) options.start = earliestDate(hits, 'createdAt');
-      if ( ! options.end) options.end = latestDate(hits, 'createdAt');
-
-      options.start = moment(options.start).startOf('day').toDate().getTime();
-      options.end = moment(options.end).endOf('day').toDate().getTime();
-
-      data.hits_per_day = {};
-      ensurePageInfo(data.hits_per_day, '__all', options.start, options.end);
-      mappers.push(updatePageHit);
-    }
-
-    var doUniqueVisitors = fields.indexOf('unique') > -1;
-    if (doUniqueVisitors) {
-      data.unique = 0;
-      mappers.push(updateUniqueVisitors);
-    }
-
-    var doReturningVisitors = fields.indexOf('returning') > -1;
-    if (doReturningVisitors) {
-      data.returning = 0;
-      mappers.push(updateReturningVisitors);
-    }
-
-    var doBrowsers = fields.indexOf('browsers') > -1;
-    if (doBrowsers) {
-      data.browsers = {};
-      mappers.push(updateBrowser);
-    }
-
-    var doOs = fields.indexOf('os') > -1;
-    if (doOs) {
-      data.os = {};
-      mappers.push(updateOs);
-    }
-
-    var doOsForm = fields.indexOf('os:form') > -1;
-    if (doOsForm) {
-      data['os:form'] = {
-        mobile: {},
-        desktop: {}
-      };
-      mappers.push(updateOsForm);
-    }
-
-    var doTags = fields.indexOf('tags') > -1;
-    if (doTags) {
-      data.tags = {};
-      mappers.push(updateTags);
-    }
+    AvailableStreams.forEach(function(Stream) {
+      if (shouldAddStream(Stream.prototype.name, fields)) {
+        addedStreams.push(new Stream(options));
+      }
+    });
 
     hits.forEach(function (hit) {
-      mappers.forEach(function(mapper) {
-        mapper(data, hit, options);
+      addedStreams.forEach(function(stream) {
+        stream.write(hit);
       });
     });
 
-    if (doReferrers) {
-      data.referrers.by_count
-              = sortHostnamesByCount(data.referrers.by_hostname);
-    }
+    var data = {};
+    addedStreams.forEach(function(stream) {
+      data[stream.name] = stream.result();
+    });
 
-    if (! doNavigation) return data;
-
-    return calculateNavigationTimingStats(
-        data.navigation_accumulators, options.navigation.calculate)
-      .then(function (navigationTimingStats) {
-
-        // free the accumulator references, they are no longer needed.
-        // The accumulators cause the heap to grow to the point of OOM.
-        freeNavigationTimingAccumulators(data.navigation_accumulators);
-        data.navigation_accumulators = null;
-        delete data.navigation_accumulators;
-
-        data.navigation = navigationTimingStats;
-        return data;
-      });
+    return data;
   }).then(function (data) {
     data.processing_time = (new Date().getTime() - startTime.getTime());
     return data;
