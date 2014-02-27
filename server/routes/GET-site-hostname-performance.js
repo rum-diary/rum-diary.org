@@ -4,8 +4,6 @@
 
 const moment = require('moment');
 const Promise = require('bluebird');
-const Stats = require('fast-stats').Stats;
-const ThinkStats = require('think-stats');
 
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
@@ -13,16 +11,13 @@ const clientResources = require('../lib/client-resources');
 const getQuery = require('../lib/site-query');
 const logger = require('../lib/logger');
 
-const NavigationHistogramStream = require('../lib/reduce/navigation-histogram');
-const NavigationCdfStream = require('../lib/reduce/navigation-cdf');
-
 exports.path = '/site/:hostname/performance';
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query.createdAt['$gte']);
-  var end = moment(query.createdAt['$lte']);
+  var start = moment(query.createdAt.$gte);
+  var end = moment(query.createdAt.$lte);
 
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;
