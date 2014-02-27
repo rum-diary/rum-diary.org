@@ -2,34 +2,29 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const path = require('path');
+const fs = require('fs');
 const Promise = require('bluebird');
 const logger = require('./logger');
 
-const OSStream = require('./reduce/os');
-const FormFactorStream = require('./reduce/form-factor');
-const TagsStream = require('./reduce/tags');
-const BrowserStream = require('./reduce/browser');
-const HostnameStream = require('./reduce/hostname');
-const HitsPerPageStream = require('./reduce/hits-per-page');
-const ReferrerStream = require('./reduce/referrer');
-const UniqueStream = require('./reduce/unique-visitor');
-const ReturningStream = require('./reduce/returning-visitor');
-const HitsPerDayStream = require('./reduce/hits-per-day');
-const NavigationStream = require('./reduce/navigation');
+const STREAM_PATH = path.join(__dirname, 'reduce');
+var allStreams;
 
-var AvailableStreams = [
-  OSStream,
-  FormFactorStream,
-  TagsStream,
-  BrowserStream,
-  HostnameStream,
-  HitsPerPageStream,
-  ReferrerStream,
-  UniqueStream,
-  ReturningStream,
-  HitsPerDayStream,
-  NavigationStream
-];
+loadStreams();
+function loadStreams() {
+  if (allStreams) return allStreams;
+
+  allStreams = [];
+
+  fs.readdirSync(STREAM_PATH).forEach(function (fileName) {
+    // skip files that don't have a .js suffix or start with a dot
+    if (path.extname(fileName) !== '.js' || /^\./.test(fileName)) return;
+    var api = require(path.join(STREAM_PATH, fileName));
+    allStreams.push(api);
+  });
+
+  return allStreams;
+}
 
 // keep this around to facilitate debugging memory leaks when needed.
 if (false) {
@@ -91,16 +86,23 @@ function StreamReduce(options) {
   this.addedStreams = [];
 
   var which = options.which;
-  AvailableStreams.forEach(function(Stream) {
-    if (shouldAddStream(Stream.prototype.name, which)) {
-      this.addedStreams.push(new Stream(options));
+  allStreams.forEach(function(Stream) {
+    var name = Stream.prototype.name;
+    if (shouldAddStream(name, which)) {
+      this.addedStreams.push(new Stream(options[name]));
     }
   }, this);
 }
 
-StreamReduce.prototype.write = function(hit) {
+StreamReduce.prototype.write = function(hit/*, encoding, callback*/) {
   this.addedStreams.forEach(function(stream) {
     stream.write(hit);
+  });
+};
+
+StreamReduce.prototype.end = function(chunk/*, encoding, callback*/) {
+  this.addedStreams.forEach(function(stream) {
+    stream.end(chunk);
   });
 };
 

@@ -43,6 +43,14 @@ ReduceStream.prototype._write = function (/*chunk, encoding, callback*/) {
   throw new Error('_write must be overridden');
 };
 
+/**
+ * Call this method when no more data will be written to the stream.
+ * Allows references to be freed.
+ */
+ReduceStream.prototype.end = function(/*chunk, encoding, callback*/) {
+  this._data = this._options = null;
+};
+
 ReduceStream.prototype.result = function () {
   return this._data;
 };

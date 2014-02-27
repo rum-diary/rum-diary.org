@@ -28,62 +28,51 @@ exports.handler = function(req, res) {
   if (req.query.plot) statName = req.query.plot;
 
   var reduceStream = new reduce.StreamReduce({
-    which: ['navigation'],
+    which: ['navigation', 'navigation-histogram', 'navigation-cdf'],
     start: start,
     end: end,
     navigation: {
       calculate: ['25', '50', '75']
+    },
+    'navigation-histogram': {
+      statName: statName
+    },
+    'navigation-cdf': {
+      statName: statName
     }
-  });
-  var histogramStream = new NavigationHistogramStream({
-    statName: statName
-  });
-  var cdfStream = new NavigationCdfStream({
-    statName: statName
   });
 
   // streams are *much* more memory efficient than one huge get.
   db.pageView.getStream(query)
     .then(function (stream) {
-      stream.on('data', function (doc) {
-        reduceStream.write(doc);
-        histogramStream.write(doc);
-        cdfStream.write(doc);
-      });
+      stream.on('data', reduceStream.write.bind(reduceStream));
 
       stream.on('close', complete);
     });
 
 
   function complete() {
-    var cdfData;
-    var histogramData;
-
     Promise.attempt(function() {
-      logger.info('calculating histogram');
-      histogramData = histogramStream.result();
-
-      logger.info('calculating cdf');
-      cdfData = cdfStream.result();
-
       logger.info('calculating navigatin timing data');
-      navigationTimingData = reduceStream.result();
+      var results = reduceStream.result();
 
       res.render('GET-site-hostname-performance.html', {
         baseURL: req.url.replace(/\?.*/, ''),
-        histogram: histogramData,
-        cdf: cdfData,
+        histogram: results['navigation-histogram'],
+        cdf: results['navigation-cdf'],
         statName: statName,
         hostname: req.params.hostname,
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD'),
         resources: clientResources('rum-diary.min.js'),
         navigationTimingFields: getNavigationTimingFields(),
-        first_q: navigationTimingData.navigation['25'],
-        second_q: navigationTimingData.navigation['50'],
-        third_q: navigationTimingData.navigation['75']
+        first_q: results.navigation['25'],
+        second_q: results.navigation['50'],
+        third_q: results.navigation['75']
       });
-      cdfData = histogramData = null;
+
+      reduceStream.end();
+      results = null;
     })
     .then(null, function(err) {
       res.send(500);

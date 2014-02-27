@@ -9,19 +9,19 @@ const ThinkStats = require('think-stats');
 const EasierObject = require('easierobject').easierObject;
 
 const ReduceStream = require('../reduce-stream');
-util.inherits(NavigationStream, ReduceStream);
+util.inherits(Stream, ReduceStream);
 
-function NavigationStream(options) {
+function Stream(options) {
+  this._data = getNavigationTimingAccumulators(options);
+
   ReduceStream.call(this, options);
-
-  this._accumulators = getNavigationTimingAccumulators(options);
 }
 
-NavigationStream.prototype.name = 'navigation';
-NavigationStream.prototype.type = Object;
+Stream.prototype.name = 'navigation';
+Stream.prototype.type = null;
 
-NavigationStream.prototype._write = function(chunk, encoding, callback) {
-  var stats = this._accumulators;
+Stream.prototype._write = function(chunk, encoding, callback) {
+  var stats = this._data;
   var navTiming = chunk.navigationTiming;
 
   for (var key in navTiming) {
@@ -62,16 +62,22 @@ NavigationStream.prototype._write = function(chunk, encoding, callback) {
   callback(null);
 };
 
-NavigationStream.prototype.result = function () {
+Stream.prototype.result = function () {
   var options = this.getOptions();
   var navTimingStats = calculateNavigationTimingStats(
-                            this._accumulators, options.navigation.calculate);
+                            this._data, options.calculate);
 
+  return navTimingStats;
+};
+
+Stream.prototype.end = function(chunk, encoding, callback) {
+  if (chunk) {
+    this.write(chunk);
+  }
   // free the accumulator references, they are no longer needed.
   // The accumulators cause the heap to grow to the point of OOM.
-  freeNavigationTimingAccumulators(this._accumulators);
-  this._accumulators = null;
-  return navTimingStats;
+  freeNavigationTimingAccumulators(this._data);
+  Stream.end.call(this, chunk, encoding, callback);
 };
 
 
@@ -198,4 +204,4 @@ function calculateNavigationTimingStats(accumulators, statsUserWants) {
 
 
 
-module.exports = NavigationStream;
+module.exports = Stream;
