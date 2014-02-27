@@ -9,19 +9,19 @@ const url = require('url');
 const ThinkStats = require('think-stats');
 const ReduceStream = require('../reduce-stream');
 
-util.inherits(ReferrerStream, ReduceStream);
+util.inherits(Stream, ReduceStream);
 
-function ReferrerStream(options) {
+function Stream(options) {
   this._data = {
     by_hostname: {}
   };
   ReduceStream.call(this, options);
 }
 
-ReferrerStream.prototype.name = 'referrers';
-ReferrerStream.prototype.type = null;
+Stream.prototype.name = 'referrers';
+Stream.prototype.type = null;
 
-ReferrerStream.prototype._write = function(chunk, encoding, callback) {
+Stream.prototype._write = function(chunk, encoding, callback) {
   var referrers = this._data.by_hostname;
   if ( ! (chunk.referrer || chunk.referrer_hostname)) return;
 
@@ -46,13 +46,14 @@ ReferrerStream.prototype._write = function(chunk, encoding, callback) {
   callback(null);
 };
 
-ReferrerStream.prototype.result = function () {
+Stream.prototype.result = function () {
   this._data.by_count = sortHostnamesByCount(this._data.by_hostname);
   return this._data;
 };
 
 function sortHostnamesByCount(countByHostname) {
   var sortedByCount = new ThinkStats({
+    store_data: true,
     compare: function (a, b) {
       return b.count - a.count;
     }
@@ -69,4 +70,4 @@ function sortHostnamesByCount(countByHostname) {
 }
 
 
-module.exports = ReferrerStream;
+module.exports = Stream;
