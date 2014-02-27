@@ -280,5 +280,22 @@ describe('reduce', function () {
       done();
     }, fail);
   });
+
+  it('streamReduce to find tags', function () {
+    var stream = new reduce.StreamReduce({
+      which: 'tags',
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    });
+
+    navigationTimingData.forEach(stream.write.bind(stream));
+
+    var data = stream.result();
+    assert.equal(data.tags.nginx, 2);
+    assert.equal(data.tags.node, 2);
+    assert.equal(data.tags['spdy3.1'], 1);
+    assert.equal(data.tags['spdy2.0'], 3);
+    assert.isUndefined(data.tags['']);
+  });
 });
 

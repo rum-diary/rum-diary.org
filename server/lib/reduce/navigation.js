@@ -9,7 +9,6 @@ const ThinkStats = require('think-stats');
 const EasierObject = require('easierobject').easierObject;
 
 const ReduceStream = require('../reduce-stream');
-
 util.inherits(NavigationStream, ReduceStream);
 
 function NavigationStream(options) {

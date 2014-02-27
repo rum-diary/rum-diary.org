@@ -2,12 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const moment = require('moment');
-const ThinkStats = require('think-stats');
-const url = require('url');
 const Promise = require('bluebird');
-const EasierObject = require('easierobject').easierObject;
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const logger = require('./logger');
 
 const OSStream = require('./reduce/os');
@@ -79,29 +74,44 @@ exports.mapReduce = function (hits, fields, options) {
   var startTime = new Date();
   return Promise.attempt(function () {
     if (! options) options = {};
+    options.which = fields;
 
-    var addedStreams = [];
+    var stream = new StreamReduce(options);
 
-    AvailableStreams.forEach(function(Stream) {
-      if (shouldAddStream(Stream.prototype.name, fields)) {
-        addedStreams.push(new Stream(options));
-      }
-    });
+    hits.forEach(stream.write.bind(stream));
 
-    hits.forEach(function (hit) {
-      addedStreams.forEach(function(stream) {
-        stream.write(hit);
-      });
-    });
-
-    var data = {};
-    addedStreams.forEach(function(stream) {
-      data[stream.name] = stream.result();
-    });
-
-    return data;
+    return stream.result();
   }).then(function (data) {
     data.processing_time = (new Date().getTime() - startTime.getTime());
     return data;
   });
 };
+
+function StreamReduce(options) {
+  this.addedStreams = [];
+
+  var which = options.which;
+  AvailableStreams.forEach(function(Stream) {
+    if (shouldAddStream(Stream.prototype.name, which)) {
+      this.addedStreams.push(new Stream(options));
+    }
+  }, this);
+}
+
+StreamReduce.prototype.write = function(hit) {
+  this.addedStreams.forEach(function(stream) {
+    stream.write(hit);
+  });
+};
+
+StreamReduce.prototype.result = function() {
+  var data = {};
+
+  this.addedStreams.forEach(function(stream) {
+    data[stream.name] = stream.result();
+  });
+
+  return data;
+};
+
+exports.StreamReduce = StreamReduce;
