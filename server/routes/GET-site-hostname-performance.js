@@ -4,8 +4,6 @@
 
 const moment = require('moment');
 const Promise = require('bluebird');
-const Stats = require('fast-stats').Stats;
-const ThinkStats = require('think-stats');
 
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
@@ -18,71 +16,58 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query.createdAt['$gte']);
-  var end = moment(query.createdAt['$lte']);
+  var start = moment(query.createdAt.$gte);
+  var end = moment(query.createdAt.$lte);
 
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;
 
-  var hitsData = [];
+  var reduceStream = new reduce.StreamReduce({
+    which: ['navigation', 'navigation-histogram', 'navigation-cdf'],
+    start: start,
+    end: end,
+    navigation: {
+      calculate: ['25', '50', '75']
+    },
+    'navigation-histogram': {
+      statName: statName
+    },
+    'navigation-cdf': {
+      statName: statName
+    }
+  });
 
   // streams are *much* more memory efficient than one huge get.
   db.pageView.getStream(query)
     .then(function (stream) {
-      stream.on('data', function (doc) {
-        hitsData.push(doc);
-      });
+      stream.on('data', reduceStream.write.bind(reduceStream));
 
       stream.on('close', complete);
     });
 
 
   function complete() {
-    var cdfData;
-    var histogramData;
-    var requestedStatData;
-
     Promise.attempt(function() {
-      requestedStatData = hitsToStats(hitsData, statName);
-    })
-    .then(function(stats) {
-      logger.info('calculating histogram');
-      return filterNavigationTimingHistogram(requestedStatData);
-    })
-    .then(function(data) {
-      logger.info('calculating cdf');
-      histogramData = data;
-      return filterNavigationTimingCdf(requestedStatData);
-    })
-    .then(function(data) {
-      logger.info('calculating quartiles');
-      cdfData = data;
-      return reduce.mapReduce(hitsData, [
-        'navigation'
-      ], {
-        start: start,
-        end: end,
-        navigation: {
-          calculate: ['25', '50', '75']
-        }
-      });
-    })
-    .then(function(navigationTimingData) {
+      logger.info('calculating navigatin timing data');
+      var results = reduceStream.result();
+
       res.render('GET-site-hostname-performance.html', {
         baseURL: req.url.replace(/\?.*/, ''),
-        histogram: histogramData,
-        cdf: cdfData,
+        histogram: results['navigation-histogram'],
+        cdf: results['navigation-cdf'],
         statName: statName,
         hostname: req.params.hostname,
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD'),
         resources: clientResources('rum-diary.min.js'),
         navigationTimingFields: getNavigationTimingFields(),
-        first_q: navigationTimingData.navigation['25'],
-        second_q: navigationTimingData.navigation['50'],
-        third_q: navigationTimingData.navigation['75']
+        first_q: results.navigation['25'],
+        second_q: results.navigation['50'],
+        third_q: results.navigation['75']
       });
-      hitsData = requestedStatData =cdfData = histogramData = null;
+
+      reduceStream.end();
+      results = null;
     })
     .then(null, function(err) {
       res.send(500);
@@ -115,56 +100,6 @@ function getNavigationTimingFields() {
     'domComplete': Number,
     'loadEventStart': Number,
     'loadEventEnd': Number
-  });
-}
-
-function hitsToStats(hits, stat) {
-  var stats = new ThinkStats();
-
-  hits.forEach(function(hit) {
-    var value = hit.navigationTiming[stat] || NaN;
-    if (isNaN(value) || value === null || value === Infinity) return;
-    stats.push(value);
-  });
-
-  return stats;
-}
-
-function filterNavigationTimingCdf(stats) {
-  return Promise.attempt(function() {
-    try {
-      return stats.cdf();
-    } catch(e) {
-      console.log('woah', String(e));
-    }
-  });
-}
-
-function filterNavigationTimingHistogram(stats) {
-  return Promise.attempt(function() {
-    var twentyFifthPercentile = stats.percentile(25);
-    var startIndex = stats.percentileIndex(25);
-
-    var seventyFifthPercentile = stats.percentile(75);
-    var endIndex = stats.percentileIndex(75);
-
-    var buckets = Math.min(endIndex - startIndex, 75) || 1;
-
-    // slice's endIndex is exclusive, add one to include the endIndex.
-    var iqrHits = stats.sorted().slice(startIndex, endIndex + 1);
-
-    var bucketed = new ThinkStats();
-    bucketed.push(iqrHits);
-
-    var values = [];
-    var d = bucketed.bucket(buckets);
-    d.forEach(function(bucket) {
-      for (var i = 0; i < bucket.count; ++i) {
-        values.push(bucket.bucket);
-      }
-    });
-
-    return values;
   });
 }
 

@@ -21,7 +21,22 @@ exports.handler = function(req, res) {
   var totalHits = 0;
   var queryTags = req.query.tags && req.query.tags.split(',') || 0;
   var tags;
-  var hitsData = [];
+
+  var reduceStream = new reduce.StreamReduce({
+    which: [
+      'hits_per_day',
+      'hits_per_page',
+      'referrers',
+      'unique',
+      'returning'
+    ],
+    start: start,
+    end: end,
+    'hits_per_day': {
+      start: start,
+      end: end,
+    }
+  });
 
   db.tags.get({
     hostname: query.hostname
@@ -56,9 +71,7 @@ exports.handler = function(req, res) {
     return db.pageView.getStream(query);
   })
   .then(function (stream) {
-    stream.on('data', function (doc) {
-      hitsData.push(doc);
-    });
+    stream.on('data', reduceStream.write.bind(reduceStream));
 
     stream.on('close', complete);
   });
@@ -66,43 +79,35 @@ exports.handler = function(req, res) {
   function complete() {
     reductionStart = new Date();
 
-    Promise.attempt(function() {
-      return reduce.mapReduce(hitsData, [
-        'hits_per_day',
-        'hits_per_page',
-        'referrers',
-        'unique',
-        'returning'
-      ], {
-        start: start,
-        end: end
-      });
-    }).then(function(data) {
-      var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
+    Promise.attempt(function(data) {
+      var results = reduceStream.result();
+      var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
 
       var reductionEnd = new Date();
       var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
       logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
+      console.log('results.hits_per_day.__all', results.hits_per_day.__all);
       res.render('GET-site-hostname.html', {
         root_url: req.url.replace(/\?.*/, ''),
         hostname: req.params.hostname,
         resources: clientResources('rum-diary.min.js'),
         pageHitsPerPage: pageHitsPerPageSorted,
-        pageHitsPerDay: data.hits_per_day.__all,
-        referrers: data.referrers.by_count.slice(0, 20),
+        pageHitsPerDay: results.hits_per_day.__all,
+        referrers: results.referrers.by_count.slice(0, 20),
         startDate: start.format('MMM DD'),
         endDate: end.format('MMM DD'),
         hits: {
           total: totalHits,
           period: pageHitsPerPageSorted[0].hits,
-          today: data.hits_per_day.__all[data.hits_per_day.__all.length - 1].hits,
-          unique: data.unique,
-          repeat: data.returning
+          today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
+          unique: results.unique,
+          repeat: results.returning
         },
         tags: tags
       });
-      hitsData = tags = null;
+      tags = null;
+      reduceStream.end();
     }).catch(function(err) {
       logger.error(String(err));
       res.send(500);
