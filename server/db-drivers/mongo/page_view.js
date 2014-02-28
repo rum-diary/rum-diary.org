@@ -61,7 +61,15 @@ const pageViewDefinition = {
   ],
   tags: [ String ],
   returning: Boolean,
-  is_counted: Boolean
+  is_counted: Boolean,
+  is_exit: {
+    type: Boolean,
+    default: true
+  },
+  duration: {
+    type: Number,
+    default: 0
+  }
 };
 
 const PageViewModel = Object.create(Model);
@@ -103,8 +111,7 @@ PageViewModel.getSearchBy = function (searchBy) {
 // This function returns an ObjectId embedded with a given datetime
 // Accepts both Date object and string input
 
-function objectIdWithTimestamp(timestamp)
-{
+function objectIdWithTimestamp(timestamp) {
     // Convert date object to hex seconds since Unix epoch
     var hexSeconds = Math.floor(timestamp.getTime()/1000).toString(16);
 

@@ -55,7 +55,11 @@ function sortHostnamesByCount(countByHostname) {
   var sortedByCount = new ThinkStats({
     store_data: true,
     compare: function (a, b) {
-      return b.count - a.count;
+      try {
+        return b.count - a.count;
+      } catch(e) {
+        console.error('error comparing');
+      }
     }
   });
 

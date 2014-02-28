@@ -28,14 +28,14 @@
     "connect-gzip-static": "git://github.com/shane-tomlinson/connect-gzip-static.git#3625997d2a8f83ef8040632c20e8ae3e9bf9fced",
     "helmet": "0.1.2",
     "connect-cachify": "0.0.15",
-    "think-stats": "git://github.com/shane-tomlinson/think-stats.git#796d963fd69b3055ef971b5d0418cd647683928c",
+    "think-stats": "git://github.com/shane-tomlinson/think-stats.git#0879fc55fa5e36e02079c7373fc0bc9005958ec5",
     "underscore": "1.6.0"
   },
   "devDependencies": {
     "mocha": "~1.16.1",
     "assert": "~1.0.3",
     "chai": "~1.8.1",
-    "request": "~2.30.0",
+    "request": "2.34.0",
     "grunt-contrib-jshint": "~0.8.0",
     "jshint": "~2.3.0",
     "grunt": "~0.4.2",

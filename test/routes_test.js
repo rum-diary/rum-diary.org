@@ -62,10 +62,37 @@ describe('routes module', function() {
       request.post(baseURL + '/navigation', function(err, response) {
         assert.equal(response.statusCode, 200);
 
-        // CORS is only allowed for POST /navigation
+        // CORS is allowed for POST /navigation
         assert.equal(response.headers['access-control-allow-origin'], '*');
 
         testCommonResponseHeaders(response);
+
+        done();
+      });
+    });
+  });
+
+  describe('POST /unload', function() {
+    it('should respond with 400 if no uuid sent', function(done) {
+      request.post(baseURL + '/unload', function(err, response) {
+        assert.equal(response.statusCode, 400);
+
+        done();
+      });
+    });
+
+    it('should respond with 200 and CORS headers if valid', function(done) {
+      request.post({
+        url: baseURL + '/unload',
+        json: { uuid: 'the-uuid-to-update' }
+      }, function(err, response) {
+        assert.equal(response.statusCode, 200);
+
+        // CORS is allowed for POST /unload
+        assert.equal(response.headers['access-control-allow-origin'], '*');
+
+        testCommonResponseHeaders(response);
+
 
         done();
       });

@@ -13,7 +13,7 @@ exports.verb = 'post';
 exports.enable_cors = true;
 
 exports.handler = function (req, res) {
-  // don't wanna me hanging around for a response.
+  // don't wanna be hanging around for a response.
   res.send(200, { success: true });
 
   // The referrer here is the page where the stats were collected,
@@ -21,7 +21,7 @@ exports.handler = function (req, res) {
   // The referrer of the page where the stats were collection is
   // collected by the client and sent in the data set.
   var referrer = req.get('referrer');
-  logger.info('saving data for: %s', referrer);
+  logger.info('saving navigation data for: %s', referrer);
 
   var data = req.body;
 
@@ -70,17 +70,19 @@ exports.handler = function (req, res) {
             })
             .then(function () {
               var resolver = Promise.defer();
-              var outstanding = data.tags.length;
+              var tags = data.tags || [];
+              var outstanding = tags.length;
 
-              data.tags.forEach(function(tag) {
+              tags.forEach(function(tag) {
                 db.tags.hit({
                     name: tag,
                     hostname: data.hostname
                   })
                   .then(function () {
                     outstanding--;
-                    if (!outstanding);
-                    resolver.resolve();
+                    if (! outstanding) {
+                      resolver.resolve();
+                    }
                   })
                   .then(null, resolver.reject.bind(resolver));
 

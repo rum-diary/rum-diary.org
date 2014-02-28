@@ -44,6 +44,7 @@ Stream.prototype.result = function() {
 
   var d = bucketed.bucket(buckets);
   d.forEach(function(bucket) {
+    if (! (bucket && bucket.hasOwnProperty('count'))) { console.error('invalid bucket', bucket); }
     for (var i = 0; i < bucket.count; ++i) {
       values.push(bucket.bucket);
     }

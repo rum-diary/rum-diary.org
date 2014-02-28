@@ -123,7 +123,7 @@
 
       data = getData(contentType, type, options.data);
 
-      xhrObject.open(type, url, true);
+      xhrObject.open(type, url, options.async);
       var headers = {
         'Content-type' : contentType
       };
@@ -142,9 +142,14 @@
 
   var Micrajax = {
     ajax: function(options) {
-      var error = options.error,
-          success = options.success,
+      var noOp = function () {},
+          error = options.error || noOp,
+          success = options.success || noOp,
           mockXHR = { readyState: 0 };
+
+      if (! options.hasOwnProperty('async')) {
+        options.async = true;
+      }
 
       var xhrObject = sendRequest(options, function(responseText, status, statusText) {
         mockXHR.status = status;
@@ -188,8 +193,6 @@
 (function (exports, undefined) {
   'use strict';
 
-  var LOCAL_STORAGE_NAMESPACE = '__speed_trap__';
-
   var SpeedTrap = {
     init: function (options) {
       options = options || {};
@@ -208,7 +211,6 @@
         baseTime: this.baseTime
       });
 
-      this.stored = create(PersistentStorage);
       this.uuid = guid();
 
       this.tags = options.tags || [];
@@ -221,20 +223,29 @@
       localStorage.setItem('_st', '1');
     },
 
-    get: function () {
+    /**
+     * Data to send on page load.
+     */
+    getLoad: function () {
       return {
         uuid: this.uuid,
         navigationTiming: this.navigationTiming.diff(),
-        timers: this.timers.get(),
-        events: this.events.get(),
         referrer: document.referrer || '',
         tags: this.tags,
         returning: this.returning
       };
     },
 
-    store: function () {
-      this.stored.store(this.get());
+    /**
+     * Data to send on page unload
+     */
+    getUnload: function () {
+      return {
+        uuid: this.uuid,
+        duration: now() - this.baseTime,
+        timers: this.timers.get(),
+        events: this.events.get()
+      };
     }
   };
 
@@ -349,31 +360,6 @@
     }
   };
 
-  var PersistentStorage = {
-    store: function (dataToStore) {
-      var storedData = this.get();
-      var lastItem = storedData[storedData.length - 1];
-
-      if (lastItem && lastItem.uuid === dataToStore.uuid) {
-        // this session is already stored, get rid of the old data.
-        storedData.pop();
-      }
-
-      storedData.push(dataToStore);
-      localStorage.setItem(LOCAL_STORAGE_NAMESPACE, JSON.stringify(storedData));
-    },
-
-    get: function () {
-      var stringified = localStorage.getItem(LOCAL_STORAGE_NAMESPACE) || '[]';
-      var data = JSON.parse(stringified);
-      return data;
-    },
-
-    clear: function () {
-      localStorage.removeItem(LOCAL_STORAGE_NAMESPACE);
-    }
-  };
-
   function create(proto) {
     if (Object.create) return Object.create(proto);
 
@@ -411,29 +397,45 @@
     tags: getTagsFromScriptTag()
   });
 
-  try {
-    window.addEventListener('load', onloadHandler, false);
-  } catch(e) {
-    window.attachEvent('onload', onloadHandler);
+  function bindDOMEvent(element, handler, callback) {
+    if (element.addEventListener) {
+      element.addEventListener(handler, callback, false);
+    } else if (element.attachEvent) {
+      element.attachEvent('on' + handler, callback);
+    }
   }
 
-  function onloadHandler() {
+  bindDOMEvent(window, 'load', onLoadHandler);
+  bindDOMEvent(window, 'unload', onUnloadHandler);
+
+  function onLoadHandler() {
     setTimeout(function () {
-      var data = speedTrap.get();
-      sendData(data, function() {});
+      var data = speedTrap.getLoad();
+      Micrajax.ajax({
+        type: 'POST',
+        url: server + '/navigation',
+        contentType: 'application/json',
+        data: data
+      });
     }, 100);
   }
 
-  function sendData(data, done) {
-    Micrajax.ajax({
-      type: 'POST',
-      url: server + '/navigation',
-      contentType: 'application/json',
-      data: data,
-      success: function(resp, respText, xhr) {
-        done();
-      }
-    });
+  function onUnloadHandler() {
+    var data = speedTrap.getUnload();
+    var url = server + '/unload';
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, JSON.stringify(data));
+    } else {
+      Micrajax.ajax({
+        // async otherwise the browser closes the connection.
+        async: false,
+        // put to update the data.
+        type: 'POST',
+        url: url,
+        contentType: 'application/json',
+        data: data
+      });
+    }
   }
 
   function getTagsFromScriptTag() {

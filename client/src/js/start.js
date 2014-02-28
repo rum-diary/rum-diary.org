@@ -99,8 +99,6 @@
       histogramData.push(value);
     });
 
-    console.log('min: ' + min + ' max: ' + max);
-
     var histogram = RD.Graphs.Histogram.create();
     histogram.init({
       root: '#histogram-graph',
@@ -140,8 +138,6 @@
       });
     });
 
-    console.log('cdf data', JSON.stringify(cdfData));
-
     var cdf = RD.Graphs.CDF.create();
     cdf.init({
       root: '#cdf-graph',
@@ -172,8 +168,6 @@
         value: parseInt(y, 10)
       });
     });
-
-    console.log('browsers data', JSON.stringify(browsersData));
 
     var browsers = RD.Graphs.Pie.create();
     browsers.init({
@@ -206,8 +200,6 @@
       });
     });
 
-    console.log('os data', JSON.stringify(osData));
-
     var os = RD.Graphs.Pie.create();
     os.init({
       root: '#os-graph',
@@ -231,8 +223,6 @@
 
     countDeviceType('mobile');
     countDeviceType('desktop');
-
-    console.log('deviceType data', JSON.stringify(deviceType));
 
     var deviceTypeArray = Object.keys(deviceTypeData).map(function(key) {
       return {
