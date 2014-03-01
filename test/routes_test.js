@@ -39,6 +39,8 @@ var ROUTES = {
                                       : 200,
   'GET /site/shanetomlinson.com/path/2013/testing-javascript-frontend-part-1-anti-patterns-and-fixes/'
                                       : 200,
+  'GET /site/www.aframejs.com/path/tutorial.html'
+                                      : 200,
   'GET /site/connect-fonts.org/path/families'
                                       : 200
 
@@ -60,7 +62,7 @@ describe('routes module', function() {
   describe('POST /navigation', function() {
     it('should have CORS `access-control-allow-origin: *` header', function(done) {
       request.post(baseURL + '/navigation', function(err, response) {
-        assert.equal(response.statusCode, 200);
+        assert.equal(response.statusCode, 200, baseURL);
 
         // CORS is allowed for POST /navigation
         assert.equal(response.headers['access-control-allow-origin'], '*');

@@ -7,7 +7,6 @@
     <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
     <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
   </ul>
-
 {% endblock %}
 
 {% block header %}
@@ -33,15 +32,15 @@
   <article id="overview" class="row-left">
     <h2>Overview</h2>
     <dl>
-      <dt class="overview-name small">Total</dt>
+      <dt class="overview-name deemphasize">Total</dt>
       <dd class="overview-stat">{{ hits.total }}</dd>
-      <dt class="overview-name small">Today</dt>
+      <dt class="overview-name deemphasize">Today</dt>
       <dd class="overview-stat">{{ hits.today }}</dd>
-      <dt class="overview-name small">Period</dt>
+      <dt class="overview-name deemphasize">Period</dt>
       <dd class="overview-stat">{{ hits.period }}</dd>
-      <dt class="overview-name small">Unique</dt>
+      <dt class="overview-name deemphasize">Unique</dt>
       <dd class="overview-stat">{{ hits.unique }}</dd>
-      <dt class="overview-name small">Repeat</dt>
+      <dt class="overview-name deemphasize">Repeat</dt>
       <dd class="overview-stat">{{ hits.repeat }}</dd>
     </dl>
 
@@ -68,7 +67,7 @@
     <dl id="referrers">
       {% for referrer in referrers %}
         <dt class="referrers-hostname">{{ referrer.hostname }}</dt>
-        <dd class="referrers-count small">{{ referrer.count }}</dd>
+        <dd class="referrers-count deemphasize">{{ referrer.count }}</dd>
       {% endfor %}
     </dl>
   </article>
@@ -79,7 +78,7 @@
       {% for page in pageHitsPerPage %}
         {% if page.page != "__all" %}
           <dt class="hits-path"><a href="{{ root_url }}/path{{ page.page }}">{{ page.page }}</a></dt>
-          <dd class="hits-count small">{{ page.hits }}</dd>
+          <dd class="hits-count deemphasize">{{ page.hits }}</dd>
         {% endif %}
       {% endfor %}
     </dl>

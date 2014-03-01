@@ -28,7 +28,7 @@
     "connect-gzip-static": "git://github.com/shane-tomlinson/connect-gzip-static.git#3625997d2a8f83ef8040632c20e8ae3e9bf9fced",
     "helmet": "0.1.2",
     "connect-cachify": "0.0.15",
-    "think-stats": "0.0.19",
+    "think-stats": "0.0.20",
     "underscore": "1.6.0"
   },
   "devDependencies": {

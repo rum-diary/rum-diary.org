@@ -169,12 +169,16 @@ main {
   width: 175px;
 }
 
-.small {
+.deemphasize {
   color: #777;
 }
 
 .overview-stat {
   font-size: 2.75em;
+}
+
+.overview-stat.small {
+  font-size: 1.7em;
 }
 
 .row {
