@@ -281,6 +281,35 @@ describe('reduce', function () {
     }, fail);
   });
 
+  it('mapReduce to find duration',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'read-time'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment(),
+      'read-time': {
+        calculate: 'amean'
+      }
+    }).then(function (data) {
+      assert.equal(data['read-time'], 204);
+      done();
+    }, fail);
+  });
+
+  it('mapReduce to find duration',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'read-time'
+    ], {
+      start: moment(new Date()).subtract('days', 30),
+      end: moment()
+    }).then(function (data) {
+      assert.equal(data['read-time'], 146);
+      done();
+    }, fail);
+  });
+
   it('streamReduce to find tags', function () {
     var stream = new reduce.StreamReduce({
       which: 'tags',
