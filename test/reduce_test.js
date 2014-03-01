@@ -25,53 +25,6 @@ function fail(err) {
 /*global describe, it */
 
 describe('reduce', function () {
-  /*
-  it('findMedianNavigationTimes', function (done) {
-    reduce.findMedianNavigationTimes(navigationTimingData, function (err, medianInfo) {
-      assert.isNull(err);
-
-      assert.isNumber(medianInfo.unloadEventStart);
-      assert.isNumber(medianInfo.unloadEventEnd);
-      assert.isNumber(medianInfo.unloadEventDuration);
-
-      assert.isNumber(medianInfo.navigationStart);
-      assert.isNumber(medianInfo.redirectStart);
-      assert.isNumber(medianInfo.redirectEnd);
-      assert.isNumber(medianInfo.redirectDuration);
-
-      assert.isNumber(medianInfo.fetchStart);
-
-      assert.isNumber(medianInfo.domainLookupStart);
-      assert.isNumber(medianInfo.domainLookupEnd);
-      assert.isNumber(medianInfo.domainLookupDuration);
-
-      assert.isNumber(medianInfo.connectStart);
-      assert.isNumber(medianInfo.secureConnectionStart);
-      assert.isNumber(medianInfo.connectEnd);
-      assert.isNumber(medianInfo.connectDuration);
-
-      assert.isNumber(medianInfo.requestStart);
-      assert.isNumber(medianInfo.responseStart);
-      assert.isNumber(medianInfo.responseEnd);
-      assert.isNumber(medianInfo.requestResponseDuration);
-
-      assert.isNumber(medianInfo.domLoading);
-      assert.isNumber(medianInfo.domInteractive);
-      assert.isNumber(medianInfo.domContentLoadedEventStart);
-      assert.isNumber(medianInfo.domContentLoadedEventEnd);
-      assert.isNumber(medianInfo.domContentLoadedEventDuration);
-      assert.isNumber(medianInfo.domComplete);
-      assert.isNumber(medianInfo.processingDuration);
-
-      assert.isNumber(medianInfo.loadEventStart);
-      assert.isNumber(medianInfo.loadEventEnd);
-      assert.isNumber(medianInfo.loadEventDuration);
-
-      done();
-    });
-  });
-*/
-
   it('findNavigationTimingStats', function (done) {
     reduce.findNavigationTimingStats(navigationTimingData,
       ['range', 'median', 'amean', 'stddev']).then(function(stats) {
@@ -113,23 +66,6 @@ describe('reduce', function () {
         done();
       }, fail);
   });
-
-  /*
-  it('findReferrers', function (done) {
-    reduce.findReferrers(
-      navigationTimingData,
-      function (err, data) {
-
-      assert.isNull(err);
-
-      assert.equal(data.by_hostname['localhost'], 9);
-      assert.equal(data.by_count[0].hostname, 'localhost');
-      assert.equal(data.by_count[0].count, 9);
-
-      done();
-    });
-  });
-*/
 
   it('findHostnames', function (done) {
     reduce.findHostnames(navigationTimingData)
@@ -195,10 +131,7 @@ describe('reduce', function () {
   it('mapReduce to calculate unique visitors', function (done) {
     reduce.mapReduce(navigationTimingData, [
       'unique'
-    ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment()
-    }).then(function (data) {
+    ]).then(function (data) {
       assert.equal(data.unique, 8);
 
       done();
@@ -208,10 +141,7 @@ describe('reduce', function () {
   it('mapReduce to calculate returning visitors', function (done) {
     reduce.mapReduce(navigationTimingData, [
       'returning'
-    ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment()
-    }).then(function (data) {
+    ]).then(function (data) {
       assert.equal(data.returning, 1);
 
       done();
@@ -221,10 +151,7 @@ describe('reduce', function () {
   it('mapReduce to calculate browsers', function (done) {
     reduce.mapReduce(navigationTimingData, [
       'browsers'
-    ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment()
-    }).then(function (data) {
+    ]).then(function (data) {
       assert.equal(data.browsers.Firefox, 7);
       assert.equal(data.browsers['Mobile Safari'], 1);
       assert.equal(data.browsers['Chrome Mobile'], 1);
@@ -235,10 +162,7 @@ describe('reduce', function () {
   it('mapReduce to calculate operating systems', function (done) {
     reduce.mapReduce(navigationTimingData, [
       'os'
-    ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment()
-    }).then(function (data) {
+    ]).then(function (data) {
       // tests for both parsed and unparsed OS'
       assert.equal(data.os['Mac OS X 10'], 1);
       assert.equal(data.os['Windows 7'], 6);
@@ -252,10 +176,7 @@ describe('reduce', function () {
       function (done) {
     reduce.mapReduce(navigationTimingData, [
       'os:form'
-    ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment()
-    }).then(function (data) {
+    ]).then(function (data) {
       assert.equal(data['os:form'].desktop['Mac OS X 10'], 1);
       assert.equal(data['os:form'].desktop['Windows 7'], 6);
       assert.equal(data['os:form'].mobile['iOS 7'], 1);
@@ -268,10 +189,7 @@ describe('reduce', function () {
       function (done) {
     reduce.mapReduce(navigationTimingData, [
       'tags'
-    ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment()
-    }).then(function (data) {
+    ]).then(function (data) {
       assert.equal(data.tags.nginx, 2);
       assert.equal(data.tags.node, 2);
       assert.equal(data.tags['spdy3.1'], 1);
@@ -286,8 +204,6 @@ describe('reduce', function () {
     reduce.mapReduce(navigationTimingData, [
       'read-time'
     ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment(),
       'read-time': {
         calculate: 'amean'
       }
@@ -301,11 +217,19 @@ describe('reduce', function () {
       function (done) {
     reduce.mapReduce(navigationTimingData, [
       'read-time'
-    ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment()
-    }).then(function (data) {
+    ]).then(function (data) {
       assert.equal(data['read-time'], 146);
+      done();
+    }, fail);
+  });
+
+  it('mapReduce to find referrers',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'referrers'
+    ]).then(function (results) {
+      assert.isUndefined(results.referrers.by_hostname['localhost']);
+      assert.equal(results.referrers.by_hostname['shanetomlinson.com'], 1);
       done();
     }, fail);
   });
@@ -315,11 +239,11 @@ describe('reduce', function () {
     reduce.mapReduce(navigationTimingData, [
       'internal-transfer'
     ]).then(function (data) {
-      assert.equal(data['internal-transfer']['by_source']['/site']['/site/localhost'], 8);
+      assert.equal(data['internal-transfer']['by_source']['/site']['/site/localhost'], 7);
       // don't count users who reload
       assert.isUndefined(data['internal-transfer']['by_source']['/site/localhost']);
 
-      assert.equal(data['internal-transfer']['by_dest']['/site/localhost']['/site'], 8);
+      assert.equal(data['internal-transfer']['by_dest']['/site/localhost']['/site'], 7);
 
       // don't count users who reload
       assert.isUndefined(data['internal-transfer']['by_dest']['/site/localhost']['/site/localhost']);

@@ -37,6 +37,9 @@ Stream.prototype._write = function(chunk, encoding, callback) {
     }
   }
 
+  // If the referrer is internal, it doesn't really count.
+  if (hostname === chunk.hostname) return;
+
   if ( ! referrers[hostname]) {
     referrers[hostname] = 0;
   }
