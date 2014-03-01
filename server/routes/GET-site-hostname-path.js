@@ -10,13 +10,13 @@ const clientResources = require('../lib/client-resources');
 const getQuery = require('../lib/site-query');
 
 
-exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)*)\/path\/(.*)?$/;
+exports.path = /\/site\/([\w\d][\w\d\-]*(?:\.[\w\d][\w\d\-]*)*)\/path\/(.*)?$/;
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query.createdAt['$gte']);
-  var end = moment(query.createdAt['$lte']);
+  var start = moment(query.createdAt.$gte);
+  var end = moment(query.createdAt.$lte);
 
   var hostname = req.params[0];
   var path = req.params[1] || 'index';
@@ -30,7 +30,6 @@ exports.handler = function(req, res) {
   query.path = path;
 
   var reductionStart;
-  var totalHits = 0;
 
   db.pageView.get(query).then(function(hits) {
     reductionStart = new Date();
@@ -41,7 +40,8 @@ exports.handler = function(req, res) {
       'referrers',
       'unique',
       'returning',
-      'read-time'
+      'read-time',
+      'internal-transfer'
     ], {
       start: start,
       end: end
@@ -70,10 +70,14 @@ exports.handler = function(req, res) {
         unique: results.unique,
         repeat: results.returning
       },
-      medianReadTime: msToHoursMinsSeconds(results['read-time'])
+      medianReadTime: msToHoursMinsSeconds(results['read-time']),
+      internalTransfer: {
+        from: results['internal-transfer']['by_dest'][path]
+      }
     });
   }, function(err) {
     res.send(500);
+    logger.error('GET-site-hostname-path error: %s', String(err));
   });
 };
 

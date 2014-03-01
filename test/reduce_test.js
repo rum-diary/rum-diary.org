@@ -281,7 +281,7 @@ describe('reduce', function () {
     }, fail);
   });
 
-  it('mapReduce to find duration',
+  it('mapReduce to find read-time',
       function (done) {
     reduce.mapReduce(navigationTimingData, [
       'read-time'
@@ -306,6 +306,23 @@ describe('reduce', function () {
       end: moment()
     }).then(function (data) {
       assert.equal(data['read-time'], 146);
+      done();
+    }, fail);
+  });
+
+  it('mapReduce to find from where users come and where they go - internally',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'internal-transfer'
+    ]).then(function (data) {
+      assert.equal(data['internal-transfer']['by_source']['/site']['/site/localhost'], 8);
+      // don't count users who reload
+      assert.isUndefined(data['internal-transfer']['by_source']['/site/localhost']);
+
+      assert.equal(data['internal-transfer']['by_dest']['/site/localhost']['/site'], 8);
+
+      // don't count users who reload
+      assert.isUndefined(data['internal-transfer']['by_dest']['/site/localhost']['/site/localhost']);
       done();
     }, fail);
   });
