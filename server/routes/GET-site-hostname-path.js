@@ -10,7 +10,7 @@ const clientResources = require('../lib/client-resources');
 const getQuery = require('../lib/site-query');
 
 
-exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)?)\/path\/([\w\d-]+(?:\/[\w\d-\.\_]+)*\/?)?$/;
+exports.path = /\/site\/([\w\d][\w\d-]*(?:\.[\w\d][\w\d-]*)*)\/path\/(.*)?$/;
 exports.verb = 'get';
 
 exports.handler = function(req, res) {
