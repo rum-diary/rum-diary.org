@@ -30,6 +30,7 @@ exports.handler = function(req, res) {
   query.path = path;
 
   var reductionStart;
+  var totalHits = 0;
 
   db.pageView.get(query).then(function(hits) {
     reductionStart = new Date();
@@ -38,16 +39,15 @@ exports.handler = function(req, res) {
       'hits_per_day',
       'hits_per_page',
       'referrers',
-      'navigation'
+      'unique',
+      'returning',
+      'read-time'
     ], {
       start: start,
-      end: end,
-      navigation: {
-        calculate: ['median']
-      }
+      end: end
     });
-  }).then(function(data) {
-    var pageHitsPerPageSorted = sortPageHitsPerPage(data.hits_per_page).slice(0, 20);
+  }).then(function(results) {
+    var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
 
     var reductionEnd = new Date();
     var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
@@ -55,15 +55,22 @@ exports.handler = function(req, res) {
 
     res.render('GET-site-hostname-path.html', {
       root_url: req.url.replace(/\?.*/, ''),
+      hostname: hostname,
       path: path,
-      hostname: req.params.hostname,
       resources: clientResources('rum-diary.min.js'),
       pageHitsPerPage: pageHitsPerPageSorted,
-      pageHitsPerDay: data.hits_per_day.__all,
-      median: data.navigation.median,
-      referrers: data.referrers.by_count.slice(0, 20),
+      pageHitsPerDay: results.hits_per_day.__all,
+      referrers: results.referrers.by_count.slice(0, 20),
       startDate: start.format('MMM DD'),
-      endDate: end.format('MMM DD')
+      endDate: end.format('MMM DD'),
+      hits: {
+        total: 'N/A',//totalHits,
+        period: pageHitsPerPageSorted[0].hits,
+        today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
+        unique: results.unique,
+        repeat: results.returning
+      },
+      medianReadTime: msToHoursMinsSeconds(results['read-time'])
     });
   }, function(err) {
     res.send(500);
@@ -82,3 +89,28 @@ function sortPageHitsPerPage(pageHitsPerPage) {
 
   return sorted;
 }
+
+function msToHoursMinsSeconds(ms) {
+  var seconds = ((ms || 0) / 1000) << 0;
+
+  var hours = (seconds / 3600) << 0;
+  var minutes = ((seconds - hours * 3600) / 60) << 0;
+  seconds = (seconds % 60);
+
+  return {
+    hours: padLeft(hours, 0, 2),
+    minutes: padLeft(minutes, 0, 2),
+    seconds: padLeft(seconds, 0, 2)
+  };
+}
+
+function padLeft(numToPad, padWith, length) {
+  var padded = '' + numToPad;
+
+  while(padded.length < length) {
+    padded = padWith + padded;
+  }
+
+  return padded;
+}
+

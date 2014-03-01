@@ -1,72 +1,72 @@
 {% extends "layout.html" %}
 {% block title %}{{ hostname }} info{% endblock %}
 
-{% block inlinecss %}
-path {
-    stroke: steelblue;      /* the line colour for paths is steelblue */
-    stroke-width: 2;      /* the line width for paths is 2 pixels */
-    fill: none;         /* don't fill the area bounded by any path elements */
-}
+{% block navigation %}
+  <ul>
+    <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
+  </ul>
+{% endblock %}
 
-.axis path,
-.axis line {
-    fill: none;         /* don't fill areas bounded by the axis line */
-    stroke: grey;       /* make the axis line grey */
-    stroke-width: 1;      /* make the width of the axis lines 1 pixel */
-    shape-rendering: crispEdges;/* make the edges sharp */
-}
-
+{% block header %}
+  {{ hostname }}{{ path }} - {{ startDate }} to {{ endDate }}
 {% endblock %}
 
 {% block body %}
-<section>
-  <h2>{{ hostname }}{{ path }} - 30 day page views per day</h2>
-  <div id="hits-graph"></div>
-  <table id="hits-data">
-    {% for day in pageHitsPerDay %}
-      <tr class="hits-data-day">
-        <td class="hits-data-date">{{ day.date }}</td>
-        <td class="hits-data-hits">{{ day.hits }}</td>
-      </tr>
-    {% endfor %}
-  </table>
+<section class="row">
+  <article id="overview" class="row-left">
+    <h2>Overview</h2>
+    <dl>
+      <dt class="overview-name deemphasize">Total</dt>
+      <dd class="overview-stat">{{ hits.total }}</dd>
+      <dt class="overview-name deemphasize">Today</dt>
+      <dd class="overview-stat">{{ hits.today }}</dd>
+      <dt class="overview-name deemphasize">Period</dt>
+      <dd class="overview-stat">{{ hits.period }}</dd>
+      <dt class="overview-name deemphasize">Unique</dt>
+      <dd class="overview-stat">{{ hits.unique }}</dd>
+      <dt class="overview-name deemphasize">Repeat</dt>
+      <dd class="overview-stat">{{ hits.repeat }}</dd>
+      <dt class="overview-name deemphasize">Median Read Time</dt>
+      <dd class="overview-stat small">{{medianReadTime.hours}}:{{ medianReadTime.minutes }}:{{ medianReadTime.seconds }}</dd>
+    </dl>
+
+  </article>
+
+  <article class="row-right">
+    <div id="hits-graph"></div>
+    <table id="hits-data">
+      {% for day in pageHitsPerDay %}
+        <tr class="hits-data-day">
+          <td class="hits-data-date">{{ day.date }}</td>
+          <td class="hits-data-hits">{{ day.hits }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </article>
 </section>
 
-<section>
-  <h2>Page views</h2>
-  <table id="page-views">
-    {% for page in pageHitsPerPage %}
-      <tr>
-        <td>{% if page.page == "__all" %}Total{% endif %}</td>
-        <td>{% if page.page == "__all" %}{{ page.hits }}{% endif %}</td>
-      </tr>
-    {% endfor %}
-  </table>
-</section>
+<section class="row">
+  <article class="row-left">
+    <h2>Top referrers</h2>
+    <dl id="referrers">
+      {% for referrer in referrers %}
+        <dt class="referrers-hostname">{{ referrer.hostname }}</dt>
+        <dd class="referrers-count deemphasize">{{ referrer.count }}</dd>
+      {% endfor %}
+    </dl>
+  </article>
 
-<section>
-  <h2>Top referrers</h2>
-  <table id="referrers">
-    {% for referrer in referrers %}
-      <tr>
-        <td>{{ referrer.hostname }}</td>
-        <td>{{ referrer.count }}</td>
-      </tr>
-    {% endfor %}
-  </table>
-</section>
-
-<section>
-  <h2>Navigation timing median values</h2>
-  <div id="navigation-timing-graph"></div>
-  <table id="medians">
-    {% for key, value in median %}
-      <tr class="navigation-timing-row">
-        <td class="navigation-timing-key">{{key}}</td>
-        <td class="navigation-timing-value">{{value}}</td>
-      </tr>
-    {% endfor %}
-  </table>
+  <article class="row-right">
+    <h2>Page views</h2>
+    <dl id="page-views">
+      {% for page in pageHitsPerPage %}
+        {% if page.page != "__all" %}
+          <dt class="hits-path">{{ page.page }}</dt>
+          <dd class="hits-count deemphasize">{{ page.hits }}</dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+  </article>
 </section>
 
 {% endblock %}
