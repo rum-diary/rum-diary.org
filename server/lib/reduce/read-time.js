@@ -7,6 +7,7 @@
 
 const util = require('util');
 const Stats = require('think-stats');
+const logger = require('intel').getLogger('server.reduce.read-time');
 
 const ReduceStream = require('../reduce-stream');
 
@@ -24,7 +25,8 @@ Stream.prototype.type = null;
 Stream.prototype._write = function(chunk, encoding, callback) {
   var duration = chunk.duration;
 
-  if (! isNaN(duration) && duration !== null) {
+  if (! isNaN(duration) && duration !== null && duration > 0) {
+    logger.info('pushing: %s', duration);
     this._data.push(duration);
   }
 
