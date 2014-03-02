@@ -34,7 +34,7 @@ exports.handler = function(req, res) {
     end: end,
     'hits_per_day': {
       start: start,
-      end: end,
+      end: end
     }
   });
 
@@ -79,7 +79,7 @@ exports.handler = function(req, res) {
   function complete() {
     reductionStart = new Date();
 
-    Promise.attempt(function(data) {
+    Promise.attempt(function() {
       var results = reduceStream.result();
       var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
 
@@ -107,7 +107,7 @@ exports.handler = function(req, res) {
       });
       tags = null;
       reduceStream.end();
-    }).catch(function(err) {
+    }, function(err) {
       logger.error(String(err));
       res.send(500);
     });
