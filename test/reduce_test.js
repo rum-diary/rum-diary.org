@@ -96,7 +96,8 @@ describe('reduce', function () {
       'hits_per_page',
       'referrers',
       'navigation',
-      'hits_per_day'
+      'hits_per_day',
+      'internal-transfer'
     ], {
       start: moment(new Date()).subtract('days', 30),
       end: moment(),

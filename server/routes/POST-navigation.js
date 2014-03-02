@@ -35,7 +35,7 @@ exports.handler = function (req, res) {
     if (data.referrer) {
       var parsedReferrer = url.parse(data.referrer);
       data.referrer_hostname = parsedReferrer.hostname;
-      data.referrer_path = parsedReferrer.pathname;
+      data.referrer_path = parsedReferrer.pathname || '/';
     }
   } catch(e) {
     logger.warn('error parsing referrer: %s', String(e));
