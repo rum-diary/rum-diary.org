@@ -7,27 +7,23 @@ const fs = require('fs');
 const Promise = require('bluebird');
 const logger = require('./logger');
 
-const STREAM_PATH = path.join(__dirname, 'reduce');
-var allStreams;
+const WATCH_FOR_MEMORY_LEAKS = false;
 
-loadStreams();
-function loadStreams() {
-  if (allStreams) return allStreams;
+/**
+ * Generic map-reduce for pageView data. Assumed that all pageViews are for
+ * the same hostname.
+ *
+ * Flow:
+ * 1) Create an instance of StreamReaduce with the required reduce functions
+ *    declared in 'which'.
+ * 2) When a pageView becomes available, write it to the stream with `write`.
+ * 3) The data will first go through filters declared in `filter`.
+ * 4) The data will then go through each `reduce` stream.
+ * 5) Results are fetches using `result`
+ * 6) Call `end` to free the stream's references.
+ */
 
-  allStreams = [];
-
-  fs.readdirSync(STREAM_PATH).forEach(function (fileName) {
-    // skip files that don't have a .js suffix or start with a dot
-    if (path.extname(fileName) !== '.js' || /^\./.test(fileName)) return;
-    var api = require(path.join(STREAM_PATH, fileName));
-    allStreams.push(api);
-  });
-
-  return allStreams;
-}
-
-// keep this around to facilitate debugging memory leaks when needed.
-if (false) {
+if (WATCH_FOR_MEMORY_LEAKS) {
   const memwatch = require('memwatch');
   memwatch.on('leak', function (info) {
     logger.error('memory leak: %s', JSON.stringify(info, null, 2));
@@ -36,6 +32,26 @@ if (false) {
     logger.warn('memory stats: %s', JSON.stringify(info, null, 2));
   });
 }
+
+const STREAM_PATH = path.join(__dirname, 'reduce');
+var allStreams = [];
+loadDirectory(STREAM_PATH, allStreams);
+
+const FILTER_PATH = path.join(__dirname, 'filter');
+var allFilters = [];
+loadDirectory(FILTER_PATH, allFilters);
+
+function loadDirectory(pathToLoad, modules) {
+  fs.readdirSync(pathToLoad).forEach(function (fileName) {
+    // skip files that don't have a .js suffix or start with a dot
+    if (path.extname(fileName) !== '.js' || /^\./.test(fileName)) return;
+    var module = require(path.join(pathToLoad, fileName));
+    modules.push(module);
+  });
+
+  return modules;
+}
+
 
 exports.findNavigationTimingStats = function (hits, statsToFind, options) {
   if (! options) options = {};
@@ -83,7 +99,12 @@ exports.mapReduce = function (hits, fields, options) {
 };
 
 function StreamReduce(options) {
+  this.addedFilters = [];
   this.addedStreams = [];
+
+  allFilters.forEach(function(Filter) {
+    this.addedFilters.push(new Filter());
+  }, this);
 
   var which = options.which;
   allStreams.forEach(function(Stream) {
@@ -95,6 +116,10 @@ function StreamReduce(options) {
 }
 
 StreamReduce.prototype.write = function(hit/*, encoding, callback*/) {
+  this.addedFilters.forEach(function(filter) {
+    filter.write(hit);
+  });
+
   this.addedStreams.forEach(function(stream) {
     stream.write(hit);
   });

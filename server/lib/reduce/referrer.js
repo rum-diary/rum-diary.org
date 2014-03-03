@@ -22,29 +22,18 @@ Stream.prototype.name = 'referrers';
 Stream.prototype.type = null;
 
 Stream.prototype._write = function(chunk, encoding, callback) {
+  if ( ! (chunk.referrer_hostname && chunk.hostname)) return;
+
+  // Do not count internal referrers
+  if (chunk.referrer_hostname === chunk.hostname) return;
+
   var referrers = this._data.by_hostname;
-  if ( ! (chunk.referrer || chunk.referrer_hostname)) return;
-
-  var hostname = chunk.referrer_hostname;
-  if ( ! hostname) {
-    try {
-      // XXX this is exceptionally slow, check if all referrers have been
-      // converted to hostnames and remove this.
-      var parsed = url.parse(chunk.referrer);
-      hostname = parsed.hostname;
-    } catch(e) {
-      return;
-    }
+  var referrerHostname = chunk.referrer_hostname;
+  if ( ! referrers[referrerHostname]) {
+    referrers[referrerHostname] = 0;
   }
 
-  // If the referrer is internal, it doesn't really count.
-  if (hostname === chunk.hostname) return;
-
-  if ( ! referrers[hostname]) {
-    referrers[hostname] = 0;
-  }
-
-  referrers[hostname]++;
+  referrers[referrerHostname]++;
 
   callback(null);
 };

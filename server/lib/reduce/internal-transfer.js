@@ -18,7 +18,6 @@
 
 
 const util = require('util');
-const url = require('url');
 const ThinkStats = require('think-stats');
 const EasierObject = require('easierobject').easierObject;
 const ReduceStream = require('../reduce-stream');
@@ -37,28 +36,13 @@ Stream.prototype.name = 'internal-transfer';
 Stream.prototype.type = null;
 
 Stream.prototype._write = function(chunk, encoding, callback) {
-  if (! (chunk.referrer || chunk.referrer_hostname)) return;
-  if (! (chunk.hostname && chunk.path)) return;
-
-  var sourceHost = chunk.referrer_hostname;
-  var sourcePath = chunk.referrer_path;
-  if ( ! (sourceHost && sourcePath)) {
-    try {
-      // XXX this is exceptionally slow, check if all referrers have been
-      // converted to hostnames and remove this.
-      var parsed = url.parse(chunk.referrer);
-      sourceHost = parsed.hostname;
-      sourcePath = parsed.path;
-    } catch(e) {
-      return;
-    }
-  }
-
-  var destHost = chunk.hostname;
-  var destPath = chunk.path;
+  if (! (chunk.hostname && chunk.path && chunk.referrer_hostname)) return;
 
   // not the same host? no bueno.
-  if (sourceHost !== destHost) return;
+  if (chunk.referrer_hostname !== chunk.hostname) return;
+
+  var sourcePath = chunk.referrer_path;
+  var destPath = chunk.path;
 
   // reload - what's the fun in counting that?
   if (sourcePath === destPath) return;

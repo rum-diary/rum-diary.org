@@ -214,7 +214,7 @@ describe('reduce', function () {
     }, fail);
   });
 
-  it('mapReduce to find duration',
+  it('mapReduce to find read-time',
       function (done) {
     reduce.mapReduce(navigationTimingData, [
       'read-time'
@@ -248,6 +248,17 @@ describe('reduce', function () {
 
       // don't count users who reload
       assert.isUndefined(data['internal-transfer']['by_dest']['/site/localhost']['/site/localhost']);
+      done();
+    }, fail);
+  });
+
+  it('mapReduce to find entrance pages',
+      function (done) {
+    reduce.mapReduce(navigationTimingData, [
+      'entrance'
+    ]).then(function (result) {
+      assert.equal(result.entrance['/site/localhost'], 1);
+      assert.equal(Object.keys(result.entrance).length, 1);
       done();
     }, fail);
   });
