@@ -40,7 +40,8 @@ exports.handler = function(req, res) {
       'unique',
       'returning',
       'read-time',
-      'internal-transfer'
+      'internal-transfer-from',
+      'internal-transfer-to'
     ],
     start: start,
     end: end,
@@ -87,7 +88,8 @@ exports.handler = function(req, res) {
         },
         medianReadTime: msToHoursMinsSeconds(results['read-time']),
         internalTransfer: {
-          from: results['internal-transfer']['by_dest'][path]
+          from: results['internal-transfer-from']['by_dest'][path],
+          to: results['internal-transfer-to']['by_source'][path]
         }
       });
     }, function(err) {

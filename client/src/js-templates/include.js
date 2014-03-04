@@ -227,8 +227,15 @@
      * Data to send on page load.
      */
     getLoad: function () {
+      // puuid is saved for users who visit another page on the same
+      // site. The current page will be updated to set its is_exit flag
+      // to false as well as update which page the user goes to next.
+      var previousPageUUID = sessionStorage.getItem('_puuid');
+      sessionStorage.removeItem('_puuid');
+
       return {
         uuid: this.uuid,
+        puuid: previousPageUUID,
         navigationTiming: this.navigationTiming.diff(),
         referrer: document.referrer || '',
         tags: this.tags,
@@ -240,6 +247,11 @@
      * Data to send on page unload
      */
     getUnload: function () {
+      // puuid is saved for users who visit another page on the same
+      // site. The current page will be updated to set its is_exit flag
+      // to false as well as update which page the user goes to next.
+      sessionStorage.setItem('_puuid', this.uuid);
+
       return {
         uuid: this.uuid,
         duration: now() - this.baseTime,
@@ -422,6 +434,7 @@
 
   function onUnloadHandler() {
     var data = speedTrap.getUnload();
+
     var url = server + '/unload';
     if (navigator.sendBeacon) {
       navigator.sendBeacon(url, JSON.stringify(data));

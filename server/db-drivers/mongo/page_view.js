@@ -18,6 +18,9 @@ const pageViewDefinition = {
   referrer: String,
   referrer_hostname: String,
   referrer_path: String,
+  refer_to: String,
+  refer_to_hostname: String,
+  refer_to_path: String,
   os: String,
   os_parsed: {
     family: String,
