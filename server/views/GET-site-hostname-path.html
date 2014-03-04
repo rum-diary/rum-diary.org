@@ -33,6 +33,7 @@
   </article>
 
   <article class="row-right">
+    <h2>Daily hits</h2>
     <div id="hits-graph"></div>
     <table id="hits-data">
       {% for day in pageHitsPerDay %}
@@ -57,13 +58,11 @@
   </article>
 
   <article class="row-right">
-    <h2>Page views</h2>
+    <h2>Visit from</h2>
     <dl id="page-views">
-      {% for page in pageHitsPerPage %}
-        {% if page.page != "__all" %}
-          <dt class="hits-path">{{ page.page }}</dt>
-          <dd class="hits-count deemphasize">{{ page.hits }}</dd>
-        {% endif %}
+      {% for page, count in internalTransfer.from %}
+        <dt class="hits-path"><a href="/site/{{ hostname }}/path{{ page }}">{{ page }}</a></dt>
+        <dd class="hits-count deemphasize">{{ count }}</dd>
       {% endfor %}
     </dl>
   </article>

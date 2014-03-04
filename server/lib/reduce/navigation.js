@@ -77,7 +77,7 @@ Stream.prototype.end = function(chunk, encoding, callback) {
   // free the accumulator references, they are no longer needed.
   // The accumulators cause the heap to grow to the point of OOM.
   freeNavigationTimingAccumulators(this._data);
-  Stream.end.call(this, chunk, encoding, callback);
+  ReduceStream.prototype.end.call(this, chunk, encoding, callback);
 };
 
 

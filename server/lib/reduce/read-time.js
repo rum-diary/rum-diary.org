@@ -2,20 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// count average read time.
-// XXX this needs a test!
+// calculate read time stats.
 
 const util = require('util');
 const Stats = require('think-stats');
-const logger = require('intel').getLogger('server.reduce.read-time');
 
 const ReduceStream = require('../reduce-stream');
 
 util.inherits(Stream, ReduceStream);
 
+/**
+ * @constructor
+ * @param {object} options
+ * @param {string} [options.calculate] - stat to calculate. default: `median`
+ */
 function Stream(options) {
-  this._data = new Stats();
+  options = options || {};
+  this.calculate = options.calculate || 'median';
 
+  this._data = new Stats();
   ReduceStream.call(this, options);
 }
 
@@ -26,7 +31,6 @@ Stream.prototype._write = function(chunk, encoding, callback) {
   var duration = chunk.duration;
 
   if (! isNaN(duration) && duration !== null && duration > 0) {
-    logger.info('pushing: %s', duration);
     this._data.push(duration);
   }
 
@@ -34,7 +38,7 @@ Stream.prototype._write = function(chunk, encoding, callback) {
 };
 
 Stream.prototype.result = function () {
-  return this._data.median() << 0;
+  return this._data[this.calculate]() << 0;
 };
 
 module.exports = Stream;
