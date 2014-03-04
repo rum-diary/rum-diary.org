@@ -4,7 +4,7 @@
 
 /**
  * Entrance pages. An entrance page is the first page a user
- * visits on the site. Entrance is the converse of an
+ * visits on the site. Entrance is the inverse of an
  * "internal-transfer" (see internal-transfer.js)
  *
  * A pageView is counted as an entrance if it lacks a referrer
