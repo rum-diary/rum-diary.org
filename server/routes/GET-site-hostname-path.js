@@ -41,7 +41,8 @@ exports.handler = function(req, res) {
       'returning',
       'read-time',
       'internal-transfer-from',
-      'internal-transfer-to'
+      'internal-transfer-to',
+      'bounce'
     ],
     start: start,
     end: end,
@@ -69,6 +70,13 @@ exports.handler = function(req, res) {
       var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
       logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
+      var pageHitsInPeriod = pageHitsPerPageSorted[0].hits;
+      /*logger.warn('bounces: %s', JSON.stringify(results.bounce));*/
+      var bouncesInPeriod = results.bounce[path];
+      /*logger.info("pageHitsInPeriod: %s, bounces: %s", pageHitsInPeriod, bouncesInPeriod);*/
+      var bounceRate = 0;
+      if (pageHitsInPeriod) bounceRate = (100 * bouncesInPeriod / pageHitsInPeriod) << 0;
+
       res.render('GET-site-hostname-path.html', {
         root_url: req.url.replace(/\?.*/, ''),
         hostname: hostname,
@@ -81,10 +89,11 @@ exports.handler = function(req, res) {
         endDate: end.format('MMM DD'),
         hits: {
           total: 'N/A',//totalHits,
-          period: pageHitsPerPageSorted[0].hits,
+          period: pageHitsInPeriod,
           today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
           unique: results.unique,
-          repeat: results.returning
+          repeat: results.returning,
+          bounceRate: bounceRate
         },
         medianReadTime: msToHoursMinsSeconds(results['read-time']),
         internalTransfer: {
