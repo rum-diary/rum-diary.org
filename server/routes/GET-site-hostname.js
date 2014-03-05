@@ -8,15 +8,13 @@ const logger = require('../lib/logger');
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
-const getQuery = require('../lib/site-query');
 
 exports.path = '/site/:hostname';
 exports.verb = 'get';
+exports.template = 'GET-site-hostname.html';
+exports['js-resources'] = clientResources('rum-diary.min.js');
 
-exports.handler = function(req, res) {
-  var query = getQuery(req);
-  var start = moment(query.createdAt.$gte);
-  var end = moment(query.createdAt.$lte);
+exports.handler = function(req) {
   var reductionStart;
   var totalHits = 0;
   var queryTags = req.query.tags && req.query.tags.split(',') || 0;
@@ -30,72 +28,66 @@ exports.handler = function(req, res) {
       'unique',
       'returning'
     ],
-    start: start,
-    end: end,
+    start: req.start,
+    end: req.end,
     'hits_per_day': {
-      start: start,
-      end: end
+      start: req.start,
+      end: req.end
     }
   });
 
-  db.tags.get({
-    hostname: query.hostname
-  })
-  .then(function (_tags) {
-    tags = _tags.map(function(tag) { return tag.name; });
+  return db.tags.get({
+      hostname: req.dbQuery.hostname
+    })
+    .then(function (_tags) {
+      tags = _tags.map(function(tag) { return tag.name; });
 
-    // tags are specified as a filter, count the
-    // total hits for the matching tags.
-    // This does not work for the "not" tag.
-    if (queryTags.length) {
-      totalHits = _tags.reduce(function(totalHits, tag) {
-        if (queryTags.indexOf(tag.name) > -1) totalHits += tag.total_hits;
-        return totalHits;
-      }, 0);
-    }
-  })
-  .then(function () {
-    // only use the grand total number of hits if a set of tags is not
-    // specified as a filter.
-    if (! queryTags.length) {
-      return db.site.getOne({
-        hostname: query.hostname
-      })
-      .then(function(site) {
-        if (site) totalHits = site.total_hits;
-      });
-    }
-  })
-  .then(function() {
-    // Use a stream instead of one large get for memory efficiency.
-    return db.pageView.getStream(query);
-  })
-  .then(function (stream) {
-    stream.on('data', reduceStream.write.bind(reduceStream));
-
-    stream.on('close', complete);
-  });
-
-  function complete() {
-    reductionStart = new Date();
-
-    Promise.attempt(function() {
-      var results = reduceStream.result();
+      // tags are specified as a filter, count the
+      // total hits for the matching tags.
+      // This does not work for the "not" tag.
+      if (queryTags.length) {
+        totalHits = _tags.reduce(function(totalHits, tag) {
+          if (queryTags.indexOf(tag.name) > -1) totalHits += tag.total_hits;
+          return totalHits;
+        }, 0);
+      }
+    })
+    .then(function () {
+      // only use the grand total number of hits if a set of tags is not
+      // specified as a filter.
+      if (! queryTags.length) {
+        return db.site.getOne({
+          hostname: req.dbQuery.hostname
+        })
+        .then(function(site) {
+          if (site) totalHits = site.total_hits;
+        });
+      }
+    })
+    .then(function() {
+      // Use a stream instead of one large get for memory efficiency.
+      reductionStart = new Date();
+      return db.pageView.pipe(req.dbQuery, null, reduceStream);
+    })
+    .then(function (results) {
       var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
 
       var reductionEnd = new Date();
       var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
       logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
-      res.render('GET-site-hostname.html', {
+      tags = null;
+      reduceStream.end();
+      reduceStream = null;
+      return {
         root_url: req.url.replace(/\?.*/, ''),
         hostname: req.params.hostname,
         resources: clientResources('rum-diary.min.js'),
         pageHitsPerPage: pageHitsPerPageSorted,
         pageHitsPerDay: results.hits_per_day.__all,
         referrers: results.referrers.by_count.slice(0, 20),
-        startDate: start.format('MMM DD'),
-        endDate: end.format('MMM DD'),
+        startDate: req.start.format('MMM DD'),
+        endDate: req.end.format('MMM DD'),
         hits: {
           total: totalHits,
           period: pageHitsPerPageSorted[0].hits,
@@ -104,14 +96,8 @@ exports.handler = function(req, res) {
           repeat: results.returning
         },
         tags: tags
-      });
-      tags = null;
-      reduceStream.end();
-    }, function(err) {
-      logger.error(String(err));
-      res.send(500);
+      };
     });
-  }
 };
 
 function sortPageHitsPerPage(pageHitsPerPage) {

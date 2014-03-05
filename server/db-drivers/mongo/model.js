@@ -120,6 +120,25 @@ exports.getStream = withDatabase(function (searchBy, fields) {
   }
 });
 
+exports.pipe = function(searchBy, fields, reduceStream) {
+  return this.getStream(searchBy, fields)
+              .then(function(stream) {
+                var resolver = Promise.defer();
+
+                stream.on('data', reduceStream.write.bind(reduceStream));
+
+                stream.on('close', function () {
+                  resolver.resolve(reduceStream.result());
+                });
+
+                stream.on('err', function (err) {
+                  resolver.reject(err);
+                });
+
+                return resolver.promise;
+              });
+};
+
 exports.getOne = withDatabase(function (searchBy) {
   var startTime = new Date();
   var name = this.name;
