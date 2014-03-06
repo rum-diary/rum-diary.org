@@ -39,6 +39,7 @@ exports.handler = function(req) {
   return db.tags.get({
       hostname: req.dbQuery.hostname
     })
+    // XXX move this into a reduce stream.
     .then(function (_tags) {
       tags = _tags.map(function(tag) { return tag.name; });
 

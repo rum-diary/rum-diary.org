@@ -16,8 +16,6 @@ exports.verb = 'get';
 
 exports.handler = function(req, res) {
   var query = getQuery(req);
-  var start = moment(query.createdAt.$gte);
-  var end = moment(query.createdAt.$lte);
 
   var hostname = req.params[0];
   var path = req.params[1] || 'index';
@@ -45,11 +43,11 @@ exports.handler = function(req, res) {
       'exit',
       'bounce'
     ],
-    start: start,
-    end: end,
+    start: req.start,
+    end: req.end,
     'hits_per_day': {
-      start: start,
-      end: end
+      start: req.start,
+      end: req.end
     }
   });
 
@@ -89,8 +87,8 @@ exports.handler = function(req, res) {
         pageHitsPerPage: pageHitsPerPageSorted,
         pageHitsPerDay: results.hits_per_day.__all,
         referrers: results.referrers.by_count.slice(0, 20),
-        startDate: start.format('MMM DD'),
-        endDate: end.format('MMM DD'),
+        startDate: req.start.format('MMM DD'),
+        endDate: req.end.format('MMM DD'),
         hits: {
           total: 'N/A',//totalHits,
           period: pageHitsInPeriod,

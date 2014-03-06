@@ -9,6 +9,7 @@ const Promise = require('bluebird');
 const mongoose = require('mongoose');
 const mongooseTimestamps = require('mongoose-timestamp');
 const Schema = mongoose.Schema;
+const ObjectId = mongoose.Types.ObjectId;
 
 const GET_FETCH_COUNT_WARNING_THRESHOLD = 500;
 
@@ -180,7 +181,24 @@ exports.clear = withDatabase(function () {
 });
 
 exports.getSearchBy = function (searchBy) {
-  return searchBy;
+  var query = {};
+
+  for (var key in searchBy) {
+    // mongo does not have a createdAt, instead the id contains a timestamp.
+    // convert createdAt to the timestamp.
+    if (key === 'start') {
+      searchBy._id = searchBy._id || {};
+      searchBy._id.$gte = timestampToObjectId(searchBy.start.toDate());
+    } else if (key === 'end') {
+      searchBy._id = searchBy._id || {};
+      searchBy._id.$lte = timestampToObjectId(searchBy.end.toDate());
+    } else {
+      query[key] = searchBy[key];
+    }
+  }
+
+
+  return query;
 };
 
 
@@ -224,4 +242,16 @@ function connect() {
 
   return connectionResolver.promise;
 }
+
+// Return an ObjectId embedded with a given timestamp
+function timestampToObjectId(timestamp) {
+  // Convert date object to hex seconds since Unix epoch
+  var hexSeconds = Math.floor(timestamp.getTime() / 1000).toString(16);
+
+  // Create an ObjectId with that hex timestamp
+  var objectId = new ObjectId(hexSeconds + '0000000000000000');
+
+  return objectId;
+}
+
 
