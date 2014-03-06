@@ -8,24 +8,21 @@ const Promise = require('bluebird');
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
-const getQuery = require('../lib/site-query');
 const logger = require('../lib/logger');
 
 exports.path = '/site/:hostname/performance';
 exports.verb = 'get';
+exports.template = 'GET-site-hostname-performance.html';
+exports['js-resources'] = clientResources('rum-diary.min.js');
 
-exports.handler = function(req, res) {
-  var query = getQuery(req);
-  var start = moment(query.createdAt.$gte);
-  var end = moment(query.createdAt.$lte);
-
+exports.handler = function(req) {
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;
 
   var reduceStream = new reduce.StreamReduce({
     which: ['navigation', 'navigation-histogram', 'navigation-cdf'],
-    start: start,
-    end: end,
+    start: req.start,
+    end: req.end,
     navigation: {
       calculate: ['25', '50', '75']
     },
@@ -37,44 +34,25 @@ exports.handler = function(req, res) {
     }
   });
 
-  // streams are *much* more memory efficient than one huge get.
-  db.pageView.getStream(query)
-    .then(function (stream) {
-      stream.on('data', reduceStream.write.bind(reduceStream));
+  return db.pageView.pipe(req.dbQuery, null, reduceStream)
+            .then(function(results) {
+              reduceStream.end();
+              reduceStream = null;
 
-      stream.on('close', complete);
-    });
-
-
-  function complete() {
-    Promise.attempt(function() {
-      logger.info('calculating navigatin timing data');
-      var results = reduceStream.result();
-
-      res.render('GET-site-hostname-performance.html', {
-        baseURL: req.url.replace(/\?.*/, ''),
-        histogram: results['navigation-histogram'],
-        cdf: results['navigation-cdf'],
-        statName: statName,
-        hostname: req.params.hostname,
-        startDate: start.format('MMM DD'),
-        endDate: end.format('MMM DD'),
-        resources: clientResources('rum-diary.min.js'),
-        navigationTimingFields: getNavigationTimingFields(),
-        first_q: results.navigation['25'],
-        second_q: results.navigation['50'],
-        third_q: results.navigation['75']
-      });
-
-      reduceStream.end();
-      results = null;
-    })
-    .then(null, function(err) {
-      res.send(500);
-      logger.error('error! %s', String(err));
-    });
-  }
-
+              return {
+                baseURL: req.url.replace(/\?.*/, ''),
+                histogram: results['navigation-histogram'],
+                cdf: results['navigation-cdf'],
+                statName: statName,
+                hostname: req.params.hostname,
+                startDate: req.start.format('MMM DD'),
+                endDate: req.end.format('MMM DD'),
+                navigationTimingFields: getNavigationTimingFields(),
+                first_q: results.navigation['25'],
+                second_q: results.navigation['50'],
+                third_q: results.navigation['75']
+              };
+            });
 };
 
 function getNavigationTimingFields() {

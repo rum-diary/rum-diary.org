@@ -26,6 +26,10 @@
       <dd class="overview-stat">{{ hits.unique }}</dd>
       <dt class="overview-name deemphasize">Repeat</dt>
       <dd class="overview-stat">{{ hits.repeat }}</dd>
+      <dt class="overview-name deemphasize">Exit Rate</dt>
+      <dd class="overview-stat">{{ hits.exitRate }}%</dd>
+      <dt class="overview-name deemphasize">Bounce Rate</dt>
+      <dd class="overview-stat">{{ hits.bounceRate }}%</dd>
       <dt class="overview-name deemphasize">Median Read Time</dt>
       <dd class="overview-stat small">{{medianReadTime.hours}}:{{ medianReadTime.minutes }}:{{ medianReadTime.seconds }}</dd>
     </dl>
@@ -57,16 +61,29 @@
     </dl>
   </article>
 
-  <article class="row-right">
-    <h2>Visit from</h2>
-    <dl id="page-views">
-      {% for page, count in internalTransfer.from %}
-        <dt class="hits-path"><a href="/site/{{ hostname }}/path{{ page }}">{{ page }}</a></dt>
-        <dd class="hits-count deemphasize">{{ count }}</dd>
-      {% endfor %}
-    </dl>
-  </article>
+  <div class="row-right">
+    <article>
+      <h2>Enter from</h2>
+      <dl id="page-views">
+        {% for page, count in internalTransfer.from %}
+          <dt class="hits-path"><a href="/site/{{ hostname }}/path{{ page }}">{{ page }}</a></dt>
+          <dd class="hits-count deemphasize">{{ count }}</dd>
+        {% endfor %}
+      </dl>
+    </article>
+
+    <article>
+      <h2>Exit to</h2>
+      <dl id="page-views">
+        {% for page, count in internalTransfer.to %}
+          <dt class="hits-path"><a href="/site/{{ hostname }}/path{{ page }}">{{ page }}</a></dt>
+          <dd class="hits-count deemphasize">{{ count }}</dd>
+        {% endfor %}
+      </dl>
+    </article>
+  </div>
 </section>
+
 
 {% endblock %}
 

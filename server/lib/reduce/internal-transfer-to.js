@@ -3,7 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * Count internal moves across pages. `result()` returns a tree
+ * Count internal moves across pages, using the current page as the
+ * source and refer_to as the destination. `result()` returns a tree
  * with two first level items: `by_source` and `by_dest`.
  *
  * `by_source` contains "exit" data - users who move to other internal pages.
@@ -32,17 +33,17 @@ function Stream(options) {
   ReduceStream.call(this, options);
 }
 
-Stream.prototype.name = 'internal-transfer';
+Stream.prototype.name = 'internal-transfer-to';
 Stream.prototype.type = null;
 
 Stream.prototype._write = function(chunk, encoding, callback) {
-  if (! (chunk.hostname && chunk.path && chunk.referrer_hostname)) return;
+  if (! (chunk.hostname && chunk.path && chunk.refer_to_hostname)) return;
 
   // not the same host? no bueno.
-  if (chunk.referrer_hostname !== chunk.hostname) return;
+  if (chunk.refer_to_hostname !== chunk.hostname) return;
 
-  var sourcePath = chunk.referrer_path;
-  var destPath = chunk.path;
+  var sourcePath = chunk.path;
+  var destPath = chunk.refer_to_path;
 
   // reload - what's the fun in counting that?
   if (sourcePath === destPath) return;

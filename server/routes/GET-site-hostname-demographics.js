@@ -3,45 +3,38 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const moment = require('moment');
-const logger = require('../lib/logger');
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
-const getQuery = require('../lib/site-query');
 
 exports.path = '/site/:hostname/demographics';
 exports.verb = 'get';
+exports.template = 'GET-site-hostname-demographics.html';
+exports['js-resources'] = clientResources('rum-diary.min.js');
 
-exports.handler = function(req, res) {
-  var query = getQuery(req);
-  var start = moment(query.createdAt.$gte);
-  var end = moment(query.createdAt.$lte);
+exports.handler = function(req) {
+  var reduceStream = new reduce.StreamReduce({
+    which: [
+      'browsers',
+      'os',
+      'os:form'
+    ],
+    start: req.start,
+    end: req.end
+  });
 
-  db.pageView.get(query)
-    .then(function(hits) {
-      return reduce.mapReduce(hits, [
-        'browsers',
-        'os',
-        'os:form'
-      ], {
-        start: start,
-        end: end
-      });
-    })
-    .then(function(data) {
-      logger.info('os data', JSON.stringify(data.os));
-      res.render('GET-site-hostname-demographics.html', {
+  return db.pageView.pipe(req.dbQuery, null, reduceStream)
+    .then(function(result) {
+      reduceStream.end();
+      reduceStream = null;
+      return {
         hostname: req.params.hostname,
-        resources: clientResources('rum-diary.min.js'),
-        startDate: start.format('MMM DD'),
-        endDate: end.format('MMM DD'),
-        browsers: data.browsers,
-        os: data.os,
-        os_form: data['os:form']
-      });
-    }).catch(function(err) {
-      logger.error(String(err));
-      res.send(500);
+        startDate: req.start.format('MMM DD'),
+        endDate: req.end.format('MMM DD'),
+        browsers: result.browsers,
+        os: result.os,
+        os_form: result['os:form']
+      };
     });
 };
 

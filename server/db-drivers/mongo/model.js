@@ -10,6 +10,8 @@ const mongoose = require('mongoose');
 const mongooseTimestamps = require('mongoose-timestamp');
 const Schema = mongoose.Schema;
 
+const GET_FETCH_COUNT_WARNING_THRESHOLD = 500;
+
 const logger = require('../../lib/logger');
 
 
@@ -58,6 +60,33 @@ exports.update = withDatabase(function (model) {
 });
 
 exports.get = withDatabase(function (searchBy, fields) {
+  // use a streaming get. Getting large data sets from the dB
+  // uses a boatload of heap, generating your own collection
+  // is much more efficient.
+  return this.getStream(searchBy, fields)
+             .then(function (stream) {
+                var resolver = Promise.defer();
+
+                var models = [];
+                stream.on('data', function (chunk) {
+                  models.push(chunk);
+                });
+                stream.on('err', function(err) {
+                  resolver.reject(err);
+                });
+                stream.on('close', function () {
+                  if (models.length > GET_FETCH_COUNT_WARNING_THRESHOLD) {
+                    logger.warn('Using model.get for large data sets is ' +
+                                'heap inefficient. Use getStream instead.');
+                  }
+                  resolver.fulfill(models);
+                });
+
+               return resolver.promise;
+             });
+});
+
+exports.getStream = withDatabase(function (searchBy, fields) {
   if ( ! fields && typeof searchBy === 'string') {
     fields = searchBy;
     searchBy = {};
@@ -65,31 +94,6 @@ exports.get = withDatabase(function (searchBy, fields) {
 
   if (!searchBy) searchBy = {};
 
-  var startTime = new Date();
-  var name = this.name;
-
-  searchBy = this.getSearchBy(searchBy);
-
-  logger.info('%s->get: %s', name, JSON.stringify(searchBy));
-  return this.Model.find(searchBy, fields).exec().then(function(models) {
-    computeDuration();
-    return models;
-  })
-  .then(null, function(err) {
-    computeDuration();
-    logger.error('%s->get error: %s', name, String(err));
-    throw err;
-  });
-
-  function computeDuration() {
-    var endTime = new Date();
-    var duration = endTime.getDate() - startTime.getDate();
-    logger.info('%s->get query time for %s: %s ms',
-                    name, JSON.stringify(searchBy), duration);
-  }
-});
-
-exports.getStream = withDatabase(function (searchBy, fields) {
   var startTime = new Date();
   var name = this.name;
 
@@ -115,6 +119,25 @@ exports.getStream = withDatabase(function (searchBy, fields) {
                     name, JSON.stringify(searchBy), duration);
   }
 });
+
+exports.pipe = function(searchBy, fields, reduceStream) {
+  return this.getStream(searchBy, fields)
+              .then(function(stream) {
+                var resolver = Promise.defer();
+
+                stream.on('data', reduceStream.write.bind(reduceStream));
+
+                stream.on('close', function () {
+                  resolver.resolve(reduceStream.result());
+                });
+
+                stream.on('err', function (err) {
+                  resolver.reject(err);
+                });
+
+                return resolver.promise;
+              });
+};
 
 exports.getOne = withDatabase(function (searchBy) {
   var startTime = new Date();

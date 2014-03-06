@@ -73,6 +73,9 @@ exports.handler = function (req, res) {
               var tags = data.tags || [];
               var outstanding = tags.length;
 
+              // no tags to update, get outta here.
+              if (! outstanding) return;
+
               tags.forEach(function(tag) {
                 db.tags.hit({
                     name: tag,
@@ -89,6 +92,27 @@ exports.handler = function (req, res) {
               });
 
               return resolver.promise;
+            })
+            .then(function () {
+              // If there is a previous page uuid, update the
+              // previous page's exit status, and where the
+              // user went.
+              if (data.puuid) {
+                return db.pageView.getOne({ uuid: data.puuid })
+                           .then(function(pageView) {
+                             if (! pageView) {
+                               return;
+                             }
+                             pageView.is_exit = false;
+                             pageView.refer_to = referrer;
+                             pageView.refer_to_hostname = data.hostname;
+                             pageView.refer_to_path = data.path;
+                             return db.pageView.update(pageView);
+                           })
+                           .then(function() {
+                             logger.info('previous page updated');
+                           });
+              }
             })
             .then(function () {
               logger.info('data saved');

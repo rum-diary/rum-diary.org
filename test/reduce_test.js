@@ -97,7 +97,7 @@ describe('reduce', function () {
       'referrers',
       'navigation',
       'hits_per_day',
-      'internal-transfer'
+      'internal-transfer-from'
     ], {
       start: moment(new Date()).subtract('days', 30),
       end: moment(),
@@ -238,16 +238,16 @@ describe('reduce', function () {
   it('mapReduce to find from where users come and where they go - internally',
       function (done) {
     reduce.mapReduce(navigationTimingData, [
-      'internal-transfer'
+      'internal-transfer-from'
     ]).then(function (data) {
-      assert.equal(data['internal-transfer']['by_source']['/site']['/site/localhost'], 7);
+      assert.equal(data['internal-transfer-from']['by_source']['/site']['/site/localhost'], 7);
       // don't count users who reload
-      assert.isUndefined(data['internal-transfer']['by_source']['/site/localhost']);
+      assert.isUndefined(data['internal-transfer-from']['by_source']['/site/localhost']);
 
-      assert.equal(data['internal-transfer']['by_dest']['/site/localhost']['/site'], 7);
+      assert.equal(data['internal-transfer-from']['by_dest']['/site/localhost']['/site'], 7);
 
       // don't count users who reload
-      assert.isUndefined(data['internal-transfer']['by_dest']['/site/localhost']['/site/localhost']);
+      assert.isUndefined(data['internal-transfer-from']['by_dest']['/site/localhost']['/site/localhost']);
       done();
     }, fail);
   });

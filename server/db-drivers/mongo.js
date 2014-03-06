@@ -24,6 +24,7 @@ function deprecated(oldName, newName, callback) {
 
 exports.save = deprecated('save', 'pageView.create', PageView.create.bind(PageView));
 exports.get = deprecated('get', 'pageView.get', PageView.get.bind(PageView));
+exports.getStream = deprecated('getStream', 'pageView.getStream', PageView.getStream.bind(PageView));
 exports.getOne = deprecated('getOne', 'pageView.getOne', PageView.getOne.bind(PageView));
 exports.clear = function(done) {
   logger.warn('clearing database');
@@ -46,8 +47,9 @@ exports.pageView = {
   create: PageView.create.bind(PageView),
   update: PageView.update.bind(PageView),
   get: PageView.get.bind(PageView),
-  getOne: PageView.getOne.bind(PageView),
   getStream: PageView.getStream.bind(PageView),
+  pipe: PageView.pipe.bind(PageView),
+  getOne: PageView.getOne.bind(PageView),
   getByHostname: function (hostname, done) {
     return PageView.get({ hostname: hostname }, done);
   },
@@ -61,6 +63,8 @@ exports.user = {
   create: User.create.bind(User),
   update: User.update.bind(User),
   get: User.get.bind(User),
+  getStream: User.getStream.bind(User),
+  pipe: User.pipe.bind(User),
   getOne: User.getOne.bind(User),
   clear: User.clear.bind(User)
 };
@@ -69,8 +73,9 @@ exports.site = {
   create: Site.create.bind(Site),
   update: Site.update.bind(Site),
   get: Site.get.bind(Site),
-  getOne: Site.getOne.bind(Site),
   getStream: Site.getStream.bind(Site),
+  pipe: User.pipe.bind(User),
+  getOne: Site.getOne.bind(Site),
   clear: Site.clear.bind(Site),
   hit: Site.hit.bind(Site),
   ensureExists: Site.ensureExists.bind(Site)
@@ -80,6 +85,8 @@ exports.tags = {
   create: Tags.create.bind(Tags),
   update: Tags.update.bind(Tags),
   get: Tags.get.bind(Tags),
+  getStream: Tags.getStream.bind(Tags),
+  pipe: Tags.pipe.bind(Tags),
   getOne: Tags.getOne.bind(Tags),
   clear: Tags.clear.bind(Tags),
   hit: Tags.hit.bind(Tags),

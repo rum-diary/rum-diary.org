@@ -9,8 +9,6 @@
     "referrer": "http://shanetomlinson.com/site/localhost",
     "referrer_hostname": "shanetomlinson.com",
     "referrer_path": "/site/localhost",
-    "refer_to_hostname": "localhost",
-    "refer_to_path": "/site/localhost/performance",
     "os": "Mac OS X 10.9",
     "os_parsed": {
       "family": "Mac OS X",
@@ -51,7 +49,61 @@
       "family": "Mobile Safari",
       "major": 7,
       "minor": 0
-    }
+    },
+    "is_exit": true
+  },
+  {
+    "updatedAt": "2013-12-29T00:16:15.000Z",
+    "uuid": "188721c5-d653-4ee6-9ac3-95272b29e925",
+    "duration": 123,
+    "returning": true,
+    "hostname": "localhost",
+    "path": "/site/localhost",
+    "referrer": "http://shanetomlinson.com/site/localhost",
+    "referrer_hostname": "shanetomlinson.com",
+    "referrer_path": "/site/localhost",
+    "os": "Mac OS X 10.9",
+    "os_parsed": {
+      "family": "Mac OS X",
+      "major": "10",
+      "minor": "9"
+    },
+    "_id": "52bf69cf87da74c4e0000001",
+    "__v": 0,
+    "events": [],
+    "tags": [
+      "nginx",
+      "spdy3.1"
+    ],
+    "navigationTiming": {
+      "navigationStart": 0,
+      "unloadEventStart": 16,
+      "unloadEventEnd": 17,
+      "redirectStart": null,
+      "redirectEnd": null,
+      "fetchStart": 1,
+      "domainLookupStart": 2,
+      "domainLookupEnd": 2,
+      "connectStart": 2,
+      "connectEnd": 2,
+      "secureConnectionStart": null,
+      "requestStart": 2,
+      "responseStart": 15,
+      "responseEnd": 16,
+      "domLoading": 16,
+      "domInteractive": 211,
+      "domContentLoadedEventStart": 231,
+      "domContentLoadedEventEnd": 234,
+      "domComplete": 234,
+      "loadEventStart": 234,
+      "loadEventEnd": 238
+    },
+    "browser": {
+      "family": "Mobile Safari",
+      "major": 7,
+      "minor": 0
+    },
+    "is_exit": true
   },
   {
     "updatedAt": "2013-12-29T00:16:17.000Z",
