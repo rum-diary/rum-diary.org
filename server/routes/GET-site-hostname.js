@@ -17,58 +17,59 @@ exports['js-resources'] = clientResources('rum-diary.min.js');
 exports.handler = function(req) {
   var reductionStart;
   var totalHits = 0;
-  var queryTags = req.query.tags && req.query.tags.split(',') || 0;
+  var queryTags = req.query.tags && req.query.tags.split(',') || [];
   var tags;
 
-  var reduceStream = new reduce.StreamReduce({
+  var pageViewTargetStream;
+
+  var tagsTargetStream = new reduce.StreamReduce({
     which: [
-      'hits_per_day',
-      'hits_per_page',
-      'referrers',
-      'unique',
-      'returning'
+      'tags-names',
+      'tags-total-hits'
     ],
-    start: req.start,
-    end: req.end,
-    'hits_per_day': {
-      start: req.start,
-      end: req.end
+    'tags-total-hits': {
+      tags: queryTags
     }
   });
 
-  return db.tags.get({
-      hostname: req.dbQuery.hostname
-    })
-    // XXX move this into a reduce stream.
-    .then(function (_tags) {
-      tags = _tags.map(function(tag) { return tag.name; });
+  return db.tags.pipe({ hostname: req.dbQuery.hostname }, null, tagsTargetStream)
+    .then(function (tagsResults) {
+      tags = tagsResults['tags-names'];
 
-      // tags are specified as a filter, count the
-      // total hits for the matching tags.
-      // This does not work for the "not" tag.
+      tagsTargetStream.end();
+      tagsTargetStream = null;
+
       if (queryTags.length) {
-        totalHits = _tags.reduce(function(totalHits, tag) {
-          if (queryTags.indexOf(tag.name) > -1) totalHits += tag.total_hits;
-          return totalHits;
-        }, 0);
-      }
-    })
-    .then(function () {
-      // only use the grand total number of hits if a set of tags is not
-      // specified as a filter.
-      if (! queryTags.length) {
-        return db.site.getOne({
-          hostname: req.dbQuery.hostname
-        })
-        .then(function(site) {
-          if (site) totalHits = site.total_hits;
-        });
+        totalHits = tagsResults['tags-total-hits'];
+      } else {
+        // XXX can this be moved into the tags-total-hits filter somehow?
+        // only use the grand total number of hits if a set of tags is not
+        // specified as a filter.
+        return db.site.getOne({ hostname: req.dbQuery.hostname })
+                    .then(function(site) {
+                      if (site) totalHits = site.total_hits;
+                    });
       }
     })
     .then(function() {
-      // Use a stream instead of one large get for memory efficiency.
       reductionStart = new Date();
-      return db.pageView.pipe(req.dbQuery, null, reduceStream);
+
+      // Use a stream instead of one large get for memory efficiency.
+      pageViewTargetStream = new reduce.StreamReduce({
+        which: [
+          'hits_per_day',
+          'hits_per_page',
+          'referrers',
+          'unique',
+          'returning'
+        ],
+        'hits_per_day': {
+          start: req.start,
+          end: req.end
+        }
+      });
+
+      return db.pageView.pipe(req.dbQuery, null, pageViewTargetStream);
     })
     .then(function (results) {
       var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
@@ -77,10 +78,7 @@ exports.handler = function(req) {
       var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
       logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
-      tags = null;
-      reduceStream.end();
-      reduceStream = null;
-      return {
+      var data = {
         root_url: req.url.replace(/\?.*/, ''),
         hostname: req.params.hostname,
         resources: clientResources('rum-diary.min.js'),
@@ -98,6 +96,13 @@ exports.handler = function(req) {
         },
         tags: tags
       };
+
+      tags = null;
+      pageViewTargetStream.end();
+      pageViewTargetStream = null;
+
+      return data;
+
     });
 };
 
