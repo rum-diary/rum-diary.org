@@ -13,35 +13,20 @@ exports.template = 'GET-site-hostname.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
 
 exports.handler = function(req) {
-  var reductionStart;
   var totalHits = 0;
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
-  var tags;
 
-  return db.tags.calculate({
-    filter: { hostname: req.dbQuery.hostname },
-    'tags-total-hits': {
-      tags: queryTags
-    },
-    'tags-names': {}
-  }).then(function (tagsResults) {
-    tags = tagsResults['tags-names'];
+  var reductionStart = new Date();
 
-    if (queryTags.length) {
-      totalHits = tagsResults['tags-total-hits'];
-    } else {
-      return db.site.calculate({
-        filter: { hostname: req.dbQuery.hostname },
-        'sites-total-hits': {}
-      }).then(function (sites) {
-        totalHits = sites[req.dbQuery.hostname] || 0;
-      });
-    }
-  })
-  .then(function() {
-    reductionStart = new Date();
-
-    return db.pageView.calculate({
+  return Promise.all([
+     db.tags.calculate({
+      filter: { hostname: req.dbQuery.hostname },
+      'tags-total-hits': {
+        tags: queryTags
+      },
+      'tags-names': {}
+    }),
+    db.pageView.calculate({
       filter: req.dbQuery,
       'hits_per_day': {
         start: req.start,
@@ -54,35 +39,43 @@ exports.handler = function(req) {
       'referrers': {},
       'unique': {},
       'returning': {}
-    });
-  })
-  .then(function (results) {
+    }),
+    db.site.calculate({
+      filter: { hostname: req.dbQuery.hostname },
+      'sites-total-hits': {}
+    })
+  ]).then(function (allResults) {
     var reductionEnd = new Date();
     var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
     logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
 
-    var data = {
+    var tagResults = allResults[0];
+    var pageViewResults = allResults[1];
+    var siteResults = allResults[2];
+
+    if (queryTags.length) {
+      totalHits = tagResults['tags-total-hits'];
+    } else {
+      totalHits = siteResults[req.dbQuery.hostname] || 0;
+    }
+
+    return {
       root_url: req.url.replace(/\?.*/, ''),
       hostname: req.params.hostname,
-      pageHitsPerPage: results.hits_per_page,
-      pageHitsPerDay: results.hits_per_day.__all,
-      referrers: results.referrers.by_count.slice(0, 20),
+      pageHitsPerPage: pageViewResults.hits_per_page,
+      pageHitsPerDay: pageViewResults.hits_per_day.__all,
+      referrers: pageViewResults.referrers.by_count.slice(0, 20),
       startDate: req.start.format('MMM DD'),
       endDate: req.end.format('MMM DD'),
       hits: {
         total: totalHits,
-        period: results.hits_per_page[0].hits,
-        today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
-        unique: results.unique,
-        repeat: results.returning
+        period: pageViewResults.hits_per_page[0].hits,
+        today: pageViewResults.hits_per_day.__all[pageViewResults.hits_per_day.__all.length - 1].hits,
+        unique: pageViewResults.unique,
+        repeat: pageViewResults.returning
       },
-      tags: tags
+      tags: tagResults['tags-names']
     };
-
-    tags = null;
-
-    return data;
-
   });
 };
 
