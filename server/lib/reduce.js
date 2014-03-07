@@ -115,14 +115,39 @@ function StreamReduce(options) {
   }, this);
 }
 
-StreamReduce.prototype.write = function(hit/*, encoding, callback*/) {
-  this.addedFilters.forEach(function(filter) {
-    filter.write(hit);
-  });
+StreamReduce.prototype.write = function(chunk/*, encoding, callback*/) {
+  var filters = this.addedFilters;
+  var filterIndex = 0;
+  var self = this;
 
-  this.addedStreams.forEach(function(stream) {
-    stream.write(hit);
-  });
+  nextFilter(null, chunk);
+
+  // this could be made into a series of pipes and let the native
+  // stream api take care of everything.
+  function nextFilter(err, filteredChunk) {
+    if (err) {
+      return logger.error('Error filtering: %s', String(err));
+    }
+
+    if (! filteredChunk) {
+      return logger.debug('Hit has been filtered');
+    }
+
+    var filter = filters[filterIndex];
+    ++filterIndex;
+
+    if (! filter) {
+      return sendToStreams(filteredChunk);
+    }
+
+    filter.write(filteredChunk, null, nextFilter);
+  }
+
+  function sendToStreams(filteredChunk) {
+    self.addedStreams.forEach(function(stream) {
+      stream.write(filteredChunk);
+    });
+  }
 };
 
 StreamReduce.prototype.end = function(chunk/*, encoding, callback*/) {
