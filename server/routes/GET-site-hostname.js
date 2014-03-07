@@ -13,10 +13,9 @@ exports.template = 'GET-site-hostname.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
 
 exports.handler = function(req) {
-  var totalHits = 0;
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
 
-  var reductionStart = new Date();
+  var start = new Date();
 
   return Promise.all([
      db.tags.calculate({
@@ -45,14 +44,15 @@ exports.handler = function(req) {
       'sites-total-hits': {}
     })
   ]).then(function (allResults) {
-    var reductionEnd = new Date();
-    var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
-    logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
+    var end = new Date();
+    var duration = end.getTime() - start.getTime();
+    logger.info('%s: elapsed time: %s ms', req.url, duration);
 
     var tagResults = allResults[0];
     var pageViewResults = allResults[1];
     var siteResults = allResults[2];
 
+    var totalHits = 0;
     if (queryTags.length) {
       totalHits = tagResults['tags-total-hits'];
     } else {

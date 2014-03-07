@@ -11,11 +11,11 @@ const mongooseTimestamps = require('mongoose-timestamp');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
 const reduce = require('../../lib/reduce');
+const logger = require('../../lib/logger');
 
 
 const GET_FETCH_COUNT_WARNING_THRESHOLD = 500;
 
-const logger = require('../../lib/logger');
 
 
 exports.init = function (name, definition) {
@@ -211,16 +211,15 @@ exports.getSearchBy = function (searchBy) {
     // mongo does not have a createdAt, instead the id contains a timestamp.
     // convert createdAt to the timestamp.
     if (key === 'start') {
-      searchBy._id = searchBy._id || {};
-      searchBy._id.$gte = timestampToObjectId(searchBy.start.toDate());
+      query._id = query._id || {};
+      query._id.$gte = timestampToObjectId(searchBy.start.toDate());
     } else if (key === 'end') {
-      searchBy._id = searchBy._id || {};
-      searchBy._id.$lte = timestampToObjectId(searchBy.end.toDate());
+      query._id = query._id || {};
+      query._id.$lte = timestampToObjectId(searchBy.end.toDate());
     } else {
       query[key] = searchBy[key];
     }
   }
-
 
   return query;
 };
