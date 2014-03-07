@@ -10,6 +10,8 @@ const mongoose = require('mongoose');
 const mongooseTimestamps = require('mongoose-timestamp');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
+const reduce = require('../../lib/reduce');
+
 
 const GET_FETCH_COUNT_WARNING_THRESHOLD = 500;
 
@@ -139,6 +141,28 @@ exports.pipe = function(searchBy, fields, reduceStream) {
                 return resolver.promise;
               });
 };
+
+function getWhich(options) {
+  return Object.keys(options).filter(function(name) { return name !== 'filter'; });
+}
+
+exports.calculate = withDatabase(function (options) {
+  options.which = getWhich(options);
+  // Use a stream instead of one large get for memory efficiency.
+  var stream = new reduce.StreamReduce(options);
+
+  // XXX Maybe this should live outside of here.
+  return this.pipe(options.filter, null, stream)
+                .then(function(results) {
+                  stream.end();
+                  stream = null;
+                  return results;
+                }, function (err) {
+                  stream.end();
+                  stream = null;
+                  throw err;
+                });
+});
 
 exports.getOne = withDatabase(function (searchBy) {
   var startTime = new Date();

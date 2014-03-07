@@ -50,6 +50,7 @@ exports.pageView = {
   getStream: PageView.getStream.bind(PageView),
   pipe: PageView.pipe.bind(PageView),
   getOne: PageView.getOne.bind(PageView),
+  calculate: PageView.calculate.bind(PageView),
   getByHostname: function (hostname, done) {
     return PageView.get({ hostname: hostname }, done);
   },
@@ -76,6 +77,7 @@ exports.site = {
   getStream: Site.getStream.bind(Site),
   pipe: User.pipe.bind(User),
   getOne: Site.getOne.bind(Site),
+  calculate: Site.calculate.bind(Site),
   clear: Site.clear.bind(Site),
   hit: Site.hit.bind(Site),
   ensureExists: Site.ensureExists.bind(Site)
@@ -88,6 +90,7 @@ exports.tags = {
   getStream: Tags.getStream.bind(Tags),
   pipe: Tags.pipe.bind(Tags),
   getOne: Tags.getOne.bind(Tags),
+  calculate: Tags.calculate.bind(Tags),
   clear: Tags.clear.bind(Tags),
   hit: Tags.hit.bind(Tags),
   ensureExists: Tags.ensureExists.bind(Tags)

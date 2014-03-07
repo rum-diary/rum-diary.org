@@ -20,90 +20,76 @@ exports.handler = function(req) {
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
   var tags;
 
-  var pageViewTargetStream;
-
-  var tagsTargetStream = new reduce.StreamReduce({
-    which: [
-      'tags-names',
-      'tags-total-hits'
-    ],
+  return db.tags.calculate({
+    filter: { hostname: req.dbQuery.hostname },
     'tags-total-hits': {
       tags: queryTags
-    }
-  });
+    },
+    'tags-names': {}
+  }).then(function (tagsResults) {
+    tags = tagsResults['tags-names'];
 
-  return db.tags.pipe({ hostname: req.dbQuery.hostname }, null, tagsTargetStream)
-    .then(function (tagsResults) {
-      tags = tagsResults['tags-names'];
-
-      tagsTargetStream.end();
-      tagsTargetStream = null;
-
-      if (queryTags.length) {
-        totalHits = tagsResults['tags-total-hits'];
-      } else {
-        // XXX can this be moved into the tags-total-hits filter somehow?
-        // only use the grand total number of hits if a set of tags is not
-        // specified as a filter.
-        return db.site.getOne({ hostname: req.dbQuery.hostname })
-                    .then(function(site) {
-                      if (site) totalHits = site.total_hits;
-                    });
-      }
-    })
-    .then(function() {
-      reductionStart = new Date();
-
-      // Use a stream instead of one large get for memory efficiency.
-      pageViewTargetStream = new reduce.StreamReduce({
-        which: [
-          'hits_per_day',
-          'hits_per_page',
-          'referrers',
-          'unique',
-          'returning'
-        ],
-        'hits_per_day': {
-          start: req.start,
-          end: req.end
-        }
+    if (queryTags.length) {
+      totalHits = tagsResults['tags-total-hits'];
+    } else {
+      return db.site.calculate({
+        filter: { hostname: req.dbQuery.hostname },
+        'sites-total-hits': {}
+      }).then(function (sites) {
+        totalHits = sites[req.dbQuery.hostname] || 0;
       });
+    }
+  })
+  .then(function() {
+    reductionStart = new Date();
 
-      return db.pageView.pipe(req.dbQuery, null, pageViewTargetStream);
-    })
-    .then(function (results) {
-      var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
-
-      var reductionEnd = new Date();
-      var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
-      logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
-
-      var data = {
-        root_url: req.url.replace(/\?.*/, ''),
-        hostname: req.params.hostname,
-        resources: clientResources('rum-diary.min.js'),
-        pageHitsPerPage: pageHitsPerPageSorted,
-        pageHitsPerDay: results.hits_per_day.__all,
-        referrers: results.referrers.by_count.slice(0, 20),
-        startDate: req.start.format('MMM DD'),
-        endDate: req.end.format('MMM DD'),
-        hits: {
-          total: totalHits,
-          period: pageHitsPerPageSorted[0].hits,
-          today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
-          unique: results.unique,
-          repeat: results.returning
-        },
-        tags: tags
-      };
-
-      tags = null;
-      pageViewTargetStream.end();
-      pageViewTargetStream = null;
-
-      return data;
-
+    return db.pageView.calculate({
+      filter: req.dbQuery,
+      'hits_per_day': {
+        start: req.start,
+        end: req.end
+      },
+      'hits_per_page': {},
+      'referrers': {},
+      'unique': {},
+      'returning': {}
     });
+  })
+  .then(function (results) {
+    var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
+
+    var reductionEnd = new Date();
+    var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
+    logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
+
+    var data = {
+      root_url: req.url.replace(/\?.*/, ''),
+      hostname: req.params.hostname,
+      resources: clientResources('rum-diary.min.js'),
+      pageHitsPerPage: pageHitsPerPageSorted,
+      pageHitsPerDay: results.hits_per_day.__all,
+      referrers: results.referrers.by_count.slice(0, 20),
+      startDate: req.start.format('MMM DD'),
+      endDate: req.end.format('MMM DD'),
+      hits: {
+        total: totalHits,
+        period: pageHitsPerPageSorted[0].hits,
+        today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
+        unique: results.unique,
+        repeat: results.returning
+      },
+      tags: tags
+    };
+
+    tags = null;
+    /*
+    pageViewTargetStream.end();
+    pageViewTargetStream = null;
+    */
+
+    return data;
+
+  });
 };
 
 function sortPageHitsPerPage(pageHitsPerPage) {
