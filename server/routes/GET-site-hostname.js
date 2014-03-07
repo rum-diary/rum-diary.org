@@ -56,7 +56,7 @@ exports.handler = function(req) {
     if (queryTags.length) {
       totalHits = tagResults['tags-total-hits'];
     } else {
-      totalHits = siteResults[req.dbQuery.hostname] || 0;
+      totalHits = siteResults['sites-total-hits'][req.dbQuery.hostname] || 0;
     }
 
     return {
