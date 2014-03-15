@@ -24,8 +24,8 @@ describe('site-query', function() {
       query: {}
     });
 
-    assert.ok(query.createdAt['$gte']);
-    assert.ok(query.createdAt['$lte']);
+    assert.ok(query.start);
+    assert.ok(query.end);
   });
 
   it('should use start and end from query string, if specified', function() {
@@ -37,8 +37,8 @@ describe('site-query', function() {
       }
     });
 
-    assert.ok(moment(query.createdAt['$gte']).isSame(moment('2013-12-31').startOf('day')));
-    assert.ok(moment(query.createdAt['$lte']).isSame(moment('2014-01-07').endOf('day')));
+    assert.ok(moment(query.start).isSame(moment('2013-12-31').startOf('day')));
+    assert.ok(moment(query.end).isSame(moment('2014-01-07').endOf('day')));
   });
 
   it('should convert CSV of tags, when specified', function() {

@@ -19,7 +19,7 @@ function cPass(done) {
 
 // fail - straight up failure.
 function fail(err) {
-  assert.fail(String(err));
+  assert.fail(String(err.message));
 }
 
 /*global describe, it */
@@ -99,8 +99,10 @@ describe('reduce', function () {
       'hits_per_day',
       'internal-transfer-from'
     ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment(),
+      hits_per_page: {
+        start: moment(new Date()).subtract('days', 30),
+        end: moment()
+      },
       navigation: {
         calculate: ['median']
       }

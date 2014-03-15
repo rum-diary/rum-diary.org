@@ -27,9 +27,6 @@ describe('reduce/entrance', function () {
 
   beforeEach(function () {
     filter = new Filter();
-    navigationTimingData.forEach(function(pageView) {
-      filter.write(pageView);
-    });
   });
 
   afterEach(function () {

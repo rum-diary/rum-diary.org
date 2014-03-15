@@ -55,6 +55,9 @@ function loadRoute(fileName) {
     if (promise && promise.then) {
       promise.then(function (templateData) {
         if (templateData && route.template) {
+          if (templateData.resources && route['js-resources']) {
+            logger.warn('%s: route defines `js-resources`, returned `resources` will be ignored. Pick one.', req.url);
+          }
           templateData.resources = route['js-resources'];
           res.render(route.template, templateData);
         }
