@@ -8,17 +8,9 @@ const navigationTimingData = require('../data/bounce.json');
 
 const Stream = require('../../server/lib/reduce/bounce');
 
-// cPass - curried pass - call done when done.
-function cPass(done) {
-  return function () {
-    done();
-  };
-}
-
-// fail - straight up failure.
-function fail(err) {
-  assert.fail(String(err));
-}
+const testExtras = require('../lib/test-extras');
+const cPass = testExtras.cPass;
+const fail = testExtras.fail;
 
 /*global describe, it */
 
