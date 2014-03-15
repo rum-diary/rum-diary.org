@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Promise = require('bluebird');
 const logger = require('../lib/logger');
-const db = require('../lib/db');
+const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname';
@@ -15,17 +14,15 @@ exports['js-resources'] = clientResources('rum-diary.min.js');
 exports.handler = function(req) {
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
 
-  var start = new Date();
-
-  return Promise.all([
-     db.tags.calculate({
+  return calculator.calculate({
+     tags: {
       filter: { hostname: req.dbQuery.hostname },
       'tags-total-hits': {
         tags: queryTags
       },
       'tags-names': {}
-    }),
-    db.pageView.calculate({
+    },
+    pageView: {
       filter: req.dbQuery,
       'hits_per_day': {
         start: req.start,
@@ -38,19 +35,17 @@ exports.handler = function(req) {
       'referrers': {},
       'unique': {},
       'returning': {}
-    }),
-    db.site.calculate({
+    },
+    site: {
       filter: { hostname: req.dbQuery.hostname },
       'sites-total-hits': {}
-    })
-  ]).then(function (allResults) {
-    var end = new Date();
-    var duration = end.getTime() - start.getTime();
-    logger.info('%s: elapsed time: %s ms', req.url, duration);
+    }
+  }).then(function (allResults) {
+    logger.info('%s: elapsed time: %s ms', req.url, allResults.duration);
 
-    var tagResults = allResults[0];
-    var pageViewResults = allResults[1];
-    var siteResults = allResults[2];
+    var tagResults = allResults.tags;
+    var pageViewResults = allResults.pageView;
+    var siteResults = allResults.site;
 
     var totalHits = 0;
     if (queryTags.length) {
