@@ -15,6 +15,7 @@
 
 
 {% block body %}
+  <!--
   {% if tags.length %}
     <nav class="horizontal-nav">
       <h4>Tags</h4>
@@ -27,22 +28,33 @@
       </ul>
     </nav>
   {% endif %}
+  -->
 
 <section class="row">
   <article id="overview" class="row-left">
     <h2>Overview</h2>
-    <dl>
-      <dt class="overview-name deemphasize">Total</dt>
-      <dd class="overview-stat">{{ hits.total }}</dd>
-      <dt class="overview-name deemphasize">Today</dt>
-      <dd class="overview-stat">{{ hits.today }}</dd>
-      <dt class="overview-name deemphasize">Period</dt>
-      <dd class="overview-stat">{{ hits.period }}</dd>
-      <dt class="overview-name deemphasize">Unique</dt>
-      <dd class="overview-stat">{{ hits.unique }}</dd>
-      <dt class="overview-name deemphasize">Repeat</dt>
-      <dd class="overview-stat">{{ hits.repeat }}</dd>
-    </dl>
+    <ul class="overview">
+      <li>
+        <dt class="overview-name deemphasize">Total</dt>
+        <dd class="overview-stat">{{ hits.total }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Today</dt>
+        <dd class="overview-stat">{{ hits.today }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Period</dt>
+        <dd class="overview-stat">{{ hits.period }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Unique</dt>
+        <dd class="overview-stat">{{ hits.unique }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Repeat</dt>
+        <dd class="overview-stat">{{ hits.repeat }}</dd>
+      </li>
+    </ul>
 
   </article>
 

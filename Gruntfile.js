@@ -45,6 +45,7 @@ module.exports = function (grunt) {
     grunt.task.run([
       selectConfig,
       'jshint',
+      'sass',
       'preprocess',
       'sass',
       'serverproc'

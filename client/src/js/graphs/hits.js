@@ -7,10 +7,13 @@
 RD.Graphs.Hits = (function(hits) {
   'use strict';
 
+  var containerEl = d3.select('#hits-graph')[0][0];
+  var containerWidth = containerEl.clientWidth;
+
   var data = hits.__all;
 
-  var margin = {top: 20, right: 80, bottom: 70, left: 50},
-      width = 600 - margin.left - margin.right,
+  var margin = {top: 20, right: 10, bottom: 70, left: 20},
+      width = containerWidth - margin.left - margin.right,
       height = 350 - margin.top - margin.bottom;
 
   var parseDate = d3.time.format('%Y-%m-%d').parse;
@@ -39,10 +42,11 @@ RD.Graphs.Hits = (function(hits) {
         return y(d.hits);
       });
 
-  var svg = d3.select('#hits-graph').append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
+  var svgEl = d3.select('#hits-graph').append('svg')
+      .attr('width', containerWidth + 'px')
+      .attr('height', height + margin.top + margin.bottom);
+
+  var svg = svgEl.append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
   color.domain(['hits']);
@@ -77,7 +81,26 @@ RD.Graphs.Hits = (function(hits) {
       .attr('class', 'axis-label axis-label-y')
 
 
-  svg.append('path')
+  var pathEl = svg.append('path')
       .attr('class', 'line')
       .attr('d', valueline(data));
+
+  d3.select(window).on('resize', resize);
+
+  function resize() {
+    containerWidth = containerEl.clientWidth;
+    // first, update the svg element's width
+    svgEl.attr('width', containerWidth + 'px');
+
+    width = containerWidth - margin.left - margin.right,
+
+    // now, update the range so the axis knows how to update itself.
+    x.range([0, width]);
+
+    // tell the axis to redraw
+    svgEl.select('.x.axis').call(xAxis.orient('bottom'));
+
+    // now tell the path to redraw.
+    pathEl.attr('d', valueline(data));
+  }
 });
