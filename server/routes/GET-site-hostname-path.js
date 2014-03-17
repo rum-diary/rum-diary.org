@@ -11,7 +11,7 @@ exports.verb = 'get';
 exports.template = 'GET-site-hostname-path.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
 
-exports.handler = function(req, res) {
+exports.handler = function(req) {
   var hostname = req.params[0];
   var path = req.params[1] || 'index';
   logger.info('get information for %s/%s', hostname, path);
@@ -48,8 +48,8 @@ exports.handler = function(req, res) {
 
     var pageHitsInPeriod = results.hits_per_page[0].hits;
 
-    var exitRate = calculateExitRate(results);
-    var bounceRate = calculateBounceRate(results);
+    var exitRate = calculateExitRate(results, path);
+    var bounceRate = calculateBounceRate(results, path);
 
     return {
       root_url: req.url.replace(/\?.*/, ''),
@@ -103,7 +103,7 @@ function padLeft(numToPad, padWith, length) {
   return padded;
 }
 
-function calculateBounceRate(results) {
+function calculateBounceRate(results, path) {
   var pageHitsInPeriod = results.hits_per_page[0].hits;
   if (! pageHitsInPeriod) return 0;
 
@@ -111,7 +111,7 @@ function calculateBounceRate(results) {
   return (100 * bouncesInPeriod / pageHitsInPeriod) << 0;
 }
 
-function calculateExitRate(results) {
+function calculateExitRate(results, path) {
   var pageHitsInPeriod = results.hits_per_page[0].hits;
   if (! pageHitsInPeriod) return 0;
 
