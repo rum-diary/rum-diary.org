@@ -8,17 +8,10 @@ const navigationTimingData = require('../data/navigation-timing.json');
 
 const Stream = require('../../server/lib/reduce/exit');
 
-// cPass - curried pass - call done when done.
-function cPass(done) {
-  return function () {
-    done();
-  };
-}
+const testExtras = require('../lib/test-extras');
+const cPass = testExtras.cPass;
+const fail = testExtras.fail;
 
-// fail - straight up failure.
-function fail(err) {
-  assert.fail(String(err));
-}
 
 /*global describe, it */
 

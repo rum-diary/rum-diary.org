@@ -9,18 +9,9 @@ const assert = require('chai').assert;
 
 const db = require('../server/lib/db');
 
-// cPass - curried pass - call done when done.
-function cPass(done) {
-  return function () {
-    done();
-  };
-}
-
-// fail - straight up failure.
-function fail(err) {
-  assert.fail(String(err));
-}
-
+const testExtras = require('./lib/test-extras');
+const cPass = testExtras.cPass;
+const fail = testExtras.fail;
 
 describe('database', function () {
   beforeEach(function (done) {

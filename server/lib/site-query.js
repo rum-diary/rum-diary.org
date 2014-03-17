@@ -10,25 +10,17 @@ module.exports = function(req) {
     hostname: req.params.hostname
   };
 
-  var start, end;
-
   if (req.query.start) {
-    start = moment(req.query.start).startOf('day');
+    query.start = moment(req.query.start).startOf('day');
   } else {
-    start = moment().subtract('days', 30).startOf('day');
+    query.start = moment().subtract('days', 30).startOf('day');
   }
 
   if (req.query.end) {
-    end = moment(req.query.end).endOf('day');
+    query.end = moment(req.query.end).endOf('day');
   } else {
-    end = moment().endOf('day');
+    query.end = moment().endOf('day');
   }
-
-  query.createdAt = {
-    '$gte': start.toDate(),
-    '$lte': end.toDate()
-  };
-
 
   if (req.query.tags) {
     var tags = req.query.tags.split(',');

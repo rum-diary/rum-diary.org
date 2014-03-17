@@ -3,8 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 /**
- * Ensure a pageView contains both a referrer_hostname and referrer_path.
- * Calculate if necessary.
+ * Use referrer to calculate missing referrer_hostname or referrer_path.
  */
 
 /**
@@ -17,8 +16,11 @@ function Filter() {
 }
 
 Filter.prototype.write = function(chunk, encoding, callback) {
-  if (chunk.referrer_hostname && chunk.referrer_path) return;
-  if (! chunk.referrer) return;
+  if (chunk.referrer_hostname && chunk.referrer_path) {
+    return callback(null, chunk);
+  }
+
+  if (! chunk.referrer) return callback(null, chunk);
 
   try {
     // XXX Better to do is to check referrers when
@@ -27,10 +29,10 @@ Filter.prototype.write = function(chunk, encoding, callback) {
     chunk.referrer_hostname = parsed.hostname;
     chunk.referrer_path = parsed.path || '/';
   } catch(e) {
-    return;
+    // do nothing.
   }
 
-  if (callback(null, chunk));
+  callback(null, chunk);
 };
 
 Filter.prototype.end = function () {

@@ -2,11 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const moment = require('moment');
-const Promise = require('bluebird');
 const logger = require('../lib/logger');
-const db = require('../lib/db');
-const reduce = require('../lib/reduce');
+const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname';
@@ -15,100 +12,65 @@ exports.template = 'GET-site-hostname.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
 
 exports.handler = function(req) {
-  var reductionStart;
-  var totalHits = 0;
-  var queryTags = req.query.tags && req.query.tags.split(',') || 0;
-  var tags;
+  var queryTags = req.query.tags && req.query.tags.split(',') || [];
 
-  var reduceStream = new reduce.StreamReduce({
-    which: [
-      'hits_per_day',
-      'hits_per_page',
-      'referrers',
-      'unique',
-      'returning'
-    ],
-    start: req.start,
-    end: req.end,
-    'hits_per_day': {
-      start: req.start,
-      end: req.end
+  return calculator.calculate({
+     tags: {
+      filter: { hostname: req.dbQuery.hostname },
+      'tags-total-hits': {
+        tags: queryTags
+      },
+      'tags-names': {}
+    },
+    pageView: {
+      filter: req.dbQuery,
+      'hits_per_day': {
+        start: req.start,
+        end: req.end
+      },
+      'hits_per_page': {
+        sort: 'desc',
+        limit: 20
+      },
+      'referrers': {},
+      'unique': {},
+      'returning': {}
+    },
+    site: {
+      filter: { hostname: req.dbQuery.hostname },
+      'sites-total-hits': {}
     }
+  }).then(function (allResults) {
+    logger.info('%s: elapsed time: %s ms', req.url, allResults.duration);
+
+    var tagResults = allResults.tags;
+    var pageViewResults = allResults.pageView;
+    var siteResults = allResults.site;
+
+    var totalHits = 0;
+    if (queryTags.length) {
+      totalHits = tagResults['tags-total-hits'];
+    } else {
+      totalHits = siteResults['sites-total-hits'][req.dbQuery.hostname] || 0;
+    }
+
+    return {
+      root_url: req.url.replace(/\?.*/, ''),
+      hostname: req.params.hostname,
+      pageHitsPerPage: pageViewResults.hits_per_page,
+      pageHitsPerDay: pageViewResults.hits_per_day.__all,
+      referrers: pageViewResults.referrers.by_count.slice(0, 20),
+      startDate: req.start.format('MMM DD'),
+      endDate: req.end.format('MMM DD'),
+      hits: {
+        total: totalHits,
+        period: pageViewResults.hits_per_page[0].hits,
+        today: pageViewResults.hits_per_day.__all[pageViewResults.hits_per_day.__all.length - 1].hits,
+        unique: pageViewResults.unique,
+        repeat: pageViewResults.returning
+      },
+      tags: tagResults['tags-names']
+    };
   });
-
-  return db.tags.get({
-      hostname: req.dbQuery.hostname
-    })
-    .then(function (_tags) {
-      tags = _tags.map(function(tag) { return tag.name; });
-
-      // tags are specified as a filter, count the
-      // total hits for the matching tags.
-      // This does not work for the "not" tag.
-      if (queryTags.length) {
-        totalHits = _tags.reduce(function(totalHits, tag) {
-          if (queryTags.indexOf(tag.name) > -1) totalHits += tag.total_hits;
-          return totalHits;
-        }, 0);
-      }
-    })
-    .then(function () {
-      // only use the grand total number of hits if a set of tags is not
-      // specified as a filter.
-      if (! queryTags.length) {
-        return db.site.getOne({
-          hostname: req.dbQuery.hostname
-        })
-        .then(function(site) {
-          if (site) totalHits = site.total_hits;
-        });
-      }
-    })
-    .then(function() {
-      // Use a stream instead of one large get for memory efficiency.
-      reductionStart = new Date();
-      return db.pageView.pipe(req.dbQuery, null, reduceStream);
-    })
-    .then(function (results) {
-      var pageHitsPerPageSorted = sortPageHitsPerPage(results.hits_per_page).slice(0, 20);
-
-      var reductionEnd = new Date();
-      var reductionDuration = reductionEnd.getTime() - reductionStart.getTime();
-      logger.info('reduction time for %s: %s ms', req.url, reductionDuration);
-
-      tags = null;
-      reduceStream.end();
-      reduceStream = null;
-      return {
-        root_url: req.url.replace(/\?.*/, ''),
-        hostname: req.params.hostname,
-        resources: clientResources('rum-diary.min.js'),
-        pageHitsPerPage: pageHitsPerPageSorted,
-        pageHitsPerDay: results.hits_per_day.__all,
-        referrers: results.referrers.by_count.slice(0, 20),
-        startDate: req.start.format('MMM DD'),
-        endDate: req.end.format('MMM DD'),
-        hits: {
-          total: totalHits,
-          period: pageHitsPerPageSorted[0].hits,
-          today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
-          unique: results.unique,
-          repeat: results.returning
-        },
-        tags: tags
-      };
-    });
 };
 
-function sortPageHitsPerPage(pageHitsPerPage) {
-  var sorted = Object.keys(pageHitsPerPage).map(function(key) {
-    return {
-      page: key,
-      hits: pageHitsPerPage[key]
-    };
-  }).sort(function(a, b) {
-    return b.hits - a.hits;
-  });
-
-  return sorted;
-}

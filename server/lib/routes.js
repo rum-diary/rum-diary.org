@@ -48,13 +48,16 @@ function loadRoute(fileName) {
   function handler(req, res) {
     // Set up some helpers on the request.
     req.dbQuery = getQuery(req);
-    req.start = moment(req.dbQuery.createdAt.$gte);
-    req.end = moment(req.dbQuery.createdAt.$lte);
+    req.start = req.dbQuery.start;
+    req.end = req.dbQuery.end;
 
     var promise = route.handler(req, res);
     if (promise && promise.then) {
       promise.then(function (templateData) {
         if (templateData && route.template) {
+          if (templateData.resources && route['js-resources']) {
+            logger.warn('%s: route defines `js-resources`, returned `resources` will be ignored. Pick one.', req.url);
+          }
           templateData.resources = route['js-resources'];
           res.render(route.template, templateData);
         }

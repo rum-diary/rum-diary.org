@@ -23,6 +23,9 @@ function ReduceStream(options) {
   else if (this.type === Array) {
     this._data = [];
   }
+  else if (this.type === Number) {
+    this._data = 0;
+  }
   else if (this.type === null && ! this.hasOwnProperty('_data')) {
     throw new Error('this._data must be set if this.type is null');
   }

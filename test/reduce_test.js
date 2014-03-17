@@ -10,17 +10,9 @@ const navigationTimingData = require('./data/navigation-timing.json');
 
 const reduce = require('../server/lib/reduce');
 
-// cPass - curried pass - call done when done.
-function cPass(done) {
-  return function () {
-    done();
-  };
-}
-
-// fail - straight up failure.
-function fail(err) {
-  assert.fail(String(err));
-}
+const testExtras = require('./lib/test-extras');
+const cPass = testExtras.cPass;
+const fail = testExtras.fail;
 
 /*global describe, it */
 
@@ -99,8 +91,10 @@ describe('reduce', function () {
       'hits_per_day',
       'internal-transfer-from'
     ], {
-      start: moment(new Date()).subtract('days', 30),
-      end: moment(),
+      hits_per_page: {
+        start: moment(new Date()).subtract('days', 30),
+        end: moment()
+      },
       navigation: {
         calculate: ['median']
       }
