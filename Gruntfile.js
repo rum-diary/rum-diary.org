@@ -18,6 +18,7 @@ module.exports = function (grunt) {
     'jshint',
     'preprocess',
     'sass',
+    'autoprefixer',
     /*'mocha',*/
     'clean',
     'copy',
@@ -46,6 +47,7 @@ module.exports = function (grunt) {
       selectConfig,
       'jshint',
       'sass',
+      'autoprefixer',
       'preprocess',
       'sass',
       'serverproc'

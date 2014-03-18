@@ -339,7 +339,8 @@ path {
 }
 
 .axis-label-x {
-  transform: rotate(70deg) translateX(2.75em) translateY(-1em);
+  -webkit-transform: rotate(70deg) translateX(2.75em) translateY(-1em);
+          transform: rotate(70deg) translateX(2.75em) translateY(-1em);
 }
 
 .axis path,
