@@ -2,14 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function () {
+module.exports = (function () {
   /*global RD, chai, describe, beforeEach, afterEach, it*/
   'use strict';
 
+  var Pie = require('../../../src/js/graphs/pie');
   var assert = chai.assert;
 
 
-  describe('RD.Graphs.Pie', function () {
+  describe('Pie', function () {
     var data = [
           { title: 'Chrome', value: 1178 },
           { title: 'Firefox', value: 675 },
@@ -40,11 +41,11 @@
     });
 
     it('exists', function () {
-      assert.isObject(RD.Graphs.Pie);
+      assert.isObject(Pie);
     });
 
     it('draws', function () {
-      var graph = RD.Graphs.Pie.create();
+      var graph = Pie.create();
       graph.init({
         root: '#graph',
         data: data
@@ -69,5 +70,5 @@
 
 
 
-}());
+});
 

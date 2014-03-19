@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*global RD, DOMinator */
 (function() {
+  var DOMinator = require('./lib/dominator');
+
   window.addEventListener('load', function() {
 
     hitsGraph();
@@ -32,12 +33,14 @@
     });
 
     // Graph the data!
-    RD.Graphs.Hits({
-      __all: data
+    var Hits = require('./graphs/hits.js');
+    var graph = Hits.create();
+    graph.init({
+      data: data
     });
+    graph.render();
 
     document.getElementById('hits-data').style.display = 'none';
-
   }
 
   function navigationTimingGraph() {
@@ -60,7 +63,7 @@
       navigationTiming3QData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
     });
 
-    var graph = RD.Graphs.NavigationTiming.create();
+    var graph = require('./graphs/navigation-timing.js').create();
     graph.init({
       root: '#navigation-timing-graph',
       data: [
@@ -99,7 +102,7 @@
       histogramData.push(value);
     });
 
-    var histogram = RD.Graphs.Histogram.create();
+    var histogram = require('./graphs/histogram.js').create();
     histogram.init({
       root: '#histogram-graph',
       data: histogramData,
@@ -138,7 +141,7 @@
       });
     });
 
-    var cdf = RD.Graphs.CDF.create();
+    var cdf = require('./graphs/cdf.js').create();
     cdf.init({
       root: '#cdf-graph',
       data: cdfData,
@@ -169,7 +172,7 @@
       });
     });
 
-    var browsers = RD.Graphs.Pie.create();
+    var browsers = require('./graphs/pie.js').create();
     browsers.init({
       root: '#browsers-graph',
       data: browsersData,
@@ -200,7 +203,7 @@
       });
     });
 
-    var os = RD.Graphs.Pie.create();
+    var os = require('./graphs/pie.js').create();
     os.init({
       root: '#os-graph',
       data: osData,
@@ -231,7 +234,7 @@
       };
     });
 
-    var deviceType = RD.Graphs.Pie.create();
+    var deviceType = require('./graphs/pie.js').create();
     deviceType.init({
       root: '#device-type-graph',
       data: deviceTypeArray,

@@ -2,14 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function () {
+module.exports = (function () {
   /*global RD, chai, describe, beforeEach, afterEach, it*/
   'use strict';
 
+  var CDF = require('../../../src/js/graphs/cdf');
   var assert = chai.assert;
 
 
-  describe('RD.Graphs.CDF', function () {
+  describe('CDF', function () {
 
     beforeEach(function() {
       removeSvgEls();
@@ -20,11 +21,11 @@
     });
 
     it('exists', function () {
-      assert.isObject(RD.Graphs.CDF);
+      assert.isObject(CDF);
     });
 
     it('draws', function () {
-      var graph = RD.Graphs.CDF.create();
+      var graph = CDF.create();
       graph.init({
         root: '#graph',
         data: [
@@ -56,5 +57,7 @@
 
 
 
-}());
+});
+
+
 

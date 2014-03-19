@@ -2,54 +2,47 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*global RD*/
+'use strict';
 
-RD.Tooltip = (function() {
-  'use strict';
+var DOM = require('./lib/dominator');
 
-  var DOM = window.DOMinator;
+module.exports = {
+  create: function() {
+    return Object.create(this);
+  },
 
-  var Module = {
-    init: function(options) {
-      options = options || {};
+  init: function(options) {
+    options = options || {};
 
-      this.appendTo = options.appendTo || 'body';
-      this.id = options.id;
+    this.appendTo = options.appendTo || 'body';
+    this.id = options.id;
 
-      this.render();
-      this.html(options.html);
+    this.render();
+    this.html(options.html);
 
-      return this;
-    },
+    return this;
+  },
 
-    render: function() {
-      this.tooltip = DOM('<div>').addClass('tooltip').appendTo('body');
+  render: function() {
+    this.tooltip = DOM('<div>').addClass('tooltip').appendTo('body');
 
-      if (this.id) this.tooltip.attr('id', this.id);
-    },
+    if (this.id) this.tooltip.attr('id', this.id);
+  },
 
-    html: function(html) {
-      this.tooltip.inner(html);
-    },
+  html: function(html) {
+    this.tooltip.inner(html);
+  },
 
-    show: function() {
-      this.tooltip.show();
-    },
+  show: function() {
+    this.tooltip.show();
+  },
 
-    hide: function() {
-      this.tooltip.hide();
-    },
+  hide: function() {
+    this.tooltip.hide();
+  },
 
-    move: function(x, y) {
-      this.tooltip.style('left', x).style('top', y);
-    }
-  };
-
-  Module.create = function() {
-    return Object.create(Module);
-  };
-
-  return Module;
-
-}());
+  move: function(x, y) {
+    this.tooltip.style('left', x).style('top', y);
+  }
+};
 

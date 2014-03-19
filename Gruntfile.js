@@ -17,9 +17,10 @@ module.exports = function (grunt) {
     'selectconfig:dist',
     'jshint',
     'preprocess',
+    'browserify:dist',
     'sass',
     'autoprefixer',
-    /*'mocha',*/
+    'mocha',
     'clean',
     'copy',
     'uglify',
@@ -42,14 +43,15 @@ module.exports = function (grunt) {
     }
 
     var selectConfig = target === 'test' ? 'selectconfig:test' : 'selectconfig';
+    var browserifyConfig = target === 'test' ? 'browserify:test' : 'browserify';
 
     grunt.task.run([
       selectConfig,
       'jshint',
-      'sass',
       'autoprefixer',
       'preprocess',
       'sass',
+      browserifyConfig,
       'serverproc'
     ]);
   });

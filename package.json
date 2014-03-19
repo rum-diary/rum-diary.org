@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "assert": "1.0.3",
+    "browserify": "3.32.0",
     "chai": "1.8.1",
     "grunt": "0.4.2",
     "grunt-autoprefixer": "0.7.2",
@@ -49,6 +50,7 @@
     "jshint-stylish": "0.1.4",
     "load-grunt-tasks": "0.2.1",
     "mocha": "1.16.1",
+    "mold-source-map": "0.3.0",
     "request": "2.34.0",
     "time-grunt": "0.2.5"
   }

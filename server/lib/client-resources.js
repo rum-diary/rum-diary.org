@@ -14,41 +14,7 @@ const config = require('./config');
 const DEPENDENCIES = {
   'rum-diary.min.js': [
     '/js/bower_components/d3/d3.js',
-    '/js/lib/dominator.js',
-    '/js/rum-diary.js',
-    {
-      path: '/js/string.js',
-      test: 'spec/string_test.js'
-    },
-    {
-      path: '/js/tooltip.js',
-      test: 'spec/tooltip_test.js'
-    },
-    '/js/graphs/graphs.js',
-    {
-      path: '/js/graphs/hits.js',
-      test: 'spec/graphs/hits_test.js'
-    },
-    {
-      path: '/js/graphs/navigation-timing.js',
-      test: 'spec/graphs/navigation-timing_test.js'
-    },
-    {
-      path: '/js/graphs/histogram.js',
-      test: 'spec/graphs/histogram_test.js'
-    },
-    {
-      path: '/js/graphs/cdf.js',
-      test: 'spec/graphs/cdf_test.js'
-    },
-    {
-      path: '/js/graphs/pie.js',
-      test: 'spec/graphs/pie_test.js'
-    },
-    {
-      path: '/js/start.js',
-      filter: ['testing']
-    }
+    '/js/bundle.js'
   ]
 };
 
