@@ -2,14 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function () {
+module.exports = (function () {
   /*global RD, chai, describe, beforeEach, afterEach, it*/
   'use strict';
 
+  var Histogram = require('../../../src/js/graphs/histogram');
   var assert = chai.assert;
 
 
-  describe('RD.Graphs.Histogram', function () {
+  describe('Histogram', function () {
 
     beforeEach(function() {
       removeSvgEls();
@@ -20,11 +21,11 @@
     });
 
     it('exists', function () {
-      assert.isObject(RD.Graphs.Histogram);
+      assert.isObject(Histogram);
     });
 
     it('draws', function () {
-      var graph = RD.Graphs.Histogram.create();
+      var graph = Histogram.create();
       graph.init({
         root: '#graph',
         data: [
@@ -49,5 +50,5 @@
 
 
 
-}());
+});
 

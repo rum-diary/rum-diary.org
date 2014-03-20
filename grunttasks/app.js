@@ -12,7 +12,10 @@ module.exports = function (grunt) {
   var STATIC_ROOT = path.join(__dirname, '..', 'client');
 
   grunt.config('app', {
+    static_root: STATIC_ROOT,
     src: path.join(STATIC_ROOT, 'src'),
+    src_js: path.join(STATIC_ROOT, 'src', 'js'),
+    src_test: path.join(STATIC_ROOT, 'tests'),
     dist: path.join(STATIC_ROOT, 'dist'),
     temp: '.tmp'
   });

@@ -36,12 +36,10 @@
 {% block footerjs %}
   <script src="lib/mocha/mocha.js"></script>
   <script src="lib/chai/chai.js"></script>
+  <script src="/src/js/bower_components/d3/d3.js"></script>
   <script src="setup.js"></script>
 
-  {% for resource in resources %}<script src="{{ resource }}"></script>
-  {% endfor %}
-
-  <script src="run.js"></script>
+  <script src="test_bundle.js"></script>
 {% endblock %}
 
 

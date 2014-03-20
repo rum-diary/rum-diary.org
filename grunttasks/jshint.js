@@ -19,7 +19,8 @@ module.exports = function (grunt) {
     all: [
       'Gruntfile.js',
       'grunttasks/{,*/}*.js',
-      'client/src/{,*/}*.js'
+      'client/src/{,*/}*.js',
+      '!client/src/js/bundle.js'
     ]
   });
 };

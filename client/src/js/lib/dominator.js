@@ -2,7 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-window.DOMinator = (function() {
+module.exports = (function() {
+  /* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
   'use strict';
 
   /*global document*/
@@ -233,6 +237,13 @@ window.DOMinator = (function() {
     },
 
     /**
+     * Run map over the set of elements.
+     */
+    map: function(callback, context) {
+      return [].map.call(this, callback, context);
+    },
+
+    /**
      * Append an element to all elements in the set
      */
     append: function(elementToAppend) {
@@ -386,6 +397,8 @@ window.DOMinator = (function() {
   }
 
   return toDOMinator;
+
+
 
 }());
 

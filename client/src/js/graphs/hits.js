@@ -2,82 +2,122 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*global RD, d3*/
+/*global d3*/
 
-RD.Graphs.Hits = (function(hits) {
-  'use strict';
+'use strict';
 
-  var data = hits.__all;
+var Module = {
+  create: function () {
+    return Object.create(this);
+  },
 
-  var margin = {top: 20, right: 80, bottom: 70, left: 50},
-      width = 600 - margin.left - margin.right,
-      height = 350 - margin.top - margin.bottom;
+  init: function(options) {
+    this.root = options.root || '#hits-graph';
+    this.containerEl = d3.select(this.root)[0][0];
+    this.data = options.data;
+    /*this.width = options.width || this.containerEl.clientWidth;*/
+    this.height = options.height || 350;
+  },
 
-  var parseDate = d3.time.format('%Y-%m-%d').parse;
+  render: function () {
+    var containerEl = this.containerEl;
+    var containerWidth = containerEl.clientWidth;
 
-  var x = d3.time.scale()
-      .range([0, width]);
+    var data = this.data;
 
-  var y = d3.scale.linear()
-      .range([height, 0]);
+    var margin = {top: 20, right: 10, bottom: 70, left: 20},
+        width = containerWidth - margin.left - margin.right,
+        height = this.height - margin.top - margin.bottom;
 
-  var color = d3.scale.category10();
+    var parseDate = d3.time.format('%Y-%m-%d').parse;
 
-  var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient('bottom');
+    var x = d3.time.scale()
+        .range([0, width]);
 
-  var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient('left');
+    var y = d3.scale.linear()
+        .range([height, 0]);
 
-  var valueline = d3.svg.line()
-      .x(function(d) {
-        return x(d.date);
+    var color = d3.scale.category10();
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom');
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient('left');
+
+    var valueline = d3.svg.line()
+        .x(function(d) {
+          return x(d.date);
         })
-      .y(function(d) {
-        return y(d.hits);
-      });
+        .y(function(d) {
+          return y(d.hits);
+        });
 
-  var svg = d3.select('#hits-graph').append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    var svgEl = d3.select('#hits-graph').append('svg')
+        .attr('width', containerWidth + 'px')
+        .attr('height', height + margin.top + margin.bottom);
 
-  color.domain(['hits']);
+    var svg = svgEl.append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-  data.forEach(function(d) {
-    d.date = parseDate(d.date);
-    d.hits = +d.hits;
-  });
+    color.domain(['hits']);
 
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([0, d3.max(data, function(d) { return d.hits; })]);
+    data.forEach(function(d) {
+      d.date = parseDate(d.date);
+      d.hits = +d.hits;
+    });
 
-  svg.append('g')
-      .attr('class', 'x axis')
-      .attr('transform', 'translate(0,' + height + ')')
-      .call(xAxis)
-      .selectAll('text')
-        .attr('class', 'axis-label axis-label-x');
+    x.domain(d3.extent(data, function(d) { return d.date; }));
+    y.domain([0, d3.max(data, function(d) { return d.hits; })]);
 
-
-  svg.append('g')
-      .attr('class', 'y axis')
-      .call(yAxis)
-      .append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 6)
-      .attr('dy', '.71em')
-      .style('text-anchor', 'end')
-      .text('Hits / day');
-
-  svg.selectAll('.y .tick text')
-      .attr('class', 'axis-label axis-label-y')
+    svg.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(xAxis)
+        .selectAll('text')
+          .attr('class', 'axis-label axis-label-x');
 
 
-  svg.append('path')
-      .attr('class', 'line')
-      .attr('d', valueline(data));
-});
+    svg.append('g')
+        .attr('class', 'y axis')
+        .call(yAxis)
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 6)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .text('Hits / day');
+
+    svg.selectAll('.y .tick text')
+        .attr('class', 'axis-label axis-label-y');
+
+
+    var pathEl = svg.append('path')
+        .attr('class', 'line')
+        .attr('d', valueline(data));
+
+    d3.select(window).on('resize', resize);
+
+    function resize() {
+      containerWidth = containerEl.clientWidth;
+      // first, update the svg element's width
+      svgEl.attr('width', containerWidth + 'px');
+
+      width = containerWidth - margin.left - margin.right,
+
+      // now, update the range so the axis knows how to update itself.
+      x.range([0, width]);
+
+      // tell the axis to redraw
+      svgEl.select('.x.axis').call(xAxis.orient('bottom'));
+
+      // now tell the path to redraw.
+      pathEl.attr('d', valueline(data));
+    }
+  }
+};
+
+module.exports = Module;
+

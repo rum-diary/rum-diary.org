@@ -2,15 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function () {
+module.exports = (function () {
   /*global chai, describe, beforeEach, it*/
   "use strict";
 
+  var Tooltip = require('../../src/js/tooltip');
+
   var assert = chai.assert;
 
-  describe('RD.Tooltip', function () {
+  describe('Tooltip', function () {
     beforeEach(function() {
-      this.tooltip = RD.Tooltip.create();
+      this.tooltip = Tooltip.create();
       this.tooltip.init({
         appendTo: 'body',
         html: 'this is the tooltip',
@@ -61,6 +63,5 @@
       assert.equal(computedStyle.getPropertyValue('top'), '10px');
     });
   });
-
-}());
+});
 

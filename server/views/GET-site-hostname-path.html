@@ -15,24 +15,40 @@
 <section class="row">
   <article id="overview" class="row-left">
     <h2>Overview</h2>
-    <dl>
-      <dt class="overview-name deemphasize">Total</dt>
-      <dd class="overview-stat">{{ hits.total }}</dd>
-      <dt class="overview-name deemphasize">Today</dt>
-      <dd class="overview-stat">{{ hits.today }}</dd>
-      <dt class="overview-name deemphasize">Period</dt>
-      <dd class="overview-stat">{{ hits.period }}</dd>
-      <dt class="overview-name deemphasize">Unique</dt>
-      <dd class="overview-stat">{{ hits.unique }}</dd>
-      <dt class="overview-name deemphasize">Repeat</dt>
-      <dd class="overview-stat">{{ hits.repeat }}</dd>
-      <dt class="overview-name deemphasize">Exit Rate</dt>
-      <dd class="overview-stat">{{ hits.exitRate }}%</dd>
-      <dt class="overview-name deemphasize">Bounce Rate</dt>
-      <dd class="overview-stat">{{ hits.bounceRate }}%</dd>
-      <dt class="overview-name deemphasize">Median Read Time</dt>
-      <dd class="overview-stat small">{{medianReadTime.hours}}:{{ medianReadTime.minutes }}:{{ medianReadTime.seconds }}</dd>
-    </dl>
+    <ul class="overview">
+      <li>
+        <dt class="overview-name deemphasize">Total</dt>
+        <dd class="overview-stat">{{ hits.total }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Today</dt>
+        <dd class="overview-stat">{{ hits.today }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Period</dt>
+        <dd class="overview-stat">{{ hits.period }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Unique</dt>
+        <dd class="overview-stat">{{ hits.unique }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Repeat</dt>
+        <dd class="overview-stat">{{ hits.repeat }}</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Exit Rate</dt>
+        <dd class="overview-stat">{{ hits.exitRate }}%</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Bounce Rate</dt>
+        <dd class="overview-stat">{{ hits.bounceRate }}%</dd>
+      </li>
+      <li>
+        <dt class="overview-name deemphasize">Median Read Time</dt>
+        <dd class="overview-stat small">{{medianReadTime.hours}}:{{ medianReadTime.minutes }}:{{ medianReadTime.seconds }}</dd>
+      </li>
+    </ul>
 
   </article>
 
