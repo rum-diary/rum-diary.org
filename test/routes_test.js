@@ -15,6 +15,7 @@ const startStop = require('./lib/start-stop');
 var ROUTES = {
   'GET /'                             : 200,
   'GET /index.html'                   : 301,
+  'GET /signup'                       : 200,
   'GET /site'                         : 200,
   'GET /site/localhost'               : 200,
   'GET /site/localhost?start=2013-12-25'
@@ -46,22 +47,22 @@ var ROUTES = {
 
 };
 
-describe('routes module', function() {
-  describe('start', function() {
-    it('starts the server', function(done) {
+describe('routes module', function () {
+  describe('start', function () {
+    it('starts the server', function (done) {
       startStop.start(done);
     });
   });
 
-  describe('request', function() {
+  describe('request', function () {
     for (var key in ROUTES) {
       it(key, respondsWith(key, ROUTES[key]));
     }
   });
 
-  describe('POST /navigation', function() {
-    it('should have CORS `access-control-allow-origin: *` header', function(done) {
-      request.post(baseURL + '/navigation', function(err, response) {
+  describe('POST /navigation', function () {
+    it('should have CORS `access-control-allow-origin: *` header', function (done) {
+      request.post(baseURL + '/navigation', function (err, response) {
         assert.equal(response.statusCode, 200, baseURL);
 
         // CORS is allowed for POST /navigation
@@ -74,20 +75,20 @@ describe('routes module', function() {
     });
   });
 
-  describe('POST /unload', function() {
-    it('should respond with 400 if no uuid sent', function(done) {
-      request.post(baseURL + '/unload', function(err, response) {
+  describe('POST /unload', function () {
+    it('should respond with 400 if no uuid sent', function (done) {
+      request.post(baseURL + '/unload', function (err, response) {
         assert.equal(response.statusCode, 400);
 
         done();
       });
     });
 
-    it('should respond with 200 and CORS headers if valid', function(done) {
+    it('should respond with 200 and CORS headers if valid', function (done) {
       request.post({
         url: baseURL + '/unload',
         json: { uuid: 'the-uuid-to-update' }
-      }, function(err, response) {
+      }, function (err, response) {
         assert.equal(response.statusCode, 200);
 
         // CORS is allowed for POST /unload
@@ -101,9 +102,24 @@ describe('routes module', function() {
     });
   });
 
-  describe('stop', function() {
-    it('stops', function(done) {
-      startStop.stop(function() {
+  describe('POST /signup', function () {
+    it('should respond with a 200 with username and assertion', function (done) {
+      request.post({
+        url: baseURL + '/signup',
+        json: {
+          name: 'Test User',
+          assertion: 'A_fake_assertion'
+        }
+      }, function (err, response) {
+        assert.equal(response.statusCode, 200);
+
+      });
+    });
+  });
+
+  describe('stop', function () {
+    it('stops', function (done) {
+      startStop.stop(function () {
         done();
       });
     });
@@ -111,7 +127,7 @@ describe('routes module', function() {
 });
 
 function respondsWith(key, expectedCode) {
-  return function(done) {
+  return function (done) {
     var parts = key.split(' ');
     var verb = parts[0].toUpperCase();
     var url = baseURL + parts[1];
@@ -120,7 +136,7 @@ function respondsWith(key, expectedCode) {
       followRedirect: false,
       uri: url,
       method: verb,
-    }, function(err, response) {
+    }, function (err, response) {
       assert.equal(response.statusCode, expectedCode);
 
       // CORS is only allowed for POST /navigation
@@ -139,7 +155,7 @@ function testCommonResponseHeaders(response) {
 
   // ensure CSP headers
   assert.equal(response.headers['x-content-security-policy'],
-            "default-src 'self';");
+            "default-src 'self' https://login.persona.org;");
 
   // DENY xframes
   assert.equal(response.headers['x-frame-options'], 'DENY');

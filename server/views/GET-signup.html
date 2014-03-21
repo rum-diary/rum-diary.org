@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}Signup{% endblock %}
+
+{% block headerjs %}
+  <script type="text/javascript" src="https://login.persona.org/include.js"></script>
+{% endblock %}
+
+{% block body %}
+  <form id="signup" method="post" action="/signup">
+    <label for="real_name">Real name</label>
+    <input required type="text" name="name" />
+    <input required type="hidden" name="assertion" />
+    <button>Sign Up</button>
+  </form>
+{% endblock %}

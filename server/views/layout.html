@@ -13,6 +13,8 @@
   {% block inlinecss %}
   {% endblock %}
   </style>
+  {% block headerjs %}
+  {% endblock %}
 </head>
 <body>
   <div id="wrapper">
@@ -42,11 +44,11 @@
       </div>
     </footer>
   </div>
-<script defer src="/include.js" data-tags="experimental,zopfli,cache"></script>
-{% block footerjs %}
-  {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
-  {% endfor %}
-{% endblock %}
+  <script defer src="/include.js" data-tags="zopfli,cache"></script>
+  {% block footerjs %}
+    {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
+    {% endfor %}
+  {% endblock %}
 </body>
 </html>
 

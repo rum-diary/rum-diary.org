@@ -51,20 +51,25 @@ function loadRoute(fileName) {
     req.start = req.dbQuery.start;
     req.end = req.dbQuery.end;
 
-    var promise = route.handler(req, res);
-    if (promise && promise.then) {
-      promise.then(function (templateData) {
-        if (templateData && route.template) {
-          if (templateData.resources && route['js-resources']) {
-            logger.warn('%s: route defines `js-resources`, returned `resources` will be ignored. Pick one.', req.url);
-          }
-          templateData.resources = route['js-resources'];
-          res.render(route.template, templateData);
+    var value = route.handler(req, res);
+    if (value) {
+      if (value.then) {
+        return value.then(render, function(err) {
+          res.send(500);
+          logger.error('%s: %s', fileName, String(err));
+        });
+      }
+      render(value);
+    }
+
+    function render(templateData) {
+      if (templateData && route.template) {
+        if (templateData.resources && route['js-resources']) {
+          logger.warn('%s: route defines `js-resources`, returned `resources` will be ignored. Pick one.', req.url);
         }
-      }, function(err) {
-        res.send(500);
-        logger.error('%s: %s', fileName, String(err));
-      });
+        templateData.resources = route['js-resources'];
+        res.render(route.template, templateData);
+      }
     }
   }
 

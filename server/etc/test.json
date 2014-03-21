@@ -1,5 +1,6 @@
 {
   "env": "test",
-  "static_dir": ""
+  "static_dir": "",
+  "verify_assertion": false
 }
 

@@ -69,6 +69,16 @@ module.exports = {
     format: Boolean,
     'default': true
   },
+  verify_assertion: {
+    doc: 'Whether to verify the assertion',
+    format: Boolean,
+    'default': true
+  },
+  noverify_email: {
+    doc: 'The email address returned by the verifier if verify_assertion is set to false',
+    format: String,
+    'default': 'testuser@testuser.com'
+  },
 
   proc_name: getProcName()
 };

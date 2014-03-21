@@ -25,10 +25,17 @@ app.use(helmet.xframe('deny'));
 if (config.get('ssl')) {
   app.use(helmet.hsts());
 }
-app.use(helmet.csp());
 app.use(helmet.iexss());
 app.use(helmet.contentTypeOptions());
 app.disable('x-powered-by');
+
+app.use(helmet.csp());
+const cspPolicy = {
+  defaultPolicy: {
+    'default-src': ["'self'", "https://login.persona.org"]
+  }
+}
+helmet.csp.policy(cspPolicy);
 
 // Template setup.
 var env = nunjucks.configure(config.get('views_dir'), {
