@@ -2,13 +2,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const clientResources = require('../lib/client-resources');
+const db = require('../lib/db');
 
-exports.path = '/signup';
+exports.path = '/user';
 exports.verb = 'get';
-exports.template = 'GET-signup.html';
-exports['js-resources'] = clientResources('signup.min.js');
 
-exports.handler = function() {
-  return {};
+exports.handler = function (req, res) {
+  return db.user.get({})
+                .then(function (models) {
+                  res.json(models);
+                });
 };

@@ -12,16 +12,23 @@ const siteDefinition = {
   total_hits: {
     type: Number,
     default: 0
+  },
+  admin_users: [ String ],
+  readonly_users: [ String ],
+  // Is a site public
+  is_public: {
+    type: Boolean,
+    default: true
   }
 };
 
 const SiteModel = Object.create(Model);
 SiteModel.init('Site', siteDefinition);
 
-SiteModel.ensureExists = function(hostname) {
+SiteModel.ensureExists = function (hostname) {
   var self = this;
   return this.getOne({ hostname: hostname })
-              .then(function(model) {
+              .then(function (model) {
                 if (model) return model;
 
                 return self.create({
@@ -30,10 +37,10 @@ SiteModel.ensureExists = function(hostname) {
               });
 };
 
-SiteModel.hit = function(hostname) {
+SiteModel.hit = function (hostname) {
   var self = this;
   return this.ensureExists(hostname)
-            .then(function(model) {
+            .then(function (model) {
               model.total_hits++;
               return self.update(model);
             });

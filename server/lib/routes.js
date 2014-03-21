@@ -45,13 +45,13 @@ function loadRoute(fileName) {
    * to the resolver. If the promise fails, the error
    * handler will be called with the error.
    */
-  function handler(req, res) {
+  function handler(req, res, next) {
     // Set up some helpers on the request.
     req.dbQuery = getQuery(req);
     req.start = req.dbQuery.start;
     req.end = req.dbQuery.end;
 
-    var value = route.handler(req, res);
+    var value = route.handler(req, res, next);
     if (value) {
       if (value.then) {
         return value.then(render, function(err) {

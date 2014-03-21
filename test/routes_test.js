@@ -15,7 +15,7 @@ const startStop = require('./lib/start-stop');
 var ROUTES = {
   'GET /'                             : 200,
   'GET /index.html'                   : 301,
-  'GET /signup'                       : 200,
+  'GET /user/new'                     : 200,
   'GET /site'                         : 200,
   'GET /site/localhost'               : 200,
   'GET /site/localhost?start=2013-12-25'
@@ -24,13 +24,6 @@ var ROUTES = {
                                       : 200,
   'GET /site/localhost/performance'   : 200,
   'GET /site/localhost/demographics'  : 200,
-  'GET /site/localhost/all'           : 200,
-  'GET /site/localhost/navigation'    : 200,
-  'GET /site/localhost/navigation/medians'
-                                      : 200,
-  'GET /site/localhost/navigation/distribution'
-                                      : 200,
-  'GET /site/localhost/hits'          : 200,
   'GET /site/localhost/path/index'    : 200,
   'GET /site/localhost/path/some-page/with-more/and-123-digits'
                                       : 200,
@@ -102,10 +95,10 @@ describe('routes module', function () {
     });
   });
 
-  describe('POST /signup', function () {
+  describe('POST /user/new', function () {
     it('should respond with a 200 with username and assertion', function (done) {
       request.post({
-        url: baseURL + '/signup',
+        url: baseURL + '/user/new',
         json: {
           name: 'Test User',
           assertion: 'A_fake_assertion'
