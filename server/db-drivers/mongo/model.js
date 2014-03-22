@@ -4,7 +4,6 @@
 
 // generic model. basic CRUD operations.
 
-const moment = require('moment');
 const Promise = require('bluebird');
 const mongoose = require('mongoose');
 const mongooseTimestamps = require('mongoose-timestamp');
@@ -12,6 +11,7 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
 const reduce = require('../../lib/reduce');
 const logger = require('../../lib/logger');
+const connection = require('../mongo-connection');
 
 
 const GET_FETCH_COUNT_WARNING_THRESHOLD = 500;
@@ -23,10 +23,8 @@ exports.init = function (name, definition) {
 
   schema.plugin(mongooseTimestamps);
 
-  const Model = mongoose.model(name, schema);
-
   this.name = name;
-  this.Model = Model;
+  this.Model = mongoose.model(name, schema);
 };
 
 /**
@@ -226,44 +224,17 @@ exports.getSearchBy = function (searchBy) {
 
 
 exports.createModel = function(data) {
-  var model = new this.Model(data);
-  return model;
+  return new this.Model(data);
 };
 
 function withDatabase(op) {
   return function () {
     var args = [].slice.call(arguments, 0);
     var self = this;
-    return connect().then(function() {
+    return connection.connect().then(function() {
       return op.apply(self, args);
     });
   };
-}
-
-var connectionResolver;
-function connect() {
-  if (connectionResolver) {
-    return connectionResolver.promise;
-  }
-
-  connectionResolver = Promise.defer();
-
-  mongoose.connect('mongodb://localhost/test');
-  var db = mongoose.connection;
-
-  db.on('error', function (err) {
-    logger.error('Error connecting to database: %s', String(err));
-
-    connectionResolver.reject(err);
-  });
-
-  db.once('open', function callback() {
-    logger.info('Connected to database');
-
-    connectionResolver.fulfill();
-  });
-
-  return connectionResolver.promise;
 }
 
 // Return an ObjectId embedded with a given timestamp

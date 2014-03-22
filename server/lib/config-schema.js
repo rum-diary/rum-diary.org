@@ -33,12 +33,6 @@ module.exports = {
     'default': 'production',
     env: 'NODE_ENV'
   },
-  database_driver: {
-    doc: 'Which driver to use for the database',
-    format: ['json', 'mongo'],
-    'default': 'mongo',
-    env: 'DATABASE_DRIVER'
-  },
   views_dir: path.join(__dirname, '..', 'views'),
   static_root: path.join(__dirname, '..', '..', 'client'),
   static_dir: {

@@ -2,12 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const moment = require('moment');
-const mongoose = require('mongoose');
-const Promise = require('bluebird');
-const mongooseTimestamps = require('mongoose-timestamp');
-const Schema = mongoose.Schema;
-
 const logger = require('../lib/logger');
 
 var PageView = require('./mongo/page_view');
@@ -15,17 +9,6 @@ var Site = require('./mongo/site');
 var User = require('./mongo/user');
 var Tags = require('./mongo/tags');
 
-function deprecated(oldName, newName, callback) {
-  return function() {
-    logger.warn('mongo.js->:%s is deprecated, please use %s', oldName, newName);
-    return callback.apply(null, arguments);
-  };
-}
-
-exports.save = deprecated('save', 'pageView.create', PageView.create.bind(PageView));
-exports.get = deprecated('get', 'pageView.get', PageView.get.bind(PageView));
-exports.getStream = deprecated('getStream', 'pageView.getStream', PageView.getStream.bind(PageView));
-exports.getOne = deprecated('getOne', 'pageView.getOne', PageView.getOne.bind(PageView));
 exports.clear = function(done) {
   logger.warn('clearing database');
   return PageView.clear()
@@ -56,8 +39,6 @@ exports.pageView = {
   },
   clear: PageView.clear.bind(PageView)
 };
-
-exports.getByHostname = deprecated('getByHostname', 'pageView.getByHostname', exports.pageView.getByHostname);
 
 
 exports.user = {
