@@ -85,7 +85,7 @@ SessionStore.create().then(function (sessionStore) {
   }));
 
   // Get all of our routes.
-  app.use(routes.middleware);
+  app.use(routes);
 
   // set up cachify before the static middleware to strip off any md5's then
   // serve up the correct gzipped item.

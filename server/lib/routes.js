@@ -5,8 +5,8 @@
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
-const moment = require('moment');
 const corsMiddleware = cors();
+
 const Router = require('express').Router;
 const router = new Router();
 
@@ -32,8 +32,12 @@ function loadRoute(fileName) {
 
   var routePath = path.join(ROUTES_DIR, fileName);
   var route = require(routePath);
+  addRoute(route, router);
+}
 
-  if ( ! (route.path && route.verb)) return;
+// router is passed in for testing.
+function addRoute(route, router) {
+  if ( ! (route.path && route.verb)) return new Error('invalid route');
 
   /*
    * Set up a local handler for generic functionality
@@ -53,13 +57,18 @@ function loadRoute(fileName) {
 
     var value = route.handler(req, res, next);
     if (value) {
-      if (value.then) {
-        return value.then(render, function(err) {
-          res.send(500);
-          logger.error('%s: %s', fileName, String(err));
-        });
+      if (value instanceof Error) {
+        return renderError(value);
+      } else if (value.then) {
+        return value.then(render, renderError);
       }
       render(value);
+    }
+
+    function renderError(err) {
+      var httpStatusCode = err.httpError || 500;
+      logger.error('%s(%s): %s', route.path, httpStatusCode, String(err));
+      res.send(httpStatusCode, err.message);
     }
 
     function render(templateData) {
@@ -80,5 +89,6 @@ function loadRoute(fileName) {
   }
 }
 
-module.exports = router;
-
+module.exports = router.middleware;
+module.exports.loadRoute = loadRoute;
+module.exports.addRoute = addRoute;

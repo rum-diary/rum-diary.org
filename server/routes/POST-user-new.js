@@ -24,17 +24,18 @@ exports.handler = function (req, res) {
         });
       })
      .then(function (existingUser) {
-        if (existingUser) {
-          // TODO sign the user in instead.
-          res.json({ success: false, reason: 'email already exists' });
-        }
+        // just sign the user in.
+        if (existingUser) return;
 
         return db.user.create({
           name: name,
           email: verifiedEmail
         });
       })
-     .then(function (newUser) {
+     .then(function () {
+        // sign the user in, visit their page.
+        req.session.email = verifiedEmail;
+
         res.redirect('/user/' + encodeURIComponent(verifiedEmail));
       });
 };

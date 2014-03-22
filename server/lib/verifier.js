@@ -20,30 +20,28 @@ const NOVERIFY_EMAIL = config.get('noverify_email');
 const AUDIENCE = config.get('hostname');
 
 exports.verify = function (assertion) {
-  var resolver = Promise.defer();
+  return new Promise(function (fulfill, reject) {
+    if (! VERIFY_ASSERTION) {
+      logger.warn('not verifying assertion, returning %s as email', NOVERIFY_EMAIL);
+      fulfill(NOVERIFY_EMAIL);
+    } else {
+      logger.info('verifying assertion: %s', AUDIENCE);
+      verify(assertion, AUDIENCE, function (err, email, response) {
+        if (err) {
+          return verificationFailure(reject, String(err));
+        } else if (response.status === 'failure') {
+          return verificationFailure(reject, response.reason);
+        }
 
-  if (! VERIFY_ASSERTION) {
-    resolver.resolve(NOVERIFY_EMAIL);
-  } else {
-    logger.info('verifying assertion: %s', AUDIENCE);
-    verify(assertion, AUDIENCE, function (err, email, response) {
-      if (err) {
-        return verificationFailure(resolver, String(err));
-      } else if (response.status === 'failure') {
-        return verificationFailure(resolver, response.reason);
-      }
-
-      logger.info('verification successful');
-      resolver.resolve(email);
-    });
-  }
-
-  return resolver.promise;
-
+        logger.info('verification successful');
+        fulfill(email);
+      });
+    }
+  });
 };
 
-function verificationFailure(resolver, reason) {
+function verificationFailure(reject, reason) {
   logger.error('verification error: %s', reason);
-  resolver.reject(reason);
+  reject(reason);
 }
 
