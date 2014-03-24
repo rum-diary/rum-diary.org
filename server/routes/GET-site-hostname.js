@@ -3,8 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const logger = require('../lib/logger');
+const db = require('../lib/db');
 const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
+const httpErrors = require('../lib/http-errors');
 
 exports.path = '/site/:hostname';
 exports.verb = 'get';
@@ -14,65 +16,74 @@ exports['js-resources'] = clientResources('rum-diary.min.js');
 // TODO - add an authentication type here.
 
 exports.handler = function(req) {
-  var queryTags = req.query.tags && req.query.tags.split(',') || [];
 
-  return calculator.calculate({
-     tags: {
-      filter: { hostname: req.dbQuery.hostname },
-      'tags-total-hits': {
-        tags: queryTags
-      },
-      'tags-names': {}
-    },
-    pageView: {
-      filter: req.dbQuery,
-      'hits_per_day': {
-        start: req.start,
-        end: req.end
-      },
-      'hits_per_page': {
-        sort: 'desc',
-        limit: 20
-      },
-      'referrers': {},
-      'unique': {},
-      'returning': {}
-    },
-    site: {
-      filter: { hostname: req.dbQuery.hostname },
-      'sites-total-hits': {}
-    }
-  }).then(function (allResults) {
-    logger.info('%s: elapsed time: %s ms', req.url, allResults.duration);
+  var queryTags;
 
-    var tagResults = allResults.tags;
-    var pageViewResults = allResults.pageView;
-    var siteResults = allResults.site;
+  return db.site.isAuthorizedToView(req.session.email, req.dbQuery.hostname)
+    .then(function (isAuthorized) {
+      if (! isAuthorized) throw httpErrors.UnauthorizedError();
+    })
+    .then(function() {
+      queryTags = req.query.tags && req.query.tags.split(',') || [];
 
-    var totalHits = 0;
-    if (queryTags.length) {
-      totalHits = tagResults['tags-total-hits'];
-    } else {
-      totalHits = siteResults['sites-total-hits'][req.dbQuery.hostname] || 0;
-    }
+      return calculator.calculate({
+         tags: {
+          filter: { hostname: req.dbQuery.hostname },
+          'tags-total-hits': {
+            tags: queryTags
+          },
+          'tags-names': {}
+        },
+        pageView: {
+          filter: req.dbQuery,
+          'hits_per_day': {
+            start: req.start,
+            end: req.end
+          },
+          'hits_per_page': {
+            sort: 'desc',
+            limit: 20
+          },
+          'referrers': {},
+          'unique': {},
+          'returning': {}
+        },
+        site: {
+          filter: { hostname: req.dbQuery.hostname },
+          'sites-total-hits': {}
+        }
+      });
+    }).then(function (allResults) {
+      logger.info('%s: elapsed time: %s ms', req.url, allResults.duration);
 
-    return {
-      root_url: req.url.replace(/\?.*/, ''),
-      hostname: req.params.hostname,
-      pageHitsPerPage: pageViewResults.hits_per_page,
-      pageHitsPerDay: pageViewResults.hits_per_day.__all,
-      referrers: pageViewResults.referrers.by_count.slice(0, 20),
-      startDate: req.start.format('MMM DD'),
-      endDate: req.end.format('MMM DD'),
-      hits: {
-        total: totalHits,
-        period: pageViewResults.hits_per_page[0].hits,
-        today: pageViewResults.hits_per_day.__all[pageViewResults.hits_per_day.__all.length - 1].hits,
-        unique: pageViewResults.unique,
-        repeat: pageViewResults.returning
-      },
-      tags: tagResults['tags-names']
-    };
-  });
+      var tagResults = allResults.tags;
+      var pageViewResults = allResults.pageView;
+      var siteResults = allResults.site;
+
+      var totalHits = 0;
+      if (queryTags.length) {
+        totalHits = tagResults['tags-total-hits'];
+      } else {
+        totalHits = siteResults['sites-total-hits'][req.dbQuery.hostname] || 0;
+      }
+
+      return {
+        root_url: req.url.replace(/\?.*/, ''),
+        hostname: req.params.hostname,
+        pageHitsPerPage: pageViewResults.hits_per_page,
+        pageHitsPerDay: pageViewResults.hits_per_day.__all,
+        referrers: pageViewResults.referrers.by_count.slice(0, 20),
+        startDate: req.start.format('MMM DD'),
+        endDate: req.end.format('MMM DD'),
+        hits: {
+          total: totalHits,
+          period: pageViewResults.hits_per_page[0].hits,
+          today: pageViewResults.hits_per_day.__all[pageViewResults.hits_per_day.__all.length - 1].hits,
+          unique: pageViewResults.unique,
+          repeat: pageViewResults.returning
+        },
+        tags: tagResults['tags-names']
+      };
+    });
 };
 
