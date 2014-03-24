@@ -67,6 +67,9 @@ SessionStore.create().then(function (sessionStore) {
   // We need to get info out of the request bodies sometimes.
   app.use(express.bodyParser());
 
+  // allow PUT/DELETE methods via POST in HTML forms.
+  app.use(express.methodOverride());
+
   // Send all express logs to our logger.
   app.use(express.logger({
     format: 'tiny',

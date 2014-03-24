@@ -18,6 +18,9 @@ const DEPENDENCIES = {
   ],
   'signup.min.js': [
     '/js/signup.bundle.js'
+  ],
+  'signin.min.js': [
+    '/js/signin.bundle.js'
   ]
 };
 
