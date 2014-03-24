@@ -5,7 +5,6 @@
 // Site model
 
 const Model = require('./model');
-const Schema = require('mongoose').Schema;
 
 const siteDefinition = {
   hostname: String,
@@ -44,6 +43,20 @@ SiteModel.hit = function (hostname) {
               model.total_hits++;
               return self.update(model);
             });
+};
+
+/**
+ * Check if a user is authorized to view a page.
+ */
+SiteModel.isAuthorizedToView = function (email, hostname) {
+  return this.getOne({ hostname: hostname })
+              .then(function (model) {
+                if (! model) return false;
+
+                if (model.readonly_users.indexOf(email) > -1) return true;
+                if (model.admin_users.indexOf(email) > -1) return true;
+                return false;
+              });
 };
 
 module.exports = SiteModel;

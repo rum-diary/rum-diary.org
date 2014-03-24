@@ -23,11 +23,11 @@ exports.handler = function (req, res) {
       })
      .then(function (existingUser) {
         // uh oh, user does not exist.
-        if (! existingUser) return httpErrors.Forbidden();
+        if (! existingUser) return httpErrors.ForbiddenError();
 
-        // sign the user in, visit their page.
+        // sign the user in, visit their list of sites.
         req.session.email = existingUser.email;
 
-        res.redirect('/user/' + encodeURIComponent(existingUser.email));
+        res.redirect('/site/');
       });
 };

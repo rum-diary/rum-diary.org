@@ -24,6 +24,7 @@ exports.handler = function (req, res, next) {
     email: email
   })
   .then(function (user) {
+    console.error('user: %s, %s', JSON.stringify(user), typeof user);
     if (! user) {
       return httpErrors.NotFoundError();
     }

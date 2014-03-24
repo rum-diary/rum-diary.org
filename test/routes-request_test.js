@@ -99,10 +99,10 @@ describe('routes module', function () {
     });
   });
 
-  describe('POST /user/new', function () {
+  describe('POST /user', function () {
     it('with real name and assertion should respond with a 302', function (done) {
       request.post({
-        url: baseURL + '/user/new',
+        url: baseURL + '/user',
         json: {
           name: 'Test User',
           assertion: 'A_fake_assertion'

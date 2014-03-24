@@ -11,6 +11,8 @@ exports.verb = 'get';
 exports.template = 'GET-site-hostname.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
 
+// TODO - add an authentication type here.
+
 exports.handler = function(req) {
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
 

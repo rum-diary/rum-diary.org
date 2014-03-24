@@ -61,7 +61,8 @@ exports.site = {
   calculate: Site.calculate.bind(Site),
   clear: Site.clear.bind(Site),
   hit: Site.hit.bind(Site),
-  ensureExists: Site.ensureExists.bind(Site)
+  ensureExists: Site.ensureExists.bind(Site),
+  isAuthorizedToView: Site.isAuthorizedToView.bind(Site)
 };
 
 exports.tags = {

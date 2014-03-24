@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Promise = require('bluebird');
 const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
@@ -55,15 +56,18 @@ function addRoute(route, router) {
     req.start = req.dbQuery.start;
     req.end = req.dbQuery.end;
 
-    var value = route.handler(req, res, next);
-    if (value) {
-      if (value instanceof Error) {
-        return renderError(value);
-      } else if (value.then) {
-        return value.then(render, renderError);
+    Promise.try(function () {
+      return route.handler(req, res, next);
+    }).then(function (value) {
+      if (value) {
+        if (value instanceof Error) {
+          // we are in a promise, let the promise's error handler
+          // take care of the error state.
+          throw value;
+        }
+        render(value);
       }
-      render(value);
-    }
+    }).catch(renderError);
 
     function renderError(err) {
       var httpStatusCode = err.httpError || 500;

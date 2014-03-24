@@ -4,7 +4,6 @@
 
 /*global describe, beforeEach, afterEach, it*/
 
-const mocha = require('mocha');
 const assert = require('chai').assert;
 
 const db = require('../../server/lib/db');
@@ -112,6 +111,43 @@ describe('database', function () {
             assert.equal(sites[0].total_hits, 2);
             done();
           }, fail);
+      });
+    });
+
+    describe('isAuthorizedToView', function () {
+      it('should return false if user is not authorized', function (done) {
+        site.create({
+          hostname: 'testsite.com'
+        }).then(function () {
+          return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
+        }).then(function (isAuthorized) {
+          assert.isFalse(isAuthorized);
+          done();
+        }, fail);
+      });
+
+      it('should return true if user is a readonly user', function (done) {
+        site.create({
+          hostname: 'testsite.com',
+          readonly_users: ['testuser@testuser.com'],
+        }).then(function () {
+          return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
+        }).then(function (isAuthorized) {
+          assert.isTrue(isAuthorized);
+          done();
+        }, fail);
+      });
+
+      it('should return true if user is an admin user', function (done) {
+        site.create({
+          hostname: 'testsite.com',
+          admin_users: ['testuser@testuser.com'],
+        }).then(function () {
+          return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
+        }).then(function (isAuthorized) {
+          assert.isTrue(isAuthorized);
+          done();
+        }, fail);
       });
     });
   });

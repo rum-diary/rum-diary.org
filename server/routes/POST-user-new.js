@@ -5,7 +5,7 @@
 const db = require('../lib/db');
 const verifier = require('../lib/verifier');
 
-exports.path = '/user/new';
+exports.path = '/user';
 exports.verb = 'post';
 
 exports.handler = function (req, res) {

@@ -4,7 +4,7 @@
   "description": "web site real user metrics with ethics",
   "scripts": {
     "start": "scripts/run_locally.js",
-    "test": "DATABASE_DRIVER=mongo CONFIG_FILES=./server/etc/local.json,./server/etc/test.json mocha test/"
+    "test": "DATABASE_DRIVER=mongo CONFIG_FILES=./server/etc/local.json,./server/etc/test.json mocha --recursive test/"
   },
   "author": "Shane Tomlinson <shane@shanetomlinson.com>",
   "license": "MPL 2.0",

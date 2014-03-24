@@ -25,30 +25,17 @@ exports.handler = function (req, res, next) {
 
     userModel = user;
 
-    return db.site.getOne({
-      hostname: hostname
-    });
+    // create site if it does not already exist.
+    return db.site.ensureExists(hostname);
   })
   .then(function (site) {
-    if (! site) {
-      // site doesn't exist, create it and be done.
-
-      logger.info('create new site: %s', hostname);
-      return db.site.create({
-        hostname: hostname,
-        admin_users: [ email ]
-      });
-    } else {
-      // add user to existing site, if not already.
-      logger.info('existing site: %s', hostname);
-      if (site.admin_users.indexOf(email) === -1) {
-        logger.info('add user to existing site: %s', hostname);
-        site.admin_users.push(email);
-        return db.site.update(site);
-      }
+    if (site.admin_users.indexOf(email) === -1) {
+      site.admin_users.push(email);
+      return db.site.update(site);
     }
   })
   .then(function () {
+    // TODO - this should probably be based on the referrer.
     res.redirect('/user/' + encodeURIComponent(email));
   });
 };
