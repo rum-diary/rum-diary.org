@@ -75,8 +75,16 @@ function addRoute(route, router) {
       res.send(httpStatusCode, err.message);
     }
 
+    // XXX Consider moving rendering functions to their own middleware.
     function render(templateData) {
-      if (templateData && route.template) {
+      templateData = templateData || {};
+      // XXX This should probably be somewhere else,
+      // perhaps in its own middleware
+      if (! templateData.email && req.session.email) {
+        templateData.email = req.session.email;
+      }
+
+      if (route.template) {
         if (templateData.resources && route['js-resources']) {
           logger.warn('%s: route defines `js-resources`, returned `resources` will be ignored. Pick one.', req.url);
         }

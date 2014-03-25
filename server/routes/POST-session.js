@@ -28,6 +28,6 @@ exports.handler = function (req, res) {
         // sign the user in, visit their list of sites.
         req.session.email = existingUser.email;
 
-        res.redirect('/site/');
+        res.redirect('/site');
       });
 };

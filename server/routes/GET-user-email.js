@@ -17,22 +17,20 @@ exports.handler = function (req, res, next) {
   if (email === 'new') return next();
 
   if (! isUserAuthorized(req)) {
-    return httpErrors.ForbiddenError();
+    throw httpErrors.ForbiddenError();
   }
 
   return db.user.getOne({
     email: email
   })
   .then(function (user) {
-    console.error('user: %s, %s', JSON.stringify(user), typeof user);
     if (! user) {
-      return httpErrors.NotFoundError();
+      throw httpErrors.NotFoundError();
     }
 
     return db.site.get({
       admin_users: email
-    })
-    .then(function(models) {
+    }).then(function(models) {
       user.sites = models;
       return user;
     });

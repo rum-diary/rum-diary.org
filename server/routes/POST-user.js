@@ -36,6 +36,6 @@ exports.handler = function (req, res) {
         // sign the user in, visit their page.
         req.session.email = verifiedEmail;
 
-        res.redirect('/user/' + encodeURIComponent(verifiedEmail));
+        res.redirect('/site');
       });
 };

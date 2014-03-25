@@ -5,6 +5,7 @@
 const db = require('../lib/db');
 const logger = require('../lib/logger');
 const clientResources = require('../lib/client-resources');
+const httpErrors = require('../lib/http-errors');
 
 exports.path = '/user/:email/site';
 exports.verb = 'post';
@@ -20,7 +21,7 @@ exports.handler = function (req, res, next) {
   })
   .then(function (user) {
     if (! user) {
-      return res.send(404);
+      throw httpErrors.NotFoundError();
     }
 
     userModel = user;
@@ -35,7 +36,7 @@ exports.handler = function (req, res, next) {
     }
   })
   .then(function () {
-    // TODO - this should probably be based on the referrer.
-    res.redirect('/user/' + encodeURIComponent(email));
+    // go back to the original page.
+    res.redirect(req.get('referrer'));
   });
 };
