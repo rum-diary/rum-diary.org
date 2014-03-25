@@ -15,35 +15,69 @@
   //    the assertion into the form.
   // 3) Sign the user out of Persona, then submit the form to the server.
 
-  // Immediately sign out upon receiving the assertion. When onlogout
-  // is invoked, re-submit the form.
-  navigator.id.watch({
-    onlogout: function () {
-      if (isFormValid()) {
-        DOMinator('form').nth(0).submit();
-      }
-    },
-    onlogin: function (assertion) {
-      if (! assertion) return;
+  DOMinator('#signin').bindEvent('submit', onSignInSubmit);
 
-      DOMinator('#signin').unbindEvent('submit', onSubmit);
-      DOMinator('[name=assertion]').inner(assertion);
-      navigator.id.logout();
-    }
-  });
-
-  DOMinator('#signin').bindEvent('submit', onSubmit);
-
-  function onSubmit(event) {
+  function onSignInSubmit(event) {
     // no assertion available, request one then re-submit the form.
     event.preventDefault();
+
+    // Immediately sign out upon receiving the assertion. When onlogout
+    // is invoked, re-submit the form.
+    navigator.id.watch({
+      onlogout: function () {
+        if (isSignInFormValid()) {
+          DOMinator('#signin').nth(0).submit();
+        }
+      },
+      onlogin: function (assertion) {
+        if (! assertion) return;
+
+        DOMinator('#signin').unbindEvent('submit', onSignInSubmit);
+        DOMinator('#signin [name=assertion]').inner(assertion);
+        navigator.id.logout();
+      }
+    });
+
     navigator.id.request({
       siteName: 'RUM Diary'
     });
   }
 
-  function isFormValid() {
-    return !!DOMinator('[name=assertion]').inner();
+  function isSignInFormValid() {
+    return !!DOMinator('#signin [name=assertion]').inner();
+  }
+
+  DOMinator('#signup').bindEvent('submit', onSignUpSubmit);
+
+  function onSignUpSubmit(event) {
+    // no assertion available, request one then re-submit the form.
+    event.preventDefault();
+
+    // Immediately sign out upon receiving the assertion. When onlogout
+    // is invoked, re-submit the form.
+    navigator.id.watch({
+      onlogout: function () {
+        if (isSignUpFormValid()) {
+          DOMinator('#signup').nth(0).submit();
+        }
+      },
+      onlogin: function (assertion) {
+        if (! assertion) return;
+
+        DOMinator('#signup').unbindEvent('submit', onSignUpSubmit);
+        DOMinator('#signup [name=assertion]').inner(assertion);
+        navigator.id.logout();
+      }
+    });
+
+    navigator.id.request({
+      siteName: 'RUM Diary'
+    });
+  }
+
+  function isSignUpFormValid() {
+    return !!(DOMinator('#signup [name=name]').inner() &&
+              DOMinator('#signup [name=assertion]').inner());
   }
 }());
 

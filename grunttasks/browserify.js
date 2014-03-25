@@ -15,7 +15,6 @@ module.exports = function (grunt) {
     cwd: appJSRoot,
     files: {
       'app.bundle.js': 'start.js',
-      'signup.bundle.js': 'pages/signup.js',
       'signin.bundle.js': 'pages/signin.js'
     }
   };

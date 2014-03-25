@@ -16,9 +16,6 @@ const DEPENDENCIES = {
     '/js/bower_components/d3/d3.js',
     '/js/app.bundle.js'
   ],
-  'signup.min.js': [
-    '/js/signup.bundle.js'
-  ],
   'signin.min.js': [
     '/js/signin.bundle.js'
   ]
