@@ -18,12 +18,11 @@ module.exports = function (grunt) {
     'dist': {
       'files': [
         {
-          'src': [STATIC_ROOT + '/dist/include.js'],
-          'dest': STATIC_ROOT + '/dist/include.js.gz'
-        },
-        {
-          'src': [STATIC_ROOT + '/dist/rum-diary.min.js'],
-          'dest': STATIC_ROOT + '/dist/rum-diary.min.js.gz'
+          'cwd': STATIC_ROOT,
+          'src': ['dist/**/*.js'],
+          'dest': STATIC_ROOT,
+          'expand': true,
+          'ext': '.js.gz'
         },
         {
           'cwd': STATIC_ROOT,

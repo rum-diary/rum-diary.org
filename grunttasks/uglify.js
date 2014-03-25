@@ -26,7 +26,8 @@ module.exports = function (grunt) {
       dist: {
         files: {
           '<%= app.dist %>/include.js': [ '<%= app.src %>/include.js' ],
-          '<%= app.dist %>/rum-diary.min.js': getClientDeps('rum-diary.min.js')
+          '<%= app.dist %>/rum-diary.min.js': getClientDeps('rum-diary.min.js'),
+          '<%= app.dist %>/signin.min.js': getClientDeps('signin.min.js')
         }
       }
     });
