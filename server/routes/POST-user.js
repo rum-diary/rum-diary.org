@@ -7,6 +7,7 @@ const verifier = require('../lib/verifier');
 
 exports.path = '/user';
 exports.verb = 'post';
+exports.authorization = require('../lib/page-authorization').NOT_AUTHENTICATED;
 
 exports.handler = function (req, res) {
   const name = req.body.name;

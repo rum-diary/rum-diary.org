@@ -6,22 +6,22 @@
 
 const logger = require('../lib/logger');
 const calculator = require('../lib/calculator');
-const httpError = require('../lib/http-errors');
-
 
 exports.path = '/site';
 exports.verb = 'get';
 exports.template = 'GET-site-index.html';
+exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 
 exports.handler = function (req, res) {
   var email = req.session.email;
-  if (! email) return [];//httpError.UnauthorizedError();
 
   return calculator.calculate({
     site: {
       filter: {
-        // TODO add a readonly user filter.
-        admin_users: email
+        $or: [
+          { admin_users: email },
+          { readonly_users: email }
+        ]
       },
       'site:hostname': {
         sort: 'asc'

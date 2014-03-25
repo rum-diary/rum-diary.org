@@ -2,18 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const moment = require('moment');
-const Promise = require('bluebird');
-
 const db = require('../lib/db');
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
-const logger = require('../lib/logger');
 
 exports.path = '/site/:hostname/performance';
 exports.verb = 'get';
 exports.template = 'GET-site-hostname-performance.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
+exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {
   var statName = 'domContentLoadedEventEnd';

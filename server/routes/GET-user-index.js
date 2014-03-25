@@ -10,6 +10,7 @@ exports.path = '/user';
 exports.verb = 'get';
 exports.template = 'GET-user-index.html';
 exports['js-resources'] = clientResources('signin.min.js');
+exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function (req, res) {
   return {};

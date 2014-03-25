@@ -9,6 +9,7 @@ const httpErrors = require('../lib/http-errors');
 
 exports.path = '/user/:email/site';
 exports.verb = 'post';
+exports.authorization = require('../lib/page-authorization').IS_USER;
 
 exports.handler = function (req, res, next) {
   var email = req.params.email;

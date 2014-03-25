@@ -9,6 +9,7 @@ const httpErrors = require('../lib/http-errors');
 exports.path = '/unload';
 exports.verb = 'post';
 exports.enable_cors = true;
+exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function (req, res) {
   var data = req.body;

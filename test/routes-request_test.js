@@ -19,28 +19,28 @@ const startStop = require('./lib/start-stop');
 var ROUTES = {
   'GET /'                             : 200,
   'GET /index.html'                   : 301,
-  'GET /user/new'                     : 200,
-  'GET /site'                         : 200,
-  'GET /site/localhost'               : 200,
+  'GET /user'                         : 200,
+  'GET /site'                         : 401,
+  'GET /site/localhost'               : 401,
   'GET /site/localhost?start=2013-12-25'
-                                      : 200,
+                                      : 401,
   'GET /site/localhost?start=2013-12-25&end=2014-01-05'
-                                      : 200,
-  'GET /site/localhost/performance'   : 200,
-  'GET /site/localhost/demographics'  : 200,
-  'GET /site/localhost/path/index'    : 200,
+                                      : 401,
+  'GET /site/localhost/performance'   : 401,
+  'GET /site/localhost/demographics'  : 401,
+  'GET /site/localhost/path/index'    : 401,
   'GET /site/localhost/path/some-page/with-more/and-123-digits'
-                                      : 200,
+                                      : 401,
   'GET /site/localhost/path/trailing-slash/'
-                                      : 200,
+                                      : 401,
   'GET /site/localhost/path/123'
-                                      : 200,
+                                      : 401,
   'GET /site/shanetomlinson.com/path/2013/testing-javascript-frontend-part-1-anti-patterns-and-fixes/'
-                                      : 200,
+                                      : 401,
   'GET /site/www.aframejs.com/path/tutorial.html'
-                                      : 200,
+                                      : 401,
   'GET /site/connect-fonts.org/path/families'
-                                      : 200
+                                      : 401
 
 };
 
@@ -110,7 +110,7 @@ describe('routes module', function () {
       }, function (err, response) {
         // redirect user to their management page.
         assert.equal(response.statusCode, 302);
-        assert.equal(response.headers.location, '/user/testuser%40testuser.com');
+        assert.equal(response.headers.location, '/site');
         done();
       });
     });

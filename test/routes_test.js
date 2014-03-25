@@ -18,6 +18,9 @@ var RequestMock = {
   query: {},
   params: {
     hostname: 'testuser.com'
+  },
+  session: {
+    email: 'testuser@testuser.com'
   }
 };
 

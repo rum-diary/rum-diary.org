@@ -10,15 +10,12 @@ exports.path = '/user/:email';
 exports.verb = 'get';
 exports.template = 'GET-user-email.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
+exports.authorization = require('../lib/page-authorization').IS_USER;
 
 exports.handler = function (req, res, next) {
   var email = decodeURIComponent(req.params.email);
 
   if (email === 'new') return next();
-
-  if (! isUserAuthorized(req)) {
-    throw httpErrors.ForbiddenError();
-  }
 
   return db.user.getOne({
     email: email
@@ -36,8 +33,3 @@ exports.handler = function (req, res, next) {
     });
   });
 };
-
-function isUserAuthorized(req) {
-  var email = decodeURIComponent(req.params.email);
-  return req.session.email === email;
-}

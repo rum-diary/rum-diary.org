@@ -42,21 +42,32 @@ function addRoute(route, router) {
 
   /*
    * Set up a local handler for generic functionality
-   * such as template rendering and error logging/display.
-   * A route's `handler` function must return a promise.
+   * such as authorization, template rendering
+   * and error logging/display. A route's `handler` function
+   * should return a value or a promise.
    *
-   * If the promise resolves and the route has a template,
-   * the template will be written with the data passed
-   * to the resolver. If the promise fails, the error
-   * handler will be called with the error.
+   * If the handler promise resolves and the route
+   * has a template, the template will be written
+   * with the resolved data. If the promise fails,
+   * the error handler will be called with the error.
    */
   function handler(req, res, next) {
+    if (route.setParams) {
+      route.setParams(req);
+    }
+
     // Set up some helpers on the request.
     req.dbQuery = getQuery(req);
     req.start = req.dbQuery.start;
     req.end = req.dbQuery.end;
 
     Promise.try(function () {
+      if (! route.authorization) {
+        logger.warn('no authorization function set for: `%s`', req.url);
+      } else {
+        return route.authorization(req);
+      }
+    }).then(function() {
       return route.handler(req, res, next);
     }).then(function (value) {
       if (value) {
@@ -71,7 +82,7 @@ function addRoute(route, router) {
 
     function renderError(err) {
       var httpStatusCode = err.httpError || 500;
-      logger.error('%s(%s): %s', route.path, httpStatusCode, String(err));
+      logger.error('%s(%s): %s', req.url, httpStatusCode, String(err));
       res.send(httpStatusCode, err.message);
     }
 

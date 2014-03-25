@@ -2,25 +2,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const logger = require('../lib/logger');
 const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
-exports.path = /\/site\/([\w\d][\w\d\-]*(?:\.[\w\d][\w\d\-]*)*)\/path\/(.*)?$/;
 exports.verb = 'get';
+exports.path = /\/site\/([\w\d][\w\d\-]*(?:\.[\w\d][\w\d\-]*)*)\/path\/(.*)?$/;
+
+// Convert from the above regexp to named params
+exports.setParams = function (req) {
+  req.params.hostname = req.params[0];
+  req.params.path = req.params[1] || 'index';
+
+  if ( ! /^\//.test(req.params.path)) {
+    req.params.path = '/' + req.params.path;
+  }
+};
+
 exports.template = 'GET-site-hostname-path.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
+exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {
-  var hostname = req.params[0];
-  var path = req.params[1] || 'index';
-  logger.info('get information for %s/%s', hostname, path);
+  var hostname = req.params.hostname;
+  var path = req.params.path;
 
-  if ( ! /^\//.test(path)) {
-    path = '/' + path;
-  }
-
-  req.dbQuery.hostname = hostname;
   req.dbQuery.path = path;
 
   return calculator.calculate({

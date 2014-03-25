@@ -10,6 +10,7 @@ const httpErrors = require('../lib/http-errors');
 
 exports.path = '/session';
 exports.verb = 'post';
+exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function (req, res) {
   const assertion = req.body.assertion;

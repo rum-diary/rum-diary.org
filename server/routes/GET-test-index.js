@@ -14,6 +14,7 @@ logger.info('woohoo! we are testing!');
 
 exports.path = '/tests/(?:index\.html)?';
 exports.verb = 'get';
+exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function(req, res) {
   res.render('GET-test-index.html', {
