@@ -20,6 +20,7 @@ var ROUTES = {
   'GET /'                             : 200,
   'GET /index.html'                   : 301,
   'GET /user'                         : 200,
+  'GET /welcome'                      : 401,
   'GET /site'                         : 401,
   'GET /site/localhost'               : 401,
   'GET /site/localhost?start=2013-12-25'
@@ -108,9 +109,9 @@ describe('routes module', function () {
           assertion: 'A_fake_assertion'
         }
       }, function (err, response) {
-        // redirect user to their management page.
+        // redirect user to the welcome screen.
         assert.equal(response.statusCode, 302);
-        assert.equal(response.headers.location, '/site');
+        assert.equal(response.headers.location, '/welcome');
         done();
       });
     });

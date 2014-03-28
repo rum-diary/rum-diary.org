@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}Welcome to RUM Diary!{% endblock %}
+
+{% block body %}
+  <p>
+    Welcome to RUM Diary!
+  </p>
+
+  </p>
+    Add the following snippet to the <code>HEAD</code> element of <code>{{ hostname }}</code>
+    to start collecting Real User Metrics:
+
+    <pre>
+      <code>
+        &lt;script src="https://{{ rum_diary_hostname }}/include.js" async /&gt;
+      </code>
+    </pre>
+  </p>
+
+
+  <a href="/site/{{ hostname }}">Done, I want to view some stats!</a>
+
+{% endblock %}
+
+
