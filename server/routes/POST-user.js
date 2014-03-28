@@ -11,13 +11,14 @@ exports.authorization = require('../lib/page-authorization').NOT_AUTHENTICATED;
 
 exports.handler = function (req, res) {
   const name = req.body.name;
+  const hostname = req.body.hostname;
   const assertion = req.body.assertion;
 
-  var verifiedEmail;
+  var email;
 
   return verifier.verify(assertion)
-     .then(function (email) {
-        verifiedEmail = email;
+     .then(function (_email) {
+        email = _email;
 
         // Check if user already exists.
         return db.user.getOne({
@@ -30,13 +31,26 @@ exports.handler = function (req, res) {
 
         return db.user.create({
           name: name,
-          email: verifiedEmail
+          email: email
         });
       })
      .then(function () {
+        // create site to track if it does not already exist.
+        return db.site.ensureExists(hostname);
+      })
+     .then(function (site) {
+        // add user to admin_users.
+        if (site.admin_users.indexOf(email) === -1) {
+          site.admin_users.push(email);
+          return db.site.update(site);
+        }
+      })
+     .then(function () {
         // sign the user in, visit their page.
-        req.session.email = verifiedEmail;
+        req.session.email = email;
+        req.session.name = name;
+        req.session.hostname = hostname;
 
-        res.redirect('/site');
+        res.redirect('/welcome');
       });
 };
