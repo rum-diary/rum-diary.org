@@ -17,89 +17,115 @@ const logger = require('./lib/logger');
 const routes = require('./lib/routes.js');
 const ssl = require('./lib/ssl');
 
+const SessionStore = require('./lib/session-store');
+
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
-const app = express();
 
-app.use(helmet.xframe('deny'));
-if (config.get('ssl')) {
-  app.use(helmet.hsts());
-}
-app.use(helmet.csp());
-app.use(helmet.iexss());
-app.use(helmet.contentTypeOptions());
-app.disable('x-powered-by');
 
-// Template setup.
-var env = nunjucks.configure(config.get('views_dir'), {
-  autoescape: true,
-  express: app
-});
+SessionStore.create().then(function (sessionStore) {
+  const app = express();
 
-// sets up a filter to use in the templates that allows for cachifying.
-env.addFilter('cachify', function(str) {
-  if (config.get('strong_http_caching')) return cachify.cachify(str);
-  return str;
-});
+  app.use(express.cookieParser());
 
-// We need to get info out of the request bodies sometimes.
-app.use(express.bodyParser());
+  app.use(express.session({
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24  // 24 hours in milliseconds
+    },
+    secret: 'wild and crazy cats',
+    store: sessionStore
+  }));
 
-// Send all express logs to our logger.
-app.use(express.logger({
-  format: 'tiny',
-  stream: {
-    write: function(x) {
-      logger.info(typeof x === 'string' ? x.trim() : x);
-    }
+  app.use(helmet.xframe('deny'));
+  if (config.get('ssl')) {
+    app.use(helmet.hsts());
   }
-}));
+  app.use(helmet.iexss());
+  app.use(helmet.contentTypeOptions());
+  app.disable('x-powered-by');
 
-app.use(connect_fonts.setup({
-  fonts: [ connect_fonts_vera_sans ],
-  allow_origin: config.get('hostname'),
-  maxage: 180 * 24 * 60 * 60 * 1000,   // 180 days
-  compress: true
-}));
+  app.use(helmet.csp());
+  const cspPolicy = {
+    defaultPolicy: {
+      'default-src': ['\'self\'', 'https://login.persona.org']
+    }
+  };
+  helmet.csp.policy(cspPolicy);
 
-// Get all of our routes.
-app.use(routes.middleware);
+  // Template setup.
+  var env = nunjucks.configure(config.get('views_dir'), {
+    autoescape: true,
+    express: app
+  });
 
-// set up cachify before the static middleware to strip off any md5's then
-// serve up the correct gzipped item.
-app.use(cachify.setup({}, {
-  root: STATIC_ROOT
-}));
+  // sets up a filter to use in the templates that allows for cachifying.
+  env.addFilter('cachify', function(str) {
+    if (config.get('strong_http_caching')) return cachify.cachify(str);
+    return str;
+  });
 
-// Static middleware is last.
-app.use(gzip_static(STATIC_ROOT, { force: true }));
+  // We need to get info out of the request bodies sometimes.
+  app.use(express.bodyParser());
+
+  // allow PUT/DELETE methods via POST in HTML forms.
+  app.use(express.methodOverride());
+
+  // Send all express logs to our logger.
+  app.use(express.logger({
+    format: 'tiny',
+    stream: {
+      write: function(x) {
+        logger.info(typeof x === 'string' ? x.trim() : x);
+      }
+    }
+  }));
+
+  app.use(connect_fonts.setup({
+    fonts: [ connect_fonts_vera_sans ],
+    allow_origin: config.get('hostname'),
+    maxage: 180 * 24 * 60 * 60 * 1000,   // 180 days
+    compress: true
+  }));
+
+  // Get all of our routes.
+  app.use(routes);
+
+  // set up cachify before the static middleware to strip off any md5's then
+  // serve up the correct gzipped item.
+  app.use(cachify.setup({}, {
+    root: STATIC_ROOT
+  }));
+
+  // Static middleware is last.
+  app.use(gzip_static(STATIC_ROOT, { force: true }));
 
 
-// Set up SPDY.
-var spdyOptions = {
-  key: ssl.getKey(),
-  cert: ssl.getCert(),
-  ssl: config.get('ssl'),
-  plain: true
-};
+  // Set up SPDY.
+  var spdyOptions = {
+    key: ssl.getKey(),
+    cert: ssl.getCert(),
+    ssl: config.get('ssl'),
+    plain: true
+  };
 
-const HTTPS_PORT = config.get('https_port');
-spdy.createServer(spdyOptions, app).listen(HTTPS_PORT, function() {
-  logger.info('https listening on port', HTTPS_PORT);
-});
+  const HTTPS_PORT = config.get('https_port');
+  spdy.createServer(spdyOptions, app).listen(HTTPS_PORT, function() {
+    logger.info('https listening on port', HTTPS_PORT);
+  });
 
-// set up http redirect. Put this on its own process perhaps?
-const HTTP_PORT = config.get('http_port');
-const http =  express();
-http.disable('x-powered-by');
+  // set up http redirect. Put this on its own process perhaps?
+  const HTTP_PORT = config.get('http_port');
+  const http =  express();
+  http.disable('x-powered-by');
 
-// allow http protocol for local testing.
-const protocol = config.get('ssl') ? 'https://' : 'http://';
-const redirectTo = protocol + config.get('hostname') + (HTTPS_PORT !== 443 ? ':' + HTTPS_PORT : '');
-http.get('*',function(req,res){
-  res.redirect(301, redirectTo + req.url)
-})
+  // allow http protocol for local testing.
+  const protocol = config.get('ssl') ? 'https://' : 'http://';
+  const redirectTo = protocol + config.get('hostname') + (HTTPS_PORT !== 443 ? ':' + HTTPS_PORT : '');
+  http.get('*',function(req, res){
+    res.redirect(301, redirectTo + req.url);
+  });
 
-http.listen(HTTP_PORT, function() {
-  logger.info('http listening on port', HTTP_PORT);
+  http.listen(HTTP_PORT, function() {
+    logger.info('http listening on port', HTTP_PORT);
+  });
 });

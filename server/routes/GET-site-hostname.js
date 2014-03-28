@@ -3,15 +3,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const logger = require('../lib/logger');
+const db = require('../lib/db');
 const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
+const httpErrors = require('../lib/http-errors');
 
 exports.path = '/site/:hostname';
 exports.verb = 'get';
 exports.template = 'GET-site-hostname.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
+exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
+
+// TODO - add an authentication type here.
 
 exports.handler = function(req) {
+
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
 
   return calculator.calculate({

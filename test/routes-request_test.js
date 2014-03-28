@@ -1,0 +1,166 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/**
+ * Test the routes by making http requests.
+ */
+
+const mocha = require('mocha');
+const assert = require('chai').assert;
+const request = require('request');
+
+const config = require('../server/lib/config');
+const baseURL = 'http://localhost:' + config.get('https_port');
+
+
+const startStop = require('./lib/start-stop');
+
+var ROUTES = {
+  'GET /'                             : 200,
+  'GET /index.html'                   : 301,
+  'GET /user'                         : 200,
+  'GET /site'                         : 401,
+  'GET /site/localhost'               : 401,
+  'GET /site/localhost?start=2013-12-25'
+                                      : 401,
+  'GET /site/localhost?start=2013-12-25&end=2014-01-05'
+                                      : 401,
+  'GET /site/localhost/performance'   : 401,
+  'GET /site/localhost/demographics'  : 401,
+  'GET /site/localhost/path/index'    : 401,
+  'GET /site/localhost/path/some-page/with-more/and-123-digits'
+                                      : 401,
+  'GET /site/localhost/path/trailing-slash/'
+                                      : 401,
+  'GET /site/localhost/path/123'
+                                      : 401,
+  'GET /site/shanetomlinson.com/path/2013/testing-javascript-frontend-part-1-anti-patterns-and-fixes/'
+                                      : 401,
+  'GET /site/www.aframejs.com/path/tutorial.html'
+                                      : 401,
+  'GET /site/connect-fonts.org/path/families'
+                                      : 401
+
+};
+
+describe('routes module', function () {
+  describe('start', function () {
+    it('starts the server', function (done) {
+      startStop.start(done);
+    });
+  });
+
+  describe('request', function () {
+    for (var key in ROUTES) {
+      it(key, respondsWith(key, ROUTES[key]));
+    }
+  });
+
+  describe('POST /navigation', function () {
+    it('should have CORS `access-control-allow-origin: *` header', function (done) {
+      request.post(baseURL + '/navigation', function (err, response) {
+        assert.equal(response.statusCode, 200, baseURL);
+
+        // CORS is allowed for POST /navigation
+        assert.equal(response.headers['access-control-allow-origin'], '*');
+
+        testCommonResponseHeaders(response);
+
+        done();
+      });
+    });
+  });
+
+  describe('POST /unload', function () {
+    it('should respond with 400 if no uuid sent', function (done) {
+      request.post(baseURL + '/unload', function (err, response) {
+        assert.equal(response.statusCode, 400);
+
+        done();
+      });
+    });
+
+    it('should respond with 200 and CORS headers if valid', function (done) {
+      request.post({
+        url: baseURL + '/unload',
+        json: { uuid: 'the-uuid-to-update' }
+      }, function (err, response) {
+        assert.equal(response.statusCode, 200);
+
+        // CORS is allowed for POST /unload
+        assert.equal(response.headers['access-control-allow-origin'], '*');
+
+        testCommonResponseHeaders(response);
+
+
+        done();
+      });
+    });
+  });
+
+  describe('POST /user', function () {
+    it('with real name and assertion should respond with a 302', function (done) {
+      request.post({
+        url: baseURL + '/user',
+        json: {
+          name: 'Test User',
+          assertion: 'A_fake_assertion'
+        }
+      }, function (err, response) {
+        // redirect user to their management page.
+        assert.equal(response.statusCode, 302);
+        assert.equal(response.headers.location, '/site');
+        done();
+      });
+    });
+  });
+
+  describe('stop', function () {
+    it('stops', function (done) {
+      startStop.stop(function () {
+        done();
+      });
+    });
+  });
+});
+
+function respondsWith(key, expectedCode) {
+  return function (done) {
+    var parts = key.split(' ');
+    var verb = parts[0].toUpperCase();
+    var url = baseURL + parts[1];
+    request({
+      // disable redirect following to ensure that 301 and 302s are reported.
+      followRedirect: false,
+      uri: url,
+      method: verb,
+    }, function (err, response) {
+      assert.equal(response.statusCode, expectedCode);
+
+      // CORS is only allowed for POST /navigation
+      assert.isUndefined(response.headers['access-control-allow-origin']);
+
+      testCommonResponseHeaders(response);
+
+      done();
+    });
+  };
+}
+
+function testCommonResponseHeaders(response) {
+  // Remove the x-powered-by
+  assert.isUndefined(response.headers['x-powered-by']);
+
+  // ensure CSP headers
+  assert.equal(response.headers['x-content-security-policy'],
+            "default-src 'self' https://login.persona.org;");
+
+  // DENY xframes
+  assert.equal(response.headers['x-frame-options'], 'DENY');
+
+  // disable mime type sniffing
+  assert.equal(response.headers['x-content-type-options'], 'nosniff');
+}
+
+

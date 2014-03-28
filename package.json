@@ -4,16 +4,19 @@
   "description": "web site real user metrics with ethics",
   "scripts": {
     "start": "scripts/run_locally.js",
-    "test": "DATABASE_DRIVER=mongo mocha test/"
+    "test": "DATABASE_DRIVER=mongo CONFIG_FILES=./server/etc/local.json,./server/etc/test.json mocha --recursive test/"
   },
   "author": "Shane Tomlinson <shane@shanetomlinson.com>",
   "license": "MPL 2.0",
   "dependencies": {
+    "allhttperrors": "0.3.1",
     "bluebird": "0.11.5-1",
+    "browserid-verify": "0.1.2",
     "connect-cachify": "0.0.15",
-    "connect-fonts": "0.0.12",
+    "connect-fonts": "1.0.0",
     "connect-fonts-bitstream-vera-sans": "0.0.1",
     "connect-gzip-static": "git://github.com/shane-tomlinson/connect-gzip-static.git#3625997d2a8f83ef8040632c20e8ae3e9bf9fced",
+    "connect-mongo": "0.4.0",
     "convict": "0.4.1",
     "cors": "2.1.1",
     "easierobject": "0.0.4",
@@ -47,7 +50,6 @@
     "grunt-preprocess": "4.0.0",
     "grunt-sass": "0.10.0",
     "grunt-zopfli": "0.3.2",
-    "jshint": "2.3.0",
     "jshint-stylish": "0.1.4",
     "load-grunt-tasks": "0.2.1",
     "mocha": "1.16.1",

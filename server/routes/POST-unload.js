@@ -4,14 +4,16 @@
 
 const logger = require('../lib/logger');
 const db = require('../lib/db');
+const httpErrors = require('../lib/http-errors');
 
 exports.path = '/unload';
 exports.verb = 'post';
 exports.enable_cors = true;
+exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function (req, res) {
   var data = req.body;
-  if (!data.uuid) return res.send(400);
+  if (! data.uuid) return httpErrors.BadRequestError();
 
   // don't wanna be hanging around for a response.
   res.send(200, { success: true });
@@ -28,6 +30,8 @@ exports.handler = function (req, res) {
   db.pageView.getOne({
     uuid: data.uuid
   }).then(function(pageView) {
+    if (! pageView) return;
+
     pageView.duration = data.duration;
     return db.pageView.update(pageView);
   }, function(err) {

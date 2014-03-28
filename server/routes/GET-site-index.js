@@ -7,22 +7,30 @@
 const logger = require('../lib/logger');
 const calculator = require('../lib/calculator');
 
-
 exports.path = '/site';
 exports.verb = 'get';
 exports.template = 'GET-site-index.html';
+exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 
 exports.handler = function (req, res) {
+  var email = req.session.email;
+
   return calculator.calculate({
     site: {
+      filter: {
+        $or: [
+          { admin_users: email },
+          { readonly_users: email }
+        ]
+      },
       'site:hostname': {
-        // TODO add a user filter.
         sort: 'asc'
       }
     }
   }).then(function (allResults) {
+    var sites = allResults ? allResults.site['site:hostname'] : []
     return {
-      sites: allResults.site['site:hostname']
+      sites: sites
     };
   });
 };

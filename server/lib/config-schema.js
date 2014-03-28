@@ -33,12 +33,6 @@ module.exports = {
     'default': 'production',
     env: 'NODE_ENV'
   },
-  database_driver: {
-    doc: 'Which driver to use for the database',
-    format: ['json', 'mongo'],
-    'default': 'mongo',
-    env: 'DATABASE_DRIVER'
-  },
   views_dir: path.join(__dirname, '..', 'views'),
   static_root: path.join(__dirname, '..', '..', 'client'),
   static_dir: {
@@ -68,6 +62,16 @@ module.exports = {
     doc: 'Add strong HTTP caching to resources.',
     format: Boolean,
     'default': true
+  },
+  verify_assertion: {
+    doc: 'Whether to verify the assertion',
+    format: Boolean,
+    'default': true
+  },
+  noverify_email: {
+    doc: 'The email address returned by the verifier if verify_assertion is set to false',
+    format: String,
+    'default': 'testuser@testuser.com'
   },
 
   proc_name: getProcName()

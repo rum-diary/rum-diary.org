@@ -13,6 +13,8 @@
   {% block inlinecss %}
   {% endblock %}
   </style>
+  {% block headerjs %}
+  {% endblock %}
 </head>
 <body>
   <div id="wrapper">
@@ -21,8 +23,20 @@
         <h1>rum-diary.org</h1>
         <h2>Metrics with ethics</h2>
         <h3>{% block header %}{% endblock %}</h3>
+
         <nav>
+          <section class="session">
+            {% if email %}
+              Hi <a href="/user/{{ email }}">{{ email }}</a>,
+              <form method="post" action="/session">
+                <input type="hidden" name="_method" value="delete" />
+                <button>Sign out</button>
+              </form>
+            {% endif %}
+          </section>
+
           {% block navigation %}
+          &nbsp;
           {% endblock %}
         </nav>
       </div>
@@ -42,11 +56,11 @@
       </div>
     </footer>
   </div>
-<script defer src="/include.js" data-tags="experimental,zopfli,cache"></script>
-{% block footerjs %}
-  {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
-  {% endfor %}
-{% endblock %}
+  <script defer src="/include.js" data-tags="zopfli,cache"></script>
+  {% block footerjs %}
+    {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
+    {% endfor %}
+  {% endblock %}
 </body>
 </html>
 

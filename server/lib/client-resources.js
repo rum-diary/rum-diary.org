@@ -14,7 +14,10 @@ const config = require('./config');
 const DEPENDENCIES = {
   'rum-diary.min.js': [
     '/js/bower_components/d3/d3.js',
-    '/js/bundle.js'
+    '/js/app.bundle.js'
+  ],
+  'signin.min.js': [
+    '/js/signin.bundle.js'
   ]
 };
 

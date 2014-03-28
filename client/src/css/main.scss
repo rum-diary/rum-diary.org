@@ -49,14 +49,35 @@ header, footer {
     margin-bottom: .5rem;
   }
 
-  nav li {
-    > a {
-      color: $navigation-text-color;
-      font-size: .8rem;
+  nav {
+    line-height: 22px;
+    font-size: 0.8rem;
+
+    li {
+      > a {
+        color: $navigation-text-color;
+      }
+
+      > a:active, > a:hover, a:focus {
+        color: $navigation-text-focus-color;
+      }
     }
 
-    > a:active, > a:hover, a:focus {
-      color: $navigation-text-focus-color;
+    .session {
+      display: inline;
+      float: right;
+
+      form {
+        display: inline;
+
+        button {
+          background: none;
+          border: none;
+          color: $header-footer-color;
+          outline: none;
+          text-decoration: underline;
+        }
+      }
     }
   }
 }
@@ -99,6 +120,10 @@ footer {
   position: absolute;
   right: 0;
   text-align: center;
+}
+
+ul, li {
+  list-style: none;
 }
 
 nav ul {

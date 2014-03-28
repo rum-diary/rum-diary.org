@@ -5,6 +5,7 @@
 exports.path = '/unload';
 exports.verb = 'options';
 exports.enable_cors = true;
+exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function(req, res, next) {
   next();

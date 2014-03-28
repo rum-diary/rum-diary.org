@@ -11,7 +11,7 @@ module.exports = function (grunt) {
       tasks: [ 'preprocess' ]
     },
     scripts: {
-      files: ['<%= app.src_js %>/*.js', '!<%= app.src_js %>/bundle.js'],
+      files: ['<%= app.src_js %>/**/*.js', '!<%= app.src_js %>/**/*bundle.js'],
       tasks: [ 'browserify' ]
     },
     test_scripts: {

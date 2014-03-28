@@ -2,150 +2,157 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/**
+ * Test the generic route infrastructure to ensure both values and promises
+ * are handled correctly.
+ */
+
 const mocha = require('mocha');
 const assert = require('chai').assert;
-const request = require('request');
+const Promise = require('bluebird');
 
-const config = require('../server/lib/config');
-const baseURL = 'http://localhost:' + config.get('https_port');
+const routes = require('../server/lib/routes');
+const httpErrors = require('../server/lib/http-errors');
 
-
-const startStop = require('./lib/start-stop');
-
-var ROUTES = {
-  'GET /'                             : 200,
-  'GET /index.html'                   : 301,
-  'GET /site'                         : 200,
-  'GET /site/localhost'               : 200,
-  'GET /site/localhost?start=2013-12-25'
-                                      : 200,
-  'GET /site/localhost?start=2013-12-25&end=2014-01-05'
-                                      : 200,
-  'GET /site/localhost/performance'   : 200,
-  'GET /site/localhost/demographics'  : 200,
-  'GET /site/localhost/all'           : 200,
-  'GET /site/localhost/navigation'    : 200,
-  'GET /site/localhost/navigation/medians'
-                                      : 200,
-  'GET /site/localhost/navigation/distribution'
-                                      : 200,
-  'GET /site/localhost/hits'          : 200,
-  'GET /site/localhost/path/index'    : 200,
-  'GET /site/localhost/path/some-page/with-more/and-123-digits'
-                                      : 200,
-  'GET /site/localhost/path/trailing-slash/'
-                                      : 200,
-  'GET /site/localhost/path/123'
-                                      : 200,
-  'GET /site/shanetomlinson.com/path/2013/testing-javascript-frontend-part-1-anti-patterns-and-fixes/'
-                                      : 200,
-  'GET /site/www.aframejs.com/path/tutorial.html'
-                                      : 200,
-  'GET /site/connect-fonts.org/path/families'
-                                      : 200
-
+var RequestMock = {
+  query: {},
+  params: {
+    hostname: 'testuser.com'
+  },
+  session: {
+    email: 'testuser@testuser.com'
+  }
 };
 
-describe('routes module', function() {
-  describe('start', function() {
-    it('starts the server', function(done) {
-      startStop.start(done);
-    });
-  });
-
-  describe('request', function() {
-    for (var key in ROUTES) {
-      it(key, respondsWith(key, ROUTES[key]));
+var routerMock = {
+  _gets: {},
+  get: function(path, middleware, handler) {
+    if (! handler) {
+      handler = middleware;
+      middleware = null;
     }
-  });
 
-  describe('POST /navigation', function() {
-    it('should have CORS `access-control-allow-origin: *` header', function(done) {
-      request.post(baseURL + '/navigation', function(err, response) {
-        assert.equal(response.statusCode, 200, baseURL);
+    this._gets[path] = handler;
+  },
 
-        // CORS is allowed for POST /navigation
-        assert.equal(response.headers['access-control-allow-origin'], '*');
+  _posts: {},
+  post: function(path, middleware, handler) {
+    if (! handler) {
+      handler = middleware;
+      middleware = null;
+    }
 
-        testCommonResponseHeaders(response);
+    this._posts[path] = handler;
+  }
+};
 
-        done();
+describe('a route handler', function () {
+  describe('that returns a value', function () {
+    routes.addRoute({
+      path: '/return_value',
+      verb: 'get',
+      template: 'template',
+      handler: function() {
+        return { success: true };
+      }
+    }, routerMock);
+
+    it('renders the value', function (done) {
+      routerMock._gets['/return_value'](Object.create(RequestMock), {
+        render: function(template, templateData) {
+          assert.equal(template, 'template');
+          assert.equal(templateData.success, true);
+          done();
+        }
       });
     });
   });
 
-  describe('POST /unload', function() {
-    it('should respond with 400 if no uuid sent', function(done) {
-      request.post(baseURL + '/unload', function(err, response) {
-        assert.equal(response.statusCode, 400);
+  describe('that returns an http error', function () {
+    routes.addRoute({
+      path: '/return_http_error',
+      verb: 'get',
+      template: 'template',
+      handler: function() {
+        return httpErrors.BadRequestError();
+      }
+    }, routerMock);
 
-        done();
-      });
-    });
-
-    it('should respond with 200 and CORS headers if valid', function(done) {
-      request.post({
-        url: baseURL + '/unload',
-        json: { uuid: 'the-uuid-to-update' }
-      }, function(err, response) {
-        assert.equal(response.statusCode, 200);
-
-        // CORS is allowed for POST /unload
-        assert.equal(response.headers['access-control-allow-origin'], '*');
-
-        testCommonResponseHeaders(response);
-
-
-        done();
+    it('sends the error', function (done) {
+      routerMock._gets['/return_http_error'](Object.create(RequestMock), {
+        send: function(statusCode, message) {
+          assert.equal(statusCode, 400);
+          assert.equal(message, 'Bad Request');
+          done();
+        }
       });
     });
   });
 
-  describe('stop', function() {
-    it('stops', function(done) {
-      startStop.stop(function() {
-        done();
+  describe('that returns nothing', function () {
+    routes.addRoute({
+      path: '/return_nothing',
+      verb: 'get',
+      template: 'template',
+      handler: function() {
+      }
+    }, routerMock);
+
+    it('does nothing', function () {
+      routerMock._gets['/return_nothing'](Object.create(RequestMock), {
+        send: function() {
+          assert.fail();
+        },
+        render: function() {
+          assert.fail();
+        }
+      });
+    });
+  });
+
+  describe('that returns a promise that becomes fulfilled', function () {
+    routes.addRoute({
+      path: '/return_promise_fulfill',
+      verb: 'get',
+      template: 'template',
+      handler: function() {
+        return new Promise(function(fulfill, reject) {
+          fulfill({ success: true });
+        });
+      }
+    }, routerMock);
+
+    it('renders the value', function (done) {
+      routerMock._gets['/return_promise_fulfill'](Object.create(RequestMock), {
+        render: function(template, templateData) {
+          assert.equal(template, 'template');
+          assert.equal(templateData.success, true);
+          done();
+        }
+      });
+    });
+  });
+
+  describe('that returns a promise that becomes rejected', function () {
+    routes.addRoute({
+      path: '/return_promise_reject',
+      verb: 'get',
+      template: 'template',
+      handler: function() {
+        return new Promise(function(fulfill, reject) {
+          reject(httpErrors.BadRequestError());
+        });
+      }
+    }, routerMock);
+
+    it('sends the error', function (done) {
+      routerMock._gets['/return_promise_reject'](Object.create(RequestMock), {
+        send: function(statusCode, message) {
+          assert.equal(statusCode, 400);
+          assert.equal(message, 'Bad Request');
+          done();
+        }
       });
     });
   });
 });
-
-function respondsWith(key, expectedCode) {
-  return function(done) {
-    var parts = key.split(' ');
-    var verb = parts[0].toUpperCase();
-    var url = baseURL + parts[1];
-    request({
-      // disable redirect following to ensure that 301 and 302s are reported.
-      followRedirect: false,
-      uri: url,
-      method: verb,
-    }, function(err, response) {
-      assert.equal(response.statusCode, expectedCode);
-
-      // CORS is only allowed for POST /navigation
-      assert.isUndefined(response.headers['access-control-allow-origin']);
-
-      testCommonResponseHeaders(response);
-
-      done();
-    });
-  };
-}
-
-function testCommonResponseHeaders(response) {
-  // Remove the x-powered-by
-  assert.isUndefined(response.headers['x-powered-by']);
-
-  // ensure CSP headers
-  assert.equal(response.headers['x-content-security-policy'],
-            "default-src 'self';");
-
-  // DENY xframes
-  assert.equal(response.headers['x-frame-options'], 'DENY');
-
-  // disable mime type sniffing
-  assert.equal(response.headers['x-content-type-options'], 'nosniff');
-}
-
-

@@ -4,6 +4,8 @@
 
 // Test helper functions. Higher order assertions.
 
+const assert = require('chai').assert;
+
 // cPass - curried pass - call done when done.
 exports.cPass = function cPass(done) {
   return function () {
@@ -13,7 +15,8 @@ exports.cPass = function cPass(done) {
 
 // fail - straight up failure.
 exports.fail = function fail(err) {
-  assert.fail(String(err.message));
+  console.error(String(err.message));
+  assert.fail();
 }
 
 

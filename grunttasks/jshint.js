@@ -20,7 +20,7 @@ module.exports = function (grunt) {
       'Gruntfile.js',
       'grunttasks/{,*/}*.js',
       'client/src/{,*/}*.js',
-      '!client/src/js/bundle.js'
+      '!client/src/js/*bundle*.js'
     ]
   });
 };
