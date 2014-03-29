@@ -7,21 +7,29 @@
 
 {% block body %}
 
-<nav class="multi-column-nav content-width">
-  <ul>
-    {% for hostname in sites %}
-      <li>
-        <a href="/site/{{ hostname }}">{{ hostname }}</a>
-      </li>
-    {% endfor %}
-  </ul>
-</nav>
+<section>
+  <h3>Your sites</h3>
+  <nav class="multi-column-nav content-width">
+    <ul>
+      {% for hostname in sites %}
+        <li>
+          <a href="/site/{{ hostname }}">{{ hostname }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</section>
 
-<form method="post" action="/user/{{ email }}/site">
-  <label for="hostname">Site to measure</label>
-  <input type="text" placeholder="site-to-measure.com" name="hostname" required />
-  <button>Add site</button>
-</form>
+<section>
+  <h3>Add a new site</h3>
+  <form method="post" action="/user/{{ email }}/site">
+    <div>
+      <label for="hostname">Site to measure</label>
+      <input type="text" placeholder="site-to-measure.com" name="hostname" required />
+    </div>
+    <button>Add site</button>
+  </form>
+</section>
 
 
 {% endblock %}

@@ -86,14 +86,17 @@
 
   <article id="top-pages" class="row-right">
     <h2>Top Pages</h2>
-    <dl id="page-views">
-      {% for page in pageHitsPerPage %}
-        {% if page.page != "__all" %}
-          <dt class="hits-path"><a href="{{ root_url }}/path{{ page.page }}">{{ page.page }}</a></dt>
-          <dd class="hits-count deemphasize">{{ page.hits }}</dd>
-        {% endif %}
-      {% endfor %}
-    </dl>
+    <nav class="multi-column-nav">
+      <ul id="page-views">
+        {% for page in pageHitsPerPage %}
+          {% if page.page != "__all" %}
+            <li>
+              <a href="{{ root_url }}/path{{ page.page }}">{{ page.page }} <small>({{ page.hits }})</small></a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
   </article>
 
 </section>

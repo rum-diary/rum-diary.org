@@ -81,22 +81,28 @@
   <div class="row-right">
     <article>
       <h2>Enter from</h2>
-      <dl id="page-views">
-        {% for page, count in internalTransfer.from %}
-          <dt class="hits-path"><a href="/site/{{ hostname }}/path{{ page }}">{{ page }}</a></dt>
-          <dd class="hits-count deemphasize">{{ count }}</dd>
-        {% endfor %}
-      </dl>
+      <nav class="multi-column-nav">
+        <ul id="page-views">
+          {% for page, count in internalTransfer.from %}
+            <li>
+              <a href="/site/{{ hostname }}/path{{ page }}">{{ page }} <small>({{ count }})</small></a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
     </article>
 
     <article>
       <h2>Exit to</h2>
-      <dl id="page-views">
-        {% for page, count in internalTransfer.to %}
-          <dt class="hits-path"><a href="/site/{{ hostname }}/path{{ page }}">{{ page }}</a></dt>
-          <dd class="hits-count deemphasize">{{ count }}</dd>
-        {% endfor %}
-      </dl>
+      <nav class="multi-column-nav">
+        <ul id="page-views">
+          {% for page, count in internalTransfer.to %}
+            <li>
+              <a href="/site/{{ hostname }}/path{{ page }}">{{ page }} <small>({{ count }})</small></a>
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
     </article>
   </div>
 </section>

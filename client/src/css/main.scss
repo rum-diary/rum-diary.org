@@ -14,6 +14,7 @@ html {
 }
 
 body {
+  background-color: $body-background-color;
   color: $body-text-color;
   font-family: $font-family;
   font-size: 18px;
@@ -26,6 +27,15 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
 }
 
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+
 /* 
  * wrapper is set to min-height: 100% to allow the footer 
  * to be placed at the bottom of the page.
@@ -37,17 +47,17 @@ h1, h2, h3, h4, h5, h6 {
 
 
 header, footer {
-  background-color: $header-footer-background-color;
-  color: $header-footer-color;
   padding: 1rem;
 
   a {
-    color: $header-footer-color;
+    color: $header-text-color;
   }
+}
 
-  h3 {
-    margin-bottom: .5rem;
-  }
+header {
+  background-color: $header-background-color;
+  color: $header-text-color;
+  margin-bottom: 1rem;
 
   nav {
     line-height: 22px;
@@ -73,7 +83,7 @@ header, footer {
         button {
           background: none;
           border: none;
-          color: $header-footer-color;
+          color: $header-text-color;
           outline: none;
           text-decoration: underline;
         }
@@ -82,45 +92,39 @@ header, footer {
   }
 }
 
-@media only screen and (min-width: 980px) {
-  header {
-    h1, h2 {
-      display: inline-block;
-      margin-bottom: 0.75rem;
-    }
-
-    h2:before {
-      content: '-';
-      margin: 0 1rem;
-    }
-  }
-}
-
-@media only screen and (max-width: 980px) {
-  header {
-    h1, h2 {
-      margin-bottom: 0.25rem;
-    }
-
-    h2 {
-      font-size: 1.1rem;
-    }
-  }
-}
-
-
-header {
-  margin-bottom: 3rem;
-}
-
 footer {
+  background-color: $footer-background-color;
   bottom: 0; 
+  color: $footer-text-color;
   font-size: 0.8rem;
   left: 0;
   position: absolute;
   right: 0;
   text-align: center;
 }
+
+@media only screen and (min-width: 980px) {
+  header {
+    h1, h2 {
+      display: inline-block;
+      margin-bottom: 0.25rem;
+    }
+
+    h2:before {
+      content: '-';
+      margin: 0 0.35rem;
+    }
+  }
+}
+
+@media only screen and (max-width: 980px) {
+  header {
+    h2 {
+      font-size: 1.1rem;
+    }
+  }
+}
+
 
 ul, li {
   list-style: none;
@@ -167,13 +171,15 @@ nav.horizontal-nav {
 }
 
 nav.multi-column-nav {
+  margin-left: -1rem;
   ul {
     list-style: none;
   }
   li {
-    margin-left: -1rem;
+    width: 48%;
 
     > a {
+      background-color: $vertical-nav-background-color;
       color: $vertical-nav-text-color;
       display: inline-block;
       font-size: 1rem;
@@ -186,7 +192,7 @@ nav.multi-column-nav {
     }
 
     > a:active, > a:hover, > a:focus, > a.selected {
-      background-color: $vertical-nav-background-color;
+      background-color: $vertical-nav-focus-background-color;
       color: $vertical-nav-text-focus-color;
       text-decoration: underline;
     }
@@ -197,9 +203,50 @@ main {
   /* allow the footer to occupy this space */
   padding-bottom: 48px;
 
+  h1 {
+    margin-bottom: 2rem;
+  }
+
   h2 {
+    font-size: 1.6rem;
     margin-bottom: 0.5rem;
   }
+
+  h3 {
+    margin-bottom: 0.5rem;
+  }
+
+  section {
+    margin-bottom: 4rem;
+  }
+
+  label {
+    display: inline-block;
+    min-width: 10rem;
+  }
+
+  form > div {
+    margin-bottom: 0.5rem;
+  }
+
+  input[type=text] {
+    border: 1px solid #999;
+    color: #333;
+    padding: 0.25rem 0.75rem;
+  }
+
+  button {
+    border: none;
+    border-radius: 5px;
+    background-color: $button-background-color;
+    color: $button-text-color;
+    padding: 10px 25px;
+
+    &:hover, &:focus {
+      background-color: $button-focus-background-color;
+    }
+  }
+
 }
 
 .content-width {
@@ -215,7 +262,7 @@ main {
 }
 
 .deemphasize {
-  color: #777;
+  color: #c7b5b5;
 }
 
 .overview {
@@ -274,7 +321,8 @@ main {
 .row-right {
   float: left;
   width: 600px;
-  margin: 0 auto 0 50px;
+  margin: 0 auto 0 auto;
+  padding-left: 50px;
 }
 
 .row-left, .row-right {
@@ -354,12 +402,13 @@ svg {
 }
 
 path {
-    stroke: steelblue;      /* the line colour for paths is steelblue */
-    stroke-width: 2;      /* the line width for paths is 2 pixels */
+    stroke: $line-graph-line-color;
+    stroke-width: 1;      /* the line width for paths is 2 pixels */
     fill: none;         /* don't fill the area bounded by any path elements */
 }
 
 .axis-label {
+  fill: $line-graph-text-color;
   font-size: 0.8em;
 }
 
@@ -368,19 +417,12 @@ path {
           transform: rotate(70deg) translateX(2.75em) translateY(-1em);
 }
 
-.axis path,
+.axis path, 
 .axis line {
-    fill: none;         /* don't fill areas bounded by the axis line */
-    stroke: grey;       /* make the axis line grey */
-    stroke-width: 1;      /* make the width of the axis lines 1 pixel */
-    shape-rendering: crispEdges;/* make the edges sharp */
-}
-
-
-.axis path, .axis line {
   fill: none;
-  stroke: #000;
   shape-rendering: crispEdges;
+  stroke: $line-graph-axis-color;
+  stroke-width: 1;
 }
 
 .area {

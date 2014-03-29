@@ -20,9 +20,7 @@
   <div id="wrapper">
     <header>
       <div class="content-width">
-        <h1>rum-diary.org</h1>
-        <h2>Metrics with ethics</h2>
-        <h3>{% block header %}{% endblock %}</h3>
+        <h1>rum-diary.org</h1><h2>Metrics with ethics</h2>
 
         <nav>
           <section class="session">
@@ -43,6 +41,7 @@
     </header>
 
     <main class="content-width">
+      <h1>{% block header %}{% endblock %}</h1>
       {% block body %}
         We need a body!
       {% endblock %}

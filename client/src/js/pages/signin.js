@@ -39,7 +39,8 @@
     });
 
     navigator.id.request({
-      siteName: 'RUM Diary'
+      siteName: 'RUM Diary',
+      backgroundColor: '#ffa200'
     });
   }
 
@@ -71,7 +72,8 @@
     });
 
     navigator.id.request({
-      siteName: 'RUM Diary'
+      siteName: 'RUM Diary',
+      backgroundColor: '#ffa200'
     });
   }
 
