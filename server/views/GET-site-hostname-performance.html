@@ -16,11 +16,11 @@
 {% endblock %}
 
 {% block body %}
-<nav class="horizontal-nav">
+<nav class="horizontal-nav no-background-color">
   <h4>Events</h4>
-  <ul class="list-unstyled">
+  <ul>
     {% for field in navigationTimingFields %}
-    <li class="navigation-timing-item">
+    <li>
       <a {% if field == statName %} class="selected {% endif %} href="{{ baseURL }}?plot={{ field }}">{{ field }}</a>
     </li>
     {% endfor %}

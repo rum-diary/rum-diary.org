@@ -6,21 +6,18 @@ $body-background-color: #f1f1f1;
 $body-text-color: #574243;
 
 /*$header-background-color: #ffa200;*/ /* An orange color */
-$header-background-color: #604F4C;
 $header-text-color: #fff;
+$header-background-color: #604F4C;
 $footer-background-color: #5a4042;
 $footer-text-color: #fff;
 
 $navigation-text-color: $header-text-color;
-$navigation-text-focus-color: #e9e9e9;
+$navigation-text-focus-color: #ffa200;
 
-$horizontal-nav-text-color: #aaa;
-$horizontal-nav-text-focus-color: #333;
-
-$vertical-nav-background-color: $body-background-color;
-$vertical-nav-focus-background-color: #fabd54;
-$vertical-nav-text-color: #42BDAB;
-$vertical-nav-text-focus-color: #2795B6;
+$nav-background-color: $body-background-color;
+$nav-focus-background-color: #fabd54;
+$nav-text-color: #42BDAB;
+$nav-text-focus-color: #2795B6;
 
 $button-text-color: $body-background-color;
 $button-background-color: #42bdab;
@@ -30,6 +27,5 @@ $button-focus-background-color: #1a9e8c;
  * hits graph colors
  */
 $line-graph-line-color: #ffa200;
-/*$line-graph-text-color: $body-text-color;*/
 $line-graph-text-color: #00c4ad;
 $line-graph-axis-color: $body-text-color;

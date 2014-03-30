@@ -86,12 +86,12 @@
 
   <article id="top-pages" class="row-right">
     <h2>Top Pages</h2>
-    <nav class="multi-column-nav">
+    <nav class="vertical-nav">
       <ul id="page-views">
         {% for page in pageHitsPerPage %}
           {% if page.page != "__all" %}
             <li>
-              <a href="{{ root_url }}/path{{ page.page }}">{{ page.page }} <small>({{ page.hits }})</small></a>
+              <a href="{{ root_url }}/path{{ page.page }}"><small>({{ page.hits }})</small> {{ page.page }}</a>
             </li>
           {% endif %}
         {% endfor %}

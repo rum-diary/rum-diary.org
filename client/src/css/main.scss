@@ -35,6 +35,13 @@ h2 {
   font-size: 1.25rem;
 }
 
+ul, li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+
 
 /* 
  * wrapper is set to min-height: 100% to allow the footer 
@@ -49,9 +56,25 @@ h2 {
 header, footer {
   padding: 1rem;
 
-  a {
-    color: $header-text-color;
+  button {
+    background: none;
+    border: none;
+    line-height: 16px;
+    outline: none;
+    padding: 0;
   }
+
+  a, button {
+    border-bottom: 1px dotted;
+    color: $navigation-text-color;
+    text-decoration: none;
+  }
+
+  a:active, a:hover, a:focus,
+  button:hover, button:focus {
+    color: $navigation-text-focus-color;
+  }
+
 }
 
 header {
@@ -63,13 +86,10 @@ header {
     line-height: 22px;
     font-size: 0.8rem;
 
-    li {
-      > a {
-        color: $navigation-text-color;
-      }
-
-      > a:active, > a:hover, a:focus {
-        color: $navigation-text-focus-color;
+    ul {
+      > li {
+        display: inline-block;
+        margin: 0 0.5rem 0 0;
       }
     }
 
@@ -79,14 +99,6 @@ header {
 
       form {
         display: inline;
-
-        button {
-          background: none;
-          border: none;
-          color: $header-text-color;
-          outline: none;
-          text-decoration: underline;
-        }
       }
     }
   }
@@ -126,25 +138,26 @@ footer {
 }
 
 
-ul, li {
-  list-style: none;
-}
+.horizontal-nav,
+.vertical-nav,
+.multi-column-nav {
+  li {
+    > a {
+      color: $nav-text-color;
+      font-size: 1rem;
+      text-decoration: none;
+    }
 
-nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  > li {
-    list-style: none;
-    display: inline-block;
-    margin: 0 0.5rem 0 0;
-    padding: 0;
+    > a:active, > a:hover, > a:focus, > a.selected {
+      background-color: $nav-focus-background-color;
+      color: $nav-text-focus-color;
+      text-decoration: underline;
+    }
   }
 }
 
 
-nav.horizontal-nav {
+.horizontal-nav {
   margin-bottom: 3rem;
 
   > h4 {
@@ -152,35 +165,23 @@ nav.horizontal-nav {
     margin-right: 1rem;
   }
 
-  ul {
+  ul, li {
     display: inline-block;
   }
 
   li {
-    > a {
-      color: $horizontal-nav-text-color;
-      font-size: 1rem;
-      text-decoration: none;
-    }
-
-    > a:active, > a:hover, > a:focus, > a.selected {
-      border-bottom: 1px dotted;
-      color: $horizontal-nav-text-focus-color;
-    }
+    margin-right: 0.35rem;
   }
 }
 
-nav.multi-column-nav {
+.vertical-nav, 
+.multi-column-nav {
   margin-left: -1rem;
-  ul {
-    list-style: none;
-  }
+
   li {
-    width: 48%;
+    display: inline-block;
 
     > a {
-      background-color: $vertical-nav-background-color;
-      color: $vertical-nav-text-color;
       display: inline-block;
       font-size: 1rem;
       overflow: hidden;
@@ -188,13 +189,31 @@ nav.multi-column-nav {
       text-decoration: none;
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: 18rem;
+      width: 100%;
     }
 
     > a:active, > a:hover, > a:focus, > a.selected {
-      background-color: $vertical-nav-focus-background-color;
-      color: $vertical-nav-text-focus-color;
+      background-color: $nav-focus-background-color;
+      color: $nav-text-focus-color;
       text-decoration: underline;
+    }
+  }
+}
+
+.vertical-nav {
+  margin-bottom: 3rem;
+}
+
+.multi-column-nav {
+  li {
+    width: 48%;
+  }
+}
+
+.no-background-color {
+  li {
+    > a:active, > a:hover, > a:focus, > a.selected {
+      background-color: $nav-background-color;
     }
   }
 }
@@ -384,16 +403,6 @@ main {
 
 .tooltip-section {
   margin: .5em 0;
-}
-
-.list-unstyled {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.navigation-timing-item {
-  margin: .25rem .35rem .25rem 0;
 }
 
 
