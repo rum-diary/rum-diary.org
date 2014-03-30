@@ -2,13 +2,12 @@
 {% block title %}Site list{% endblock %}
 
 {% block header %}
-  Site list
+  Your sites
 {% endblock %}
 
 {% block body %}
 
 <section>
-  <h3>Your sites</h3>
   <nav class="multi-column-nav">
     <ul>
       {% for hostname in sites %}
@@ -21,10 +20,10 @@
 </section>
 
 <section>
-  <h3>Add a new site</h3>
+  <h3>Add a site</h3>
   <form method="post" action="/user/{{ email }}/site">
     <div>
-      <label for="hostname">Site to measure</label>
+      <label for="hostname">Hostname</label>
       <input type="text" placeholder="site-to-measure.com" name="hostname" required />
     </div>
     <button>Add site</button>

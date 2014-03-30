@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block body %}
-<section class="row">
+<section class="row narrow-left">
   <article id="overview" class="row-left">
     <h2>Overview</h2>
     <ul class="overview">
@@ -67,15 +67,14 @@
   </article>
 </section>
 
-<section class="row">
+<section class="row narrow-left">
   <article class="row-left">
     <h2>Top referrers</h2>
-    <dl id="referrers">
+    <ul>
       {% for referrer in referrers %}
-        <dt class="referrers-hostname">{{ referrer.hostname }}</dt>
-        <dd class="referrers-count deemphasize">{{ referrer.count }}</dd>
+        <li><small>({{ referrer.count }})</small> {{ referrer.hostname }}</li>
       {% endfor %}
-    </dl>
+    </ul>
   </article>
 
   <div class="row-right">
@@ -85,7 +84,7 @@
         <ul id="page-views">
           {% for page, count in internalTransfer.from %}
             <li>
-              <a href="/site/{{ hostname }}/path{{ page }}">{{ page }} <small>({{ count }})</small></a>
+              <a href="/site/{{ hostname }}/path{{ page }}"><small>({{ count }})</small> {{ page }}</a>
             </li>
           {% endfor %}
         </ul>
@@ -98,7 +97,7 @@
         <ul id="page-views">
           {% for page, count in internalTransfer.to %}
             <li>
-              <a href="/site/{{ hostname }}/path{{ page }}">{{ page }} <small>({{ count }})</small></a>
+              <a href="/site/{{ hostname }}/path{{ page }}"><small>({{ count }})</small> {{ page }}</a>
             </li>
           {% endfor %}
         </ul>

@@ -54,7 +54,7 @@ ul, li {
 
 
 header, footer {
-  padding: 1rem;
+  padding: 1rem 0;
 
   button {
     background: none;
@@ -177,19 +177,15 @@ footer {
 .vertical-nav, 
 .multi-column-nav {
   margin-left: -1rem;
-
   li {
-    display: inline-block;
-
     > a {
-      display: inline-block;
+      display: block;
       font-size: 1rem;
       overflow: hidden;
-      padding: 1rem;
+      padding: 0.5rem 1rem;
       text-decoration: none;
       text-overflow: ellipsis;
       white-space: nowrap;
-      width: 100%;
     }
 
     > a:active, > a:hover, > a:focus, > a.selected {
@@ -207,6 +203,7 @@ footer {
 .multi-column-nav {
   li {
     width: 48%;
+    display: inline-block;
   }
 }
 
@@ -274,9 +271,9 @@ main {
   width: 960px;
 }
 
-@media only screen and (max-width: 980px) {
+@media only screen and (max-width: 1085px) {
   .content-width {
-    width: 80%;
+    width: 90%;
   }
 }
 
@@ -285,14 +282,7 @@ main {
 }
 
 .overview {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-
   > li {
-    margin: 0;
-    padding: 0;
-
     > .overview-stat {
       font-size: 3.15rem;
     }
@@ -314,15 +304,7 @@ main {
 
 .row {
   clear: both;
-  display: flex;
 }
-
-@media only screen and (min-width: 700px) {
-  .row {
-    margin-bottom: 5rem;
-  }
-}
-
 
 .row:after {
   clear: both;
@@ -331,54 +313,46 @@ main {
   display: block;
 }
 
-.row-left {
-  width: 175px;
-  float: left;
-  margin: 0 50px 0 auto;
-}
-
-.row-right {
-  float: left;
-  width: 600px;
-  margin: 0 auto 0 auto;
-  padding-left: 50px;
-}
-
-.row-left, .row-right {
-  overflow: hidden;
-}
-
-@media only screen and (max-width: 980px) {
-  .row-right {
-    width: 50%;
-  }
-}
-
 @media only screen and (max-width: 700px) {
-  .row {
-    display: block;
-  }
-
-  .row-left, .row-right {
-    float: none;
-    width: auto;
-    margin: 0;
-  }
-
   .row-left {
     margin-bottom: 3rem;
   }
 }
 
-.row-center {
-  width: 650px;
-  margin: 0 auto;
+@media only screen and (min-width: 700px) {
+  .row {
+    margin-bottom: 5rem;
+  }
+
+  .row-left, .row-right {
+    float: left;
+    overflow: hidden;
+  }
+
+  .narrow-left {
+    padding-left: 300px;
+
+    .row-left {
+      width: 250px;
+      margin: 0 50px 0 -300px;
+      margin-left: -300px;
+    }
+
+    .row-right {
+      width: 100%;
+    }
+  }
+
+  .half {
+    width: 50%;
+  }
+
+  .row-center {
+    width: 650px;
+    margin: 0 auto;
+  }
 }
 
-.half {
-  width: 50%;
-  margin: 0;
-}
 
 
 .tooltip {
