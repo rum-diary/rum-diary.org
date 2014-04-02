@@ -30,7 +30,7 @@
   {% endif %}
   -->
 
-<section class="row">
+<section class="row narrow-left">
   <article id="overview" class="row-left">
     <h2>Overview</h2>
     <ul class="overview">
@@ -73,27 +73,29 @@
 </section>
 
 
-<section class="row">
+<section class="row narrow-left">
   <article id="referrers" class="row-left">
     <h2>Top referrers</h2>
-    <dl id="referrers">
+    <ul>
       {% for referrer in referrers %}
-        <dt class="referrers-hostname">{{ referrer.hostname }}</dt>
-        <dd class="referrers-count deemphasize">{{ referrer.count }}</dd>
+        <li><small>({{ referrer.count }})</small> {{ referrer.hostname }}</li>
       {% endfor %}
-    </dl>
+    </ul>
   </article>
 
   <article id="top-pages" class="row-right">
     <h2>Top Pages</h2>
-    <dl id="page-views">
-      {% for page in pageHitsPerPage %}
-        {% if page.page != "__all" %}
-          <dt class="hits-path"><a href="{{ root_url }}/path{{ page.page }}">{{ page.page }}</a></dt>
-          <dd class="hits-count deemphasize">{{ page.hits }}</dd>
-        {% endif %}
-      {% endfor %}
-    </dl>
+    <nav class="vertical-nav">
+      <ul id="page-views">
+        {% for page in pageHitsPerPage %}
+          {% if page.page != "__all" %}
+            <li>
+              <a href="{{ root_url }}/path{{ page.page }}"><small>({{ page.hits }})</small> {{ page.page }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
   </article>
 
 </section>

@@ -6,23 +6,29 @@
 {% endblock %}
 
 {% block body %}
-  <form id="signin" method="post" action="/session">
-    <input required type="hidden" name="assertion" />
-    <button>Sign In</button>
-  </form>
+  <section>
+    <h2>Already have an account?</h2>
+    <form id="signin" method="post" action="/session">
+      <input type="hidden" name="assertion" />
+      <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
+      <button>Sign In</button>
+    </form>
+  </section>
 
-  &mdash; or &mdash;
-
-  <form id="signup" method="post" action="/user">
-    <div>
-      <label for="real_name">Real name</label>
-      <input type="text" name="name" required />
-    </div>
-    <div>
-      <label for="hostname">Site to measure</label>
-      <input type="text" placeholder="site-to-measure.com" name="hostname" required />
-    </div>
-    <input required type="hidden" name="assertion" />
-    <button>Sign Up</button>
-  </form>
+  <section>
+    <h2>New here?</h2>
+    <form id="signup" method="post" action="/user">
+      <div>
+        <label for="real_name">Real name</label>
+        <input type="text" name="name" required />
+      </div>
+      <div>
+        <label for="hostname">Site to measure</label>
+        <input type="text" placeholder="site-to-measure.com" name="hostname" required />
+      </div>
+      <input type="hidden" name="assertion" />
+      <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
+      <button>Sign Up</button>
+    </form>
+  </section>
 {% endblock %}

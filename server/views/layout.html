@@ -20,16 +20,15 @@
   <div id="wrapper">
     <header>
       <div class="content-width">
-        <h1>rum-diary.org</h1>
-        <h2>Metrics with ethics</h2>
-        <h3>{% block header %}{% endblock %}</h3>
+        <h1>rum-diary.org</h1><h2>Metrics with ethics</h2>
 
-        <nav>
+        <nav class="header-nav">
           <section class="session">
             {% if email %}
               <a href="/user/{{ email }}">{{ email }}</a>,
               <form method="post" action="/session">
                 <input type="hidden" name="_method" value="delete" />
+                <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
                 <button>Sign out</button>
               </form>
             {% endif %}
@@ -43,6 +42,7 @@
     </header>
 
     <main class="content-width">
+      <h1>{% block header %}{% endblock %}</h1>
       {% block body %}
         We need a body!
       {% endblock %}

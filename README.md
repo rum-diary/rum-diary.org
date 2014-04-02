@@ -17,6 +17,8 @@ Real user metrics with ethics.
 
 1. Fork and clone [the repo](https://github.com/shane-tomlinson/rum-diary.org) from GitHub - https://github.com/shane-tomlinson/rum-diary.org/
 2. `npm install`
+3. Copy `server/etc/local.json-sample` to `server/etc/local.json`
+4. In `server/etc/local.json`, modify the value of `session_cookie_secret`
 
 ## Run the server
 
