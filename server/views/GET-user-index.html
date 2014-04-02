@@ -9,7 +9,8 @@
   <section>
     <h2>Already have an account?</h2>
     <form id="signin" method="post" action="/session">
-      <input required type="hidden" name="assertion" />
+      <input type="hidden" name="assertion" />
+      <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
       <button>Sign In</button>
     </form>
   </section>
@@ -25,7 +26,8 @@
         <label for="hostname">Site to measure</label>
         <input type="text" placeholder="site-to-measure.com" name="hostname" required />
       </div>
-      <input required type="hidden" name="assertion" />
+      <input type="hidden" name="assertion" />
+      <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
       <button>Sign Up</button>
     </form>
   </section>

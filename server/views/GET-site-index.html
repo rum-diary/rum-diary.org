@@ -25,6 +25,7 @@
     <div>
       <label for="hostname">Hostname</label>
       <input type="text" placeholder="site-to-measure.com" name="hostname" required />
+      <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
     </div>
     <button>Add site</button>
   </form>

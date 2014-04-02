@@ -28,6 +28,7 @@
               <a href="/user/{{ email }}">{{ email }}</a>,
               <form method="post" action="/session">
                 <input type="hidden" name="_method" value="delete" />
+                <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
                 <button>Sign out</button>
               </form>
             {% endif %}
