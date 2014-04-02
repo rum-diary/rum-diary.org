@@ -8,6 +8,7 @@
   "static_dir": "src",
   "data_collection_server": "http://localhost:8443",
   "use_concatenated_resources": false,
-  "strong_http_caching": false
+  "strong_http_caching": false,
+  "session_cookie_secret": "CHANGE_ME_NOW!!!!!!!!"
 }
 
