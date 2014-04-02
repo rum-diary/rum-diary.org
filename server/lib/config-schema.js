@@ -73,6 +73,22 @@ module.exports = {
     format: String,
     'default': 'testuser@testuser.com'
   },
+  session_cookie_name: {
+    doc: 'The name of the session cookie',
+    format: String,
+    'default': 'sessionId'
+  },
+  session_duration_ms: {
+    doc: 'Session duration',
+    format: Number,
+    'default': 1000 * 60 * 60 * 24 * 7 // 7 days
+  },
+  session_cookie_secret: {
+    doc: 'Session cookie secret',
+    format: String,
+    'default': 'wild and crazy cats',
+    env: 'SESSION_COOKIE_SECRET'
+  },
 
   proc_name: getProcName()
 };

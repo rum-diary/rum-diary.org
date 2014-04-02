@@ -30,9 +30,12 @@ SessionStore.create().then(function (sessionStore) {
 
   app.use(express.session({
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24  // 24 hours in milliseconds
+      maxAge: config.get('session_duration_ms'),
+      httpOnly: true,
+      secure: config.get('ssl'),
     },
-    secret: 'wild and crazy cats',
+    key: config.get('session_cookie_name'),
+    secret: config.get('session_cookie_secret'),
     store: sessionStore
   }));
 
