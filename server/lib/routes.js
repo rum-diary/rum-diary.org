@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 const corsMiddleware = cors();
+const joi = require('joi');
 
 const Router = require('express').Router;
 const router = new Router();
@@ -63,6 +64,14 @@ function addRoute(route, router) {
     req.end = req.dbQuery.end;
 
     Promise.try(function () {
+      if (route.validation) {
+        var err = joi.validate(req.body, route.validation);
+        if (err) {
+          throw err;
+        }
+      }
+    })
+    .then(function () {
       if (! route.authorization) {
         logger.warn('no authorization function set for: `%s`', req.url);
       } else {

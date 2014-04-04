@@ -24,6 +24,7 @@
     "fast-stats": "0.0.2",
     "helmet": "0.1.2",
     "intel": "0.4.0",
+    "joi": "2.9.0",
     "mkdirp": "0.3.5",
     "moment": "2.4.0",
     "mongoose": "3.8.7",
