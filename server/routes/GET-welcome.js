@@ -11,7 +11,10 @@ exports.template = 'GET-welcome.html';
 
 exports.handler = function(req, res) {
   const hostname = req.session.hostname;
+  delete req.session.hostname;
+
   const name = req.session.name;
+  delete req.session.name;
 
   return {
     email: req.session.email,
