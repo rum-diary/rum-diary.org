@@ -14,6 +14,9 @@ exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function (req, res) {
   const assertion = req.body.assertion;
+  const redirectTo = decodeURIComponent(req.session.redirectTo || '/site');
+
+  delete req.session.redirectTo;
 
   return verifier.verify(assertion)
      .then(function (email) {
@@ -29,6 +32,6 @@ exports.handler = function (req, res) {
         // sign the user in, visit their list of sites.
         req.session.email = existingUser.email;
 
-        res.redirect('/site');
+        res.redirect(redirectTo);
       });
 };

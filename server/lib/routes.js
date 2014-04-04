@@ -13,6 +13,7 @@ const router = new Router();
 
 const logger = require('./logger');
 const getQuery = require('./site-query');
+const httpErrors = require('./http-errors');
 
 const ROUTES_DIR = path.join(__dirname, '..', 'routes');
 
@@ -78,9 +79,16 @@ function addRoute(route, router) {
         }
         render(value);
       }
-    }).catch(renderError);
+    }).catch(handleError);
 
-    function renderError(err) {
+    function handleError(err) {
+      if (httpErrors.is(err, httpErrors.UnauthorizedError)) {
+        // user is not authenticated, redirect them to the signin page.
+        req.session.redirectTo = encodeURIComponent(req.url);
+        res.redirect(307, '/user');
+        return;
+      }
+
       var httpStatusCode = err.httpError || 500;
       logger.error('%s(%s): %s', req.url, httpStatusCode, String(err));
       res.send(httpStatusCode, err.message);

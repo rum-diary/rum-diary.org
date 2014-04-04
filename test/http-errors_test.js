@@ -15,5 +15,13 @@ describe('http-errors', function () {
     assert.equal(err.httpError, 400);
     assert.equal(err.message, 'Bad Request');
   });
+
+  describe('is', function () {
+    var err = httpErrors.ForbiddenError();
+    assert.isTrue(httpErrors.is(err, httpErrors.ForbiddenError));
+    assert.isTrue(httpErrors.is(err, 'ForbiddenError'));
+    assert.isFalse(httpErrors.is(err, httpErrors.BadRequestError));
+    assert.isFalse(httpErrors.is(err, 'BadRequestError'));
+  });
 });
 

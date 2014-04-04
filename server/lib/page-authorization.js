@@ -31,7 +31,8 @@ module.exports = {
     var email = decodeURIComponent(req.params.email);
     if (email === 'new') return;
 
-    if (req.session.email !== email) throw httpErrors.UnauthorizedError();
+    if (! req.session.email) throw httpErrors.UnauthorizedError();
+    else if (req.session.email !== email) throw httpErrors.ForbiddenError();
   },
 
   /**
@@ -42,7 +43,7 @@ module.exports = {
 
     return db.site.isAuthorizedToView(req.session.email, req.dbQuery.hostname)
       .then(function (isAuthorized) {
-        if (! isAuthorized) throw httpErrors.UnauthorizedError();
+        if (! isAuthorized) throw httpErrors.ForbiddenError();
       });
   }
 };

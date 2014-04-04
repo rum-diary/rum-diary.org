@@ -20,28 +20,28 @@ var ROUTES = {
   'GET /'                             : 200,
   'GET /index.html'                   : 301,
   'GET /user'                         : 200,
-  'GET /welcome'                      : 401,
-  'GET /site'                         : 401,
-  'GET /site/localhost'               : 401,
+  'GET /welcome'                      : 307,
+  'GET /site'                         : 307,
+  'GET /site/localhost'               : 307,
   'GET /site/localhost?start=2013-12-25'
-                                      : 401,
+                                      : 307,
   'GET /site/localhost?start=2013-12-25&end=2014-01-05'
-                                      : 401,
-  'GET /site/localhost/performance'   : 401,
-  'GET /site/localhost/demographics'  : 401,
-  'GET /site/localhost/path/index'    : 401,
+                                      : 307,
+  'GET /site/localhost/performance'   : 307,
+  'GET /site/localhost/demographics'  : 307,
+  'GET /site/localhost/path/index'    : 307,
   'GET /site/localhost/path/some-page/with-more/and-123-digits'
-                                      : 401,
+                                      : 307,
   'GET /site/localhost/path/trailing-slash/'
-                                      : 401,
+                                      : 307,
   'GET /site/localhost/path/123'
-                                      : 401,
+                                      : 307,
   'GET /site/shanetomlinson.com/path/2013/testing-javascript-frontend-part-1-anti-patterns-and-fixes/'
-                                      : 401,
+                                      : 307,
   'GET /site/www.aframejs.com/path/tutorial.html'
-                                      : 401,
+                                      : 307,
   'GET /site/connect-fonts.org/path/families'
-                                      : 401
+                                      : 307
 
 };
 
