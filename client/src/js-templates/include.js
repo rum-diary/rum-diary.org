@@ -436,9 +436,11 @@
     var data = speedTrap.getUnload();
 
     var url = server + '/unload';
+    /*
     if (navigator.sendBeacon) {
       navigator.sendBeacon(url, JSON.stringify(data));
     } else {
+      */
       Micrajax.ajax({
         // async otherwise the browser closes the connection.
         async: false,
@@ -448,7 +450,7 @@
         contentType: 'application/json',
         data: data
       });
-    }
+    /*}*/
   }
 
   function getTagsFromScriptTag() {
