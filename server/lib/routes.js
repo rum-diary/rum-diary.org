@@ -7,6 +7,7 @@ const path = require('path');
 const cors = require('cors');
 const corsMiddleware = cors();
 const joi = require('joi');
+const requireSubdir = require('require-subdir');
 
 const Router = require('express').Router;
 const router = new Router();
@@ -14,7 +15,6 @@ const router = new Router();
 const logger = require('./logger');
 const getQuery = require('./site-query');
 const httpErrors = require('./http-errors');
-const requireSubdir = require('./require-subdir');
 
 const ROUTES_DIR = path.join(__dirname, '..', 'routes');
 
@@ -26,12 +26,11 @@ const ROUTES_DIR = path.join(__dirname, '..', 'routes');
 loadAllRoutes();
 
 function loadAllRoutes() {
-  requireSubdir(ROUTES_DIR)
-    .then(function (routes) {
-      routes.forEach(function(route) {
-        addRoute(route, router);
-      });
+  requireSubdir(ROUTES_DIR, function (err, routes) {
+    routes.forEach(function(route) {
+      addRoute(route.exports, router);
     });
+  });
 }
 
 // router is passed in for testing.
