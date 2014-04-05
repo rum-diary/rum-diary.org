@@ -27,7 +27,7 @@ exports.hostname = function () {
 // A BrowserID assertion
 // TODO - is there a generic form?
 exports.assertion = function () {
-  return joi.string().min(100).max(5000);
+  return joi.string().min(10).max(5000);
 };
 
 // A CSRF token.

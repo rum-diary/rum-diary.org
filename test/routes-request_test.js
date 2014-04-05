@@ -156,7 +156,7 @@ function testCommonResponseHeaders(response) {
 
   // ensure CSP headers
   assert.equal(response.headers['x-content-security-policy'],
-            "default-src 'self' https://login.persona.org;");
+            "default-src 'self' https://login.persona.org");
 
   // DENY xframes
   assert.equal(response.headers['x-frame-options'], 'DENY');
