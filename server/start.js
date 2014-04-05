@@ -52,13 +52,9 @@ SessionStore.create().then(function (sessionStore) {
 
   app.disable('x-powered-by');
 
-  app.use(helmet.csp());
-  const cspPolicy = {
-    defaultPolicy: {
-      'default-src': ['\'self\'', 'https://login.persona.org']
-    }
-  };
-  helmet.csp.policy(cspPolicy);
+  app.use(helmet.csp({
+    'default-src': ['\'self\'', 'https://login.persona.org']
+  }));
 
   // Template setup.
   var env = nunjucks.configure(config.get('views_dir'), {

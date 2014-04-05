@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const inputValidation = require('../lib/input-validation');
 const db = require('../lib/db');
 const verifier = require('../lib/verifier');
 
@@ -9,9 +10,16 @@ exports.path = '/user';
 exports.verb = 'post';
 exports.authorization = require('../lib/page-authorization').NOT_AUTHENTICATED;
 
+exports.validation = {
+  _csrf: inputValidation.csrf(),
+  name: inputValidation.string().min(3).max(50),
+  hostname: inputValidation.hostname(),
+  assertion: inputValidation.assertion()
+};
+
 exports.handler = function (req, res) {
   const name = req.body.name;
-  const hostname = req.body.hostname;
+  const hostname = req.body.hostname.replace(/^https?:\/\//, '');;
   const assertion = req.body.assertion;
 
   var email;

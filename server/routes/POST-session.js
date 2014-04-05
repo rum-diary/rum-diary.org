@@ -4,6 +4,7 @@
 
 // Sign in an existing user.
 
+const inputValidation = require('../lib/input-validation');
 const db = require('../lib/db');
 const verifier = require('../lib/verifier');
 const httpErrors = require('../lib/http-errors');
@@ -11,6 +12,12 @@ const httpErrors = require('../lib/http-errors');
 exports.path = '/session';
 exports.verb = 'post';
 exports.authorization = require('../lib/page-authorization').ANY;
+
+exports.validation = {
+  _csrf: inputValidation.csrf(),
+  assertion: inputValidation.assertion()
+};
+
 
 exports.handler = function (req, res) {
   const assertion = req.body.assertion;

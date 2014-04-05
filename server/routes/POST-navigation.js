@@ -2,16 +2,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Promise = require('bluebird');
 const url = require('url');
 const useragent = require('useragent');
-const Promise = require('bluebird');
-const logger = require('../lib/logger');
+
 const db = require('../lib/db');
+const inputValidation = require('../lib/input-validation');
+const logger = require('../lib/logger');
 
 exports.path = '/navigation';
 exports.verb = 'post';
 exports.enable_cors = true;
 exports.authorization = require('../lib/page-authorization').ANY;
+
+exports.validation = {
+  uuid: inputValidation.guid(),
+  puuid: inputValidation.guid().optional(),
+  referrer: inputValidation.referrer().optional(),
+  tags: inputValidation.tags().optional(),
+  returning: inputValidation.boolean(),
+  navigationTiming: inputValidation.navigationTiming()
+};
 
 exports.handler = function (req, res) {
   // don't wanna be hanging around for a response.

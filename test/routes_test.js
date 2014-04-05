@@ -135,10 +135,10 @@ describe('a route handler', function () {
 
       routerMock.handle(request, {
         send: function() {
-          assert.fail();
+          assert(false, 'unexpected');
         },
         render: function() {
-          assert.fail();
+          assert(false, 'unexpected');
         }
       });
     });
