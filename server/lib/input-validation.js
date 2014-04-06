@@ -49,27 +49,27 @@ exports.navigationTiming = function () {
   // redirect events are not sent if there is no redirect.
   // secureConnectionStart is not sent if using only an HTTP connection.
   return joi.object({
-    navigationStart: joi.number().integer(),
+    navigationStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
     unloadEventStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
     unloadEventEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
     redirectStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
     redirectEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    fetchStart: joi.number().integer(),
-    domainLookupStart: joi.number().integer(),
-    domainLookupEnd: joi.number().integer(),
-    connectStart: joi.number().integer(),
-    connectEnd: joi.number().integer(),
+    fetchStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    domainLookupStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    domainLookupEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    connectStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    connectEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
     secureConnectionStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    requestStart: joi.number().integer(),
-    responseStart: joi.number().integer(),
-    responseEnd: joi.number().integer(),
-    domLoading: joi.number().integer(),
-    domInteractive: joi.number().integer(),
-    domContentLoadedEventStart: joi.number().integer(),
-    domContentLoadedEventEnd: joi.number().integer(),
-    domComplete: joi.number().integer(),
-    loadEventStart: joi.number().integer(),
-    loadEventEnd: joi.number().integer()
+    requestStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    responseStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    responseEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    domLoading: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    domInteractive: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    domContentLoadedEventStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    domContentLoadedEventEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    domComplete: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    loadEventStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
+    loadEventEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null))
   });
 };
 
