@@ -86,6 +86,6 @@ exports.puuid = function () {
 
 // Tags when reporting navigation timing.
 exports.tags = function () {
-  return joi.array().includes(joi.string());
+  return joi.array().includes(joi.string().allow(''));
 };
 
