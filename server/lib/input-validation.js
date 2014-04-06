@@ -78,7 +78,14 @@ exports.guid = function () {
   return joi.string().guid();
 };
 
+// previous uuid - this is optional and is not reported if the user
+// is visiting their first page on the site in this session.
+exports.puuid = function () {
+  return joi.alternatives(exports.guid(), joi.any().allow(null));
+};
+
 // Tags when reporting navigation timing.
 exports.tags = function () {
   return joi.array().includes(joi.string());
 };
+

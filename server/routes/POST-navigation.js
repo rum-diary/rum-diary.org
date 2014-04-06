@@ -17,7 +17,7 @@ exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.validation = {
   uuid: inputValidation.guid(),
-  puuid: inputValidation.guid().optional(),
+  puuid: inputValidation.puuid(),
   referrer: inputValidation.referrer().optional(),
   tags: inputValidation.tags().optional(),
   returning: inputValidation.boolean(),
