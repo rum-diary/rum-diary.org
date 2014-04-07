@@ -89,3 +89,18 @@ exports.tags = function () {
   return joi.array().includes(joi.string().allow(''));
 };
 
+// Session duration.
+exports.duration = function () {
+  return joi.alternatives(joi.number().integer(), joi.any().allow(null));
+};
+
+// unload data timers.
+exports.timers = function () {
+  return joi.object();
+};
+
+// unload data events.
+exports.events = function () {
+  return joi.array(joi.any());
+};
+

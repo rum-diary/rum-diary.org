@@ -2,18 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const logger = require('../lib/logger');
 const db = require('../lib/db');
 const httpErrors = require('../lib/http-errors');
+const inputValidation = require('../lib/input-validation');
+const logger = require('../lib/logger');
 
 exports.path = '/unload';
 exports.verb = 'post';
 exports.enable_cors = true;
 exports.authorization = require('../lib/page-authorization').ANY;
 
+exports.validation = {
+  uuid: inputValidation.guid(),
+  duration: inputValidation.duration(),
+  timers: inputValidation.timers(),
+  events: inputValidation.events()
+};
+
 exports.handler = function (req, res) {
   var data = req.body;
-  if (! data.uuid) return httpErrors.BadRequestError();
 
   // don't wanna be hanging around for a response.
   res.send(200, { success: true });
