@@ -25,7 +25,7 @@ var Module = {
 
     var data = this.data;
 
-    var margin = {top: 20, right: 10, bottom: 70, left: 20},
+    var margin = {top: 20, right: 10, bottom: 70, left: 30},
         width = containerWidth - margin.left - margin.right,
         height = this.height - margin.top - margin.bottom;
 
