@@ -16,7 +16,7 @@ var Module = {
     this.containerEl = d3.select(this.root)[0][0];
     this.data = options.data;
     /*this.width = options.width || this.containerEl.clientWidth;*/
-    this.height = 200;//options.height || 350;
+    this.height = options.height || 350;
   },
 
   render: function () {
