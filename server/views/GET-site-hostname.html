@@ -60,7 +60,7 @@
 
   <article id="daily-hits" class="row-right">
     <h2>Daily hits</h2>
-    <form method="get" action="/site/localhost">
+    <form method="get" action="/site/{{ hostname }}">
       <div>
         <label for="start">Start date</label>
         <input type="datepicker" name="start" value="{{ startDate | dateFormat('YYYY-MM-DD') }}" />
