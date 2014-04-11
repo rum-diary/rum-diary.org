@@ -16,7 +16,7 @@ var Module = {
     this.containerEl = d3.select(this.root)[0][0];
     this.data = options.data;
     /*this.width = options.width || this.containerEl.clientWidth;*/
-    this.height = options.height || 350;
+    this.height = 200;//options.height || 350;
   },
 
   render: function () {
@@ -54,6 +54,12 @@ var Module = {
         .y(function(d) {
           return y(d.hits);
         });
+
+    var area = d3.svg.area()
+        .x(function(d) { return x(d.date); })
+        .y0(height)
+        .y1(function(d) { return y(d.hits); });
+
 
     var svgEl = d3.select('#hits-graph').append('svg')
         .attr('width', containerWidth + 'px')
@@ -95,8 +101,10 @@ var Module = {
 
 
     var pathEl = svg.append('path')
-        .attr('class', 'line')
-        .attr('d', valueline(data));
+        .datum(data)
+        .attr('class', 'area')
+        /*.attr('d', valueline(data));*/
+        .attr('d', area);
 
     d3.select(window).on('resize', resize);
 
