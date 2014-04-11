@@ -4,6 +4,7 @@
 
 (function() {
   var DOMinator = require('./lib/dominator');
+  var Pikaday = require('./bower_components/pikaday/pikaday');
 
   window.addEventListener('load', function() {
 
@@ -14,8 +15,28 @@
     browsersGraph();
     osGraph();
     deviceTypeGraph();
-
+    datePicker();
   }, false);
+
+  function datePicker() {
+    var startEl = DOMinator('[name=start]').nth(0);
+    var startPicker = new Pikaday({
+      field: startEl,
+      onSelect: function() {
+        startEl.value = startPicker.toString();
+      },
+      maxDate: new Date()
+    });
+
+    var endEl = DOMinator('[name=end]').nth(0);
+    var endPicker = new Pikaday({
+      field: endEl,
+      onSelect: function() {
+        endEl.value = endPicker.toString();
+      },
+      maxDate: new Date()
+    });
+  }
 
   function hitsGraph() {
     // Get data from the HTML

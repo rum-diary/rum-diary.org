@@ -60,6 +60,18 @@
 
   <article id="daily-hits" class="row-right">
     <h2>Daily hits</h2>
+    <form method="get" action="/site/localhost">
+      <div>
+        <label for="start">Start date</label>
+        <input type="date" name="start" value="{{ startDateYYYYMMDD }}" />
+      </div>
+      <div>
+        <label for="end">End date</label>
+        <input type="date" name="end" value="{{ endDateYYYYMMDD }}" />
+      </div>
+      <button>Update</button>
+    </form>
+
     <div id="hits-graph" data-hostname="{{ hostname }}"></div>
     <table id="hits-data">
       {% for day in pageHitsPerDay %}
