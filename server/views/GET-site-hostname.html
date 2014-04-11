@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block header %}
-  {{ hostname }} - {{ startDate }} to {{ endDate }}
+  {{ hostname }} - {{ startDate | dateFormat('MMM DD') }} to {{ endDate | dateFormat('MMM DD') }}
 {% endblock %}
 
 
@@ -63,11 +63,11 @@
     <form method="get" action="/site/localhost">
       <div>
         <label for="start">Start date</label>
-        <input type="date" name="start" value="{{ startDateYYYYMMDD }}" />
+        <input type="date" name="start" value="{{ startDate | dateFormat('YYYY-MM-DD') }}" />
       </div>
       <div>
         <label for="end">End date</label>
-        <input type="date" name="end" value="{{ endDateYYYYMMDD }}" />
+        <input type="date" name="end" value="{{ endDate | dateFormat('YYYY-MM-DD') }}" />
       </div>
       <button>Update</button>
     </form>

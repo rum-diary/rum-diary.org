@@ -66,10 +66,8 @@ exports.handler = function(req) {
       pageHitsPerPage: pageViewResults.hits_per_page,
       pageHitsPerDay: pageViewResults.hits_per_day.__all,
       referrers: pageViewResults.referrers.by_count.slice(0, 20),
-      startDate: req.start.format('MMM DD'),
-      startDateYYYYMMDD: req.start.format('YYYY-MM-DD'),
-      endDate: req.end.format('MMM DD'),
-      endDateYYYYMMDD: req.end.format('YYYY-MM-DD'),
+      startDate: req.start,
+      endDate: req.end,
       hits: {
         total: totalHits,
         period: pageViewResults.hits_per_page[0].hits,
