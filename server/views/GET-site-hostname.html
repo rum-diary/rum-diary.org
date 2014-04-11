@@ -63,11 +63,11 @@
     <form method="get" action="/site/localhost">
       <div>
         <label for="start">Start date</label>
-        <input type="date" name="start" value="{{ startDate | dateFormat('YYYY-MM-DD') }}" />
+        <input type="datepicker" name="start" value="{{ startDate | dateFormat('YYYY-MM-DD') }}" />
       </div>
       <div>
         <label for="end">End date</label>
-        <input type="date" name="end" value="{{ endDate | dateFormat('YYYY-MM-DD') }}" />
+        <input type="datepicker" name="end" value="{{ endDate | dateFormat('YYYY-MM-DD') }}" />
       </div>
       <button>Update</button>
     </form>
