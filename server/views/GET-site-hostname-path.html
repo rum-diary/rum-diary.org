@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block header %}
-  {{ hostname }}{{ path }} - {{ startDate }} to {{ endDate }}
+  {{ hostname }}{{ path }} - {{ startDate | dateFormat('MMM DD') }} to {{ endDate | dateFormat('MMM DD') }}
 {% endblock %}
 
 {% block body %}
@@ -55,47 +55,22 @@
 
   <article class="row-right">
     <h2>Daily hits</h2>
-    <div id="hits-graph"></div>
-    <table id="hits-data">
-      {% for day in pageHitsPerDay %}
-        <tr class="hits-data-day">
-          <td class="hits-data-date">{{ day.date }}</td>
-          <td class="hits-data-hits">{{ day.hits }}</td>
-        </tr>
-      {% endfor %}
-    </table>
+    {% include "partials/_hits-graph.html" %}
   </article>
 </section>
 
 <section class="row narrow-left">
   <article class="row-left">
     <h2>Top referrers</h2>
-    <ul>
-      {% for referrer in referrers %}
-        <li><small>({{ referrer.count }})</small> {{ referrer.hostname }}</li>
-      {% endfor %}
-    </ul>
+    {% include "partials/_referrers-list.html" %}
   </article>
 
   <div class="row-right">
     <article>
       <h2>Enter from</h2>
-      <nav class="multi-column-nav">
+      <nav class="vertical-nav">
         <ul id="page-views">
           {% for page, count in internalTransfer.from %}
-            <li>
-              <a href="/site/{{ hostname }}/path{{ page }}"><small>({{ count }})</small> {{ page }}</a>
-            </li>
-          {% endfor %}
-        </ul>
-      </nav>
-    </article>
-
-    <article>
-      <h2>Exit to</h2>
-      <nav class="multi-column-nav">
-        <ul id="page-views">
-          {% for page, count in internalTransfer.to %}
             <li>
               <a href="/site/{{ hostname }}/path{{ page }}"><small>({{ count }})</small> {{ page }}</a>
             </li>

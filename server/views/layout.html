@@ -20,6 +20,10 @@
         <h1>rum-diary.org</h1><h2>Metrics with ethics</h2>
 
         <nav class="header-nav">
+          {% block navigation %}
+          &nbsp;
+          {% endblock %}
+
           <section class="session">
             {% if email %}
               <a href="/user/{{ email }}">{{ email }}</a>,
@@ -30,10 +34,6 @@
               </form>
             {% endif %}
           </section>
-
-          {% block navigation %}
-          &nbsp;
-          {% endblock %}
         </nav>
       </div>
     </header>

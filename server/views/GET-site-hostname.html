@@ -15,21 +15,6 @@
 
 
 {% block body %}
-  <!--
-  {% if tags.length %}
-    <nav class="horizontal-nav">
-      <h4>Tags</h4>
-      <ul>
-        <li><a href="{{ root_url }}">None</a></li>
-        {% for tag in tags %}
-          <li><a href="{{ root_url }}?tags={{ tag }}">{{ tag }}</a></li>
-          <li><a href="{{ root_url }}?tags=!{{ tag }}">!{{ tag }}</a></li>
-        {% endfor %}
-      </ul>
-    </nav>
-  {% endif %}
-  -->
-
 <section class="row narrow-left">
   <article id="overview" class="row-left">
     <h2>Overview</h2>
@@ -60,27 +45,7 @@
 
   <article id="daily-hits" class="row-right">
     <h2>Daily hits</h2>
-    <form method="get" action="/site/{{ hostname }}">
-      <div>
-        <label for="start">Start date</label>
-        <input type="datepicker" name="start" value="{{ startDate | dateFormat('YYYY-MM-DD') }}" />
-      </div>
-      <div>
-        <label for="end">End date</label>
-        <input type="datepicker" name="end" value="{{ endDate | dateFormat('YYYY-MM-DD') }}" />
-      </div>
-      <button>Update</button>
-    </form>
-
-    <div id="hits-graph" data-hostname="{{ hostname }}"></div>
-    <table id="hits-data">
-      {% for day in pageHitsPerDay %}
-        <tr class="hits-data-day">
-          <td class="hits-data-date">{{ day.date }}</td>
-          <td class="hits-data-hits">{{ day.hits }}</td>
-        </tr>
-      {% endfor %}
-    </table>
+    {% include "partials/_hits-graph.html" %}
   </article>
 </section>
 
@@ -88,11 +53,7 @@
 <section class="row narrow-left">
   <article id="referrers" class="row-left">
     <h2>Top referrers</h2>
-    <ul>
-      {% for referrer in referrers %}
-        <li><small>({{ referrer.count }})</small> {{ referrer.hostname }}</li>
-      {% endfor %}
-    </ul>
+    {% include "partials/_referrers-list.html" %}
   </article>
 
   <article id="top-pages" class="row-right">

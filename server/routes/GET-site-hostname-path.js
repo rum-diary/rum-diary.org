@@ -44,7 +44,6 @@ exports.handler = function(req) {
       'returning': {},
       'read-time': {},
       'internal-transfer-from': {},
-      'internal-transfer-to': {},
       'exit': {},
       'bounce': {}
     }
@@ -63,8 +62,8 @@ exports.handler = function(req) {
       pageHitsPerPage: results.hits_per_page,
       pageHitsPerDay: results.hits_per_day.__all,
       referrers: results.referrers.by_count.slice(0, 20),
-      startDate: req.start.format('MMM DD'),
-      endDate: req.end.format('MMM DD'),
+      startDate: req.start,
+      endDate: req.end,
       hits: {
         total: 'N/A',//totalHits,
         period: pageHitsInPeriod,
@@ -76,8 +75,7 @@ exports.handler = function(req) {
       },
       medianReadTime: msToHoursMinsSeconds(results['read-time']),
       internalTransfer: {
-        from: results['internal-transfer-from']['by_dest'][path],
-        to: results['internal-transfer-to']['by_source'][path]
+        from: results['internal-transfer-from']['by_dest'][path]
       }
     };
   });

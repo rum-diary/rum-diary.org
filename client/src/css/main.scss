@@ -81,23 +81,39 @@ header {
   background-color: $header-background-color;
   color: $header-text-color;
   margin-bottom: 1rem;
+  text-align: center;
 
   nav {
     line-height: 22px;
     font-size: 0.8rem;
 
-    ul {
-      > li {
-        display: inline-block;
-        margin: 0 0.5rem 0 0;
+    .session {
+      form {
+        display: inline;
       }
     }
+  }
+}
 
-    .session {
-      display: inline;
-      float: right;
+@media only screen and (min-width: 500px) {
+  header {
+    text-align: left;
+  }
+}
 
-      form {
+@media only screen and (min-width: 700px) {
+  header {
+    nav {
+      ul {
+        display: inline;
+        > li {
+          display: inline;
+          margin: 0 0.5rem 0 0;
+        }
+      }
+
+      .session {
+        float: right;
         display: inline;
       }
     }
@@ -302,7 +318,18 @@ main {
   .overview > li {
     display: inline-block;
     margin-bottom: 0.35rem;
-    width: 10rem;
+    width: 32%;
+
+    > .overview-stat {
+      margin-left: 1rem;
+      font-size: 2rem;
+    }
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .overview > li {
+    width: 49%;
   }
 }
 
@@ -414,7 +441,7 @@ path {
 }
 
 .area {
-  fill: #42BDAB;
+  fill: $line-graph-fill-color;
 }
 
 .bar rect {
@@ -426,4 +453,30 @@ path {
   fill: #fff;
 }
 
+.date-range {
+  display: flex;
+  flex-direction: row;
 
+  > .form-row {
+    flex: 2 1 auto;
+    padding-right: 1.5rem;
+    width: 10px;
+
+    > input {
+      width: 100%;
+    }
+  }
+
+  > .submit {
+    flex: 1 1 auto;
+    margin: 0;
+    width: 10px;
+
+    > button {
+      margin-top: 20px;
+      padding: 0.25rem 0;
+      width: 100%;
+    }
+
+  }
+}
