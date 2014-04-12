@@ -223,9 +223,18 @@ footer {
   }
 }
 
-#referrers li {
+.referrers li {
   line-height: 1.6;
 }
+
+@media only screen and (min-width: 500px) and (max-width: 700px) {
+  .referrers {
+    -webkit-columns: 2;
+       -moz-columns: 2;
+            columns: 2;
+  }
+}
+
 
 
 .no-background-color {
