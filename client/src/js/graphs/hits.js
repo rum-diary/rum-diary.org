@@ -25,7 +25,7 @@ var Module = {
 
     var data = this.data;
 
-    var margin = {top: 20, right: 10, bottom: 70, left: 30},
+    var margin = {top: 20, right: 0, bottom: 70, left: 30},
         width = containerWidth - margin.left - margin.right,
         height = this.height - margin.top - margin.bottom;
 
@@ -122,7 +122,7 @@ var Module = {
       svgEl.select('.x.axis').call(xAxis.orient('bottom'));
 
       // now tell the path to redraw.
-      pathEl.attr('d', valueline(data));
+      pathEl.attr('d', area);
     }
   }
 };
