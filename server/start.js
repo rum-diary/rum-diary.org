@@ -11,6 +11,7 @@ const connect_fonts_vera_sans = require('connect-fonts-bitstream-vera-sans');
 const gzip_static = require('connect-gzip-static');
 const helmet = require('helmet');
 const cachify = require('connect-cachify');
+const moment = require('moment');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
@@ -66,6 +67,11 @@ SessionStore.create().then(function (sessionStore) {
   env.addFilter('cachify', function(str) {
     if (config.get('strong_http_caching')) return cachify.cachify(str);
     return str;
+  });
+
+  // Add the ability to convert dates using moment.
+  env.addFilter('dateFormat', function(date, format) {
+    return moment(new Date(date)).format(format);
   });
 
   // We need to get info out of the request bodies sometimes.

@@ -25,7 +25,7 @@ var Module = {
 
     var data = this.data;
 
-    var margin = {top: 20, right: 10, bottom: 70, left: 30},
+    var margin = {top: 20, right: 0, bottom: 70, left: 30},
         width = containerWidth - margin.left - margin.right,
         height = this.height - margin.top - margin.bottom;
 
@@ -54,6 +54,12 @@ var Module = {
         .y(function(d) {
           return y(d.hits);
         });
+
+    var area = d3.svg.area()
+        .x(function(d) { return x(d.date); })
+        .y0(height)
+        .y1(function(d) { return y(d.hits); });
+
 
     var svgEl = d3.select('#hits-graph').append('svg')
         .attr('width', containerWidth + 'px')
@@ -95,8 +101,10 @@ var Module = {
 
 
     var pathEl = svg.append('path')
-        .attr('class', 'line')
-        .attr('d', valueline(data));
+        .datum(data)
+        .attr('class', 'area')
+        /*.attr('d', valueline(data));*/
+        .attr('d', area);
 
     d3.select(window).on('resize', resize);
 
@@ -114,7 +122,7 @@ var Module = {
       svgEl.select('.x.axis').call(xAxis.orient('bottom'));
 
       // now tell the path to redraw.
-      pathEl.attr('d', valueline(data));
+      pathEl.attr('d', area);
     }
   }
 };

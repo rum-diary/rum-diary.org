@@ -1,0 +1,6 @@
+    <ul class="referrers">
+      {% for referrer in referrers %}
+        <li><small>({{ referrer.count }})</small> {{ referrer.hostname }}</li>
+      {% endfor %}
+    </ul>
+

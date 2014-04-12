@@ -6,6 +6,7 @@
   <title>RUM Diary - {% block title %}{% endblock %}</title>
   <link href="/en/vera-regular/fonts.css" type="text/css" rel="stylesheet" />
   <link href="{{ "/css/normalize.css" | cachify }}" type="text/css" rel="stylesheet" />
+  <link href="{{ "/js/bower_components/pikaday/css/pikaday.css" | cachify }}" type="text/css" rel="stylesheet" />
   <link href="{{ "/css/main.css" | cachify }}" type="text/css" rel="stylesheet" />
   {% block headercss %}
   {% endblock %}
@@ -19,6 +20,10 @@
         <h1>rum-diary.org</h1><h2>Metrics with ethics</h2>
 
         <nav class="header-nav">
+          {% block navigation %}
+          &nbsp;
+          {% endblock %}
+
           <section class="session">
             {% if email %}
               <a href="/user/{{ email }}">{{ email }}</a>,
@@ -29,10 +34,6 @@
               </form>
             {% endif %}
           </section>
-
-          {% block navigation %}
-          &nbsp;
-          {% endblock %}
         </nav>
       </div>
     </header>
