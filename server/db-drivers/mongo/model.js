@@ -187,6 +187,30 @@ exports.getOne = withDatabase(function (searchBy) {
   }
 });
 
+exports.findOneAndUpdate = withDatabase(function (searchBy, update, options) {
+  var startTime = new Date();
+  var name = this.name;
+
+  searchBy = this.getSearchBy(searchBy);
+
+  logger.info('%s->getOneAndUpdate: %s', name, JSON.stringify(searchBy));
+  return this.Model.findOneAndUpdate(searchBy, update, options).exec().then(function(model) {
+    computeDuration();
+    return model;
+  })
+  .then(null, function(err) {
+    computeDuration();
+    logger.error('%s->findOneAndUpdate error: %s', name, String(err));
+    throw err;
+  });
+
+  function computeDuration() {
+    var endTime = new Date();
+    var duration = endTime.getDate() - startTime.getDate();
+    logger.info('%s->findOneAndUpdate query time for %s: %s ms',
+                    name, JSON.stringify(searchBy), duration);
+  }
+});
 exports.clear = withDatabase(function () {
   logger.warn('clearing table: %s', this.name);
   var resolver = Promise.defer();

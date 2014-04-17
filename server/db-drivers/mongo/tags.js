@@ -36,12 +36,12 @@ TagsModel.ensureExists = function(options) {
 };
 
 TagsModel.hit = function(options) {
-  var self = this;
-  return this.ensureExists(options)
-            .then(function(model) {
-              model.total_hits++;
-              return self.update(model);
-            });
+  return this.findOneAndUpdate(
+    options,
+    {
+      $inc: { total_hits: 1 }
+    },
+    { upsert: true });
 };
 
 
