@@ -19,7 +19,7 @@ var Module = {
   },
 
   render: function() {
-    var margin = {top: 30, right: 10, bottom: 0, left: 50};
+    var margin = {top: 30, right: 10, bottom: 0, left: 80};
     var width = this.width - margin.left - margin.right;
     var height = this.height - margin.top - margin.bottom;
 
