@@ -37,12 +37,12 @@ SiteModel.ensureExists = function (hostname) {
 };
 
 SiteModel.hit = function (hostname) {
-  var self = this;
-  return this.ensureExists(hostname)
-            .then(function (model) {
-              model.total_hits++;
-              return self.update(model);
-            });
+  return this.findOneAndUpdate(
+    { hostname: hostname },
+    {
+      $inc: { total_hits: 1 }
+    },
+    { upsert: true });
 };
 
 /**
