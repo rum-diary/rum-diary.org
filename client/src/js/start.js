@@ -193,12 +193,12 @@
       });
     });
 
-    var browsers = require('./graphs/pie.js').create();
+    var browsers = require('./graphs/horizontal-bar.js').create();
     browsers.init({
       root: '#browsers-graph',
       data: browsersData,
       width: DOMinator('#browsers-graph').nth(0).clientWidth,
-      height: '500'
+      height: 250
     });
     browsers.render();
 

@@ -11,6 +11,7 @@
   require('./spec/graphs/hits_test.js')();
   require('./spec/graphs/navigation-timing_test.js')();
   require('./spec/graphs/pie_test.js')();
+  require('./spec/graphs/horizontal-bar_test.js')();
 
   window.addEventListener('load', function() {
     if (navigator.userAgent.indexOf('PhantomJS') < 0) {

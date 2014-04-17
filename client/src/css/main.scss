@@ -462,6 +462,32 @@ path {
   fill: #fff;
 }
 
+.bar-chart {
+  .bar.positive {
+    fill: steelblue;
+  }
+
+  .bar.positive:hover {
+    fill: brown;
+  }
+
+  .bar.negative {
+    fill: brown;
+  }
+
+  .axis text {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+}
+
 .date-range {
   display: flex;
   flex-direction: row;
