@@ -19,7 +19,7 @@ var Module = {
   },
 
   render: function() {
-    var margin = {top: 30, right: 10, bottom: 0, left: 80};
+    var margin = {top: 30, right: 10, bottom: 0, left: 100};
     var width = this.width - margin.left - margin.right;
     var height = this.height - margin.top - margin.bottom;
 
@@ -32,7 +32,7 @@ var Module = {
 
 
     var x = d3.scale.linear()
-        .domain([0, d3.max(this.data, function(d) { return d.value })])
+        .domain([0, d3.max(this.data, function(d) { return d.value; })])
         .range([0, width]);
 
     var y = d3.scale.ordinal()
@@ -43,7 +43,8 @@ var Module = {
         .scale(x)
         .orient('top');
 
-    var svg = d3.select(this.root).append('svg')
+    var containerEl = d3.select(this.root);
+    var svg = containerEl.append('svg')
         .attr('class', 'bar-chart horizontal')
         .attr('width', this.width)
         .attr('height', this.height)
@@ -53,8 +54,8 @@ var Module = {
     svg.selectAll('.bar')
         .data(this.data)
       .enter().append('rect')
-        .attr('class', function(d) { return 'bar positive'; })
-        .attr('x', function(d) { return x(0); })
+        .attr('class', 'bar positive')
+        .attr('x', x(0))
         .attr('y', function(d) { return y(d.title); })
         .attr('width', function(d) { return x(d.value) - x(0); })
         .attr('height', y.rangeBand());
@@ -70,7 +71,6 @@ var Module = {
     svg.append('g')
         .attr('class', 'y axis')
         .call(yAxis);
-
   }
 };
 

@@ -199,6 +199,7 @@
       data: browsersData,
       width: DOMinator('#browsers-graph').nth(0).clientWidth,
       height: 250
+
     });
     browsers.render();
 
@@ -224,7 +225,7 @@
       });
     });
 
-    var os = require('./graphs/pie.js').create();
+    var os = require('./graphs/horizontal-bar.js').create();
     os.init({
       root: '#os-graph',
       data: osData,
@@ -255,7 +256,7 @@
       };
     });
 
-    var deviceType = require('./graphs/pie.js').create();
+    var deviceType = require('./graphs/horizontal-bar.js').create();
     deviceType.init({
       root: '#device-type-graph',
       data: deviceTypeArray,
