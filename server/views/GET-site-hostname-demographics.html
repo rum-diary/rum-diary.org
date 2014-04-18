@@ -15,27 +15,23 @@
 
 {% block body %}
 
-<section>
-  Browser, OS, mobile vs tablet vs desktop stats go here.
-</section>
-
-
-<article>
-  <h2>Browser breakdown</h2>
-  <div id="browsers-graph"></div>
-
-  <table id="browsers-data">
-    {% for browser, count in browsers %}
-      <tr class="browsers-data-item">
-        <td class="browsers-data-browser">{{ browser }}</td>
-        <td class="browsers-data-count">{{ count }}</td>
-      </tr>
-    {% endfor %}
-  </table>
-</article>
 
 <section class="row">
   <article class="row-left half">
+    <h2>Browser breakdown</h2>
+    <div id="browsers-graph"></div>
+
+    <table id="browsers-data">
+      {% for browser, count in browsers %}
+        <tr class="browsers-data-item">
+          <td class="browsers-data-browser">{{ browser }}</td>
+          <td class="browsers-data-count">{{ count }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </article>
+
+  <article class="row-right half">
     <h2>OS breakdown</h2>
     <div id="os-graph"></div>
 
@@ -48,8 +44,10 @@
       {% endfor %}
     </table>
   </article>
+</section>
 
-  <article class="row-right half">
+<section class="row">
+  <article class="row-center">
     <h2>Device type</h2>
     <div id="device-type-graph"></div>
 
