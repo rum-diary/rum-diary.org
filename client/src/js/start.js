@@ -196,10 +196,7 @@
     var browsers = require('./graphs/horizontal-bar.js').create();
     browsers.init({
       root: '#browsers-graph',
-      data: browsersData,
-      width: DOMinator('#browsers-graph').nth(0).clientWidth,
-      height: 250
-
+      data: browsersData
     });
     browsers.render();
 
@@ -228,9 +225,7 @@
     var os = require('./graphs/horizontal-bar.js').create();
     os.init({
       root: '#os-graph',
-      data: osData,
-      width: DOMinator('#os-graph').nth(0).clientWidth,
-      height: '300'
+      data: osData
     });
     os.render();
 
@@ -259,9 +254,7 @@
     var deviceType = require('./graphs/horizontal-bar.js').create();
     deviceType.init({
       root: '#device-type-graph',
-      data: deviceTypeArray,
-      width: DOMinator('#device-type-graph').nth(0).clientWidth,
-      height: '300'
+      data: deviceTypeArray
     });
     deviceType.render();
 

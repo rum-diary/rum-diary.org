@@ -6,6 +6,9 @@
 
 'use strict';
 
+var DOMinator = require('../lib/dominator');
+var margin = {top: 30, right: 10, bottom: 0, left: 100};
+
 var Module = {
   create: function() {
     return Object.create(this);
@@ -14,12 +17,11 @@ var Module = {
   init: function(options) {
     this.root = options.root;
     this.data = options.data;
-    this.width = options.width || 960;
-    this.height = options.height || 500;
+    this.width = options.width || DOMinator(this.root).nth(0).clientWidth;
+    this.height = options.height || (30 * this.data.length + margin.top);
   },
 
   render: function() {
-    var margin = {top: 30, right: 10, bottom: 0, left: 100};
     var width = this.width - margin.left - margin.right;
     var height = this.height - margin.top - margin.bottom;
 
