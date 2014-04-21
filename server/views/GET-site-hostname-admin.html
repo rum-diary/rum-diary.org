@@ -16,13 +16,19 @@
 
 {% block body %}
 <section class="row">
+  <h2>Owner</h2>
+  {{ owner }}
+</section>
+
+<section class="row">
   <h2>Administrators</h2>
   <ul>
     <li>
       {% if admin_users.length %}
         {% for email in admin_users %}
-          <form method="post" action="/site/{{ hostname }}/admin/{{ email }}">
+          <form method="post" action="/site/{{ hostname }}/user">
             {{ email }}
+            <input type="hidden" name="email" value="{{ email }}" />
             <input type="hidden" name="_method" value="delete" />
             <button type="submit">Delete</button>
           </form>
@@ -32,13 +38,12 @@
       {% endif %}
     </li>
   </ul>
-  <form>
+  <form method="post" action="/site/{{ hostname }}/user">
     <h3>Add administrator</h3>
-    <form method="post" action="/site/{{ hostname }}/admin">
-      <label for="new_admin_user">Email address</label>
-      <input type="email" name="new_admin_user" placeholder="administrator@domain.com" />
-      <button type="submit">Add</button>
-    </form>
+    <label for="email">Email address</label>
+    <input type="email" name="email" placeholder="administrator@domain.com" />
+    <input type="hidden" name="access_level" value="ADMIN" />
+    <button type="submit">Add</button>
   </form>
 </section>
 
@@ -48,8 +53,9 @@
     <li>
       {% if readonly_users.length %}
         {% for email in readonly_users %}
-          <form method="post" action="/site/{{ hostname }}/readonly_user/{{ email }}">
+          <form method="post" action="/site/{{ hostname }}/user">
             {{ email }}
+            <input type="hidden" name="email" value="{{ email }}" />
             <input type="hidden" name="_method" value="delete" />
             <button type="submit">Delete</button>
           </form>
@@ -59,13 +65,12 @@
       {% endif %}
     </li>
   </ul>
-  <form>
+  <form method="post" action="/site/{{ hostname }}/user">
     <h3>Add readonly user</h3>
-    <form method="post" action="/site/{{ hostname }}/readonly_user">
-      <label for="new_readonly_user">Email address</label>
-      <input type="email" name="new_readonly_user" placeholder="readonly_user@domain.com" />
-      <button type="submit">Add</button>
-    </form>
+    <label for="email">Email address</label>
+    <input type="email" name="email" placeholder="readonly_user@domain.com" />
+    <input type="hidden" name="access_level" value="READONLY" />
+    <button type="submit">Add</button>
   </form>
 </section>
 

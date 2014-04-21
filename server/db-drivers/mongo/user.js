@@ -6,6 +6,7 @@
 
 const Model = require('./model');
 const Schema = require('mongoose').Schema;
+const Site = require('./site');
 
 const userDefinition = {
   name: String,
@@ -14,5 +15,13 @@ const userDefinition = {
 
 const UserModel = Object.create(Model);
 UserModel.init('User', userDefinition);
+
+/**
+ * A helper that makes sense here even though most of the logic
+ * is contained within the Site model
+ */
+UserModel.getSites = function (email) {
+  return Site.getSitesForUser(email);
+};
 
 module.exports = UserModel;

@@ -57,6 +57,15 @@ module.exports = {
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });
+  },
+
+  IS_OWNER_HOST: function (req) {
+    if (! req.session.email) throw httpErrors.UnauthorizedError();
+
+    return db.site.isOwner(req.session.email, req.dbQuery.hostname)
+      .then(function (isAuthorized) {
+        if (! isAuthorized) throw httpErrors.ForbiddenError();
+      });
   }
 };
 

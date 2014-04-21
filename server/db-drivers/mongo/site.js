@@ -13,14 +13,14 @@ const siteDefinition = {
     type: Number,
     default: 0
   },
-  admin_users: {
-    type: [ String ],
-    default: []
-  },
-  readonly_users: {
-    type: [ String ],
-    default: []
-  },
+  owner: String,
+  users: [{
+    email: String,
+    access_level: {
+      type: Number,
+      default: accessLevels.READONLY
+    }
+  }],
   // Is a site public
   is_public: {
     type: Boolean,
@@ -43,105 +43,126 @@ SiteModel.ensureExists = function (hostname) {
               });
 };
 
+SiteModel.registerNewSite = function (hostname, owner) {
+  var self = this;
+  return this.getOne({ hostname: hostname })
+              .then(function (model) {
+                if (model) throw new Error('already exists');
+
+                return self.create({
+                  hostname: hostname,
+                  owner: owner
+                });
+              });
+};
+
 SiteModel.hit = function (hostname) {
   return this.findOneAndUpdate(
     { hostname: hostname },
     {
       $inc: { total_hits: 1 }
     },
-    { upsert: true });
+    // do NOT automatically create a new site.
+    { upsert: false });
 };
 
 /**
  * Set a user's access level on the site.
  */
 SiteModel.setUserAccessLevel = function(email, hostname, accessLevel) {
-  return SiteModel.getOne({ hostname: hostname })
+  var self = this;
+  return this.getOne({ hostname: hostname })
     .then(function (site) {
       if (! site) {
         throw new Error('cannot find site: ' + hostname);
       }
 
+      if (site.owner === email) {
+        throw new Error('cannot set owner\'s access level');
+      }
+
+      // TODO - do we have to care whether the email actually
+      // exists?
+
       // TODO - we should really be doing this as an atomic
       // op when reading the site.
 
-      var isReadonlyUpdated = false;
-      var isAdminUpdated = false;
+      var users = site.users;
+      var index = indexOfUser(users, email);
 
-      if (accessLevel === accessLevels.NONE) {
-        isReadonlyUpdated = removeReadonlyAccess(site, email);
-        isAdminUpdated = removeAdminAccess(site, email);
-      } else if (accessLevel === accessLevels.ADMIN) {
-        isReadonlyUpdated = removeReadonlyAccess(site, email);
-        isAdminUpdated = addAdminAccess(site, email);
-      } else if (accessLevel === accessLevels.READONLY) {
-        isReadonlyUpdated = addReadonlyAccess(site, email);
-        isAdminUpdated = removeAdminAccess(site, email);
-      }
+      if (index === -1) {
+        // user is not yet added to DB.
+        users.push({
+          email: email,
+          access_level: accessLevel
+        });
 
-      if (isReadonlyUpdated || isAdminUpdated) {
-        return SiteModel.update(site);
+        return self.update(site);
+      } else if (users[index].access_level !== accessLevel) {
+        // user is already in DB and access level must be updated.
+        if (accessLevel === accessLevels.NONE) {
+          users.splice(index, 1);
+        } else {
+          users[index].access_level = accessLevel;
+        }
+        return self.update(site);
       }
 
       return site;
     });
-
-  function addReadonlyAccess(site, email) {
-    if (site.readonly_users.indexOf(email) === -1) {
-      site.readonly_users.push(email);
-      return true;
-    }
-  }
-
-  function removeReadonlyAccess(site, email) {
-    var readonlyIndex = site.readonly_users.indexOf(email);
-    if (readonlyIndex > -1) {
-      site.readonly_users.splice(readonlyIndex, 1);
-      return true;
-    }
-  }
-
-  function addAdminAccess(site, email) {
-    if (site.admin_users.indexOf(email) === -1) {
-      site.admin_users.push(email);
-      return true;
-    }
-  }
-
-  function removeAdminAccess(site, email) {
-    var adminIndex = site.admin_users.indexOf(email);
-    if (adminIndex > -1) {
-      site.admin_users.splice(adminIndex, 1);
-      return true;
-    }
-  }
 };
+
+function indexOfUser(users, email) {
+  for (var i = 0, user; user = users[i]; ++i) {
+    if (user.email === email) return i;
+  }
+
+  return -1;
+}
 
 /**
  * Check if a user is authorized to view a site.
  */
 SiteModel.isAuthorizedToView = function (email, hostname) {
-  return this.getOne({ hostname: hostname })
-              .then(function (model) {
-                if (! model) return false;
-
-                if (model.readonly_users.indexOf(email) > -1) return true;
-                if (model.admin_users.indexOf(email) > -1) return true;
-                return false;
-              });
+  return isUserAuthorized.call(this, email, hostname, accessLevels.READONLY);
 };
 
 /**
  * Check if a user is authorized to administrate a site.
  */
 SiteModel.isAuthorizedToAdministrate = function (email, hostname) {
-  return this.getOne({ hostname: hostname })
+  return isUserAuthorized.call(this, email, hostname, accessLevels.ADMIN);
+};
+
+function isUserAuthorized(email, hostname, minAccessLevel) {
+  return this.getOne({ hostname: hostname, $or: [ { owner: email }, { 'users.email': email } ] })
               .then(function (model) {
                 if (! model) return false;
 
-                if (model.admin_users.indexOf(email) > -1) return true;
-                return false;
+                if (model.owner === email) return true;
+
+                var index = indexOfUser(model.users, email);
+                return model.users[index].access_level >= minAccessLevel;
               });
+}
+
+/**
+ * Check if a user is an owner of a site.
+ */
+SiteModel.isOwner = function (email, hostname) {
+  return this.getOne({ hostname: hostname, owner: email })
+              .then(function (model) {
+                if (! model) return false;
+
+                return true;
+              });
+};
+
+/**
+ * Get all sites for a user.
+ */
+SiteModel.getSitesForUser = function (email) {
+  return this.get({ $or: [ { owner: email }, { 'users.email': email } ] });
 };
 
 module.exports = SiteModel;

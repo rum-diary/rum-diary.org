@@ -4,6 +4,8 @@
 
 const httpErrors = require('../lib/http-errors');
 const db = require('../lib/db');
+const userCollection = db.user;
+const siteCollection = db.site;
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/user/:email';
@@ -17,7 +19,7 @@ exports.handler = function (req, res, next) {
 
   if (email === 'new') return next();
 
-  return db.user.getOne({
+  return userCollection.getOne({
     email: email
   })
   .then(function (user) {
@@ -25,11 +27,10 @@ exports.handler = function (req, res, next) {
       throw httpErrors.NotFoundError();
     }
 
-    return db.site.get({
-      admin_users: email
-    }).then(function(models) {
-      user.sites = models;
-      return user;
-    });
+    return userCollection.getSites(email);
+  })
+  .then(function(sites) {
+    user.sites = sites;
+    return user;
   });
 };

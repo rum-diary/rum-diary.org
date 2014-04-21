@@ -103,8 +103,6 @@ describe('invite', function () {
         return invite.getOne({ token: token });
       }).then(function(invitation) {
         assert.equal(invitation, null);
-      }, function (err) {
-        assert.isTrue(false, 'this is not what was expected');
       });
     });
 

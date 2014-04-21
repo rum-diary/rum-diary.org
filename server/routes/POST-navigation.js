@@ -76,7 +76,12 @@ exports.handler = function (req, res) {
   }
 
   return db.site.hit(data.hostname)
-            .then(function () {
+            .then(function (site) {
+              // site isn't yet registered, do NOT collect data.
+              if (! site) {
+                throw new Error('site does not exist: ' + data.hostname);
+              }
+
               data.is_counted = true;
               return db.pageView.create(data);
             })

@@ -100,8 +100,11 @@ describe('database', function () {
     });
 
     describe('hit', function () {
-      it('should increment the hit_count of the model by one', function (done) {
-        site.hit('testsite.com')
+      it('should increment the hit_count of the model by one', function () {
+        return site.create({ hostname: 'testsite.com' })
+          .then(function () {
+            return site.hit('testsite.com');
+          })
           .then(function () {
             return site.hit('testsite.com');
           })
@@ -110,54 +113,53 @@ describe('database', function () {
           }).then(function (sites) {
             assert.equal(sites[0].hostname, 'testsite.com');
             assert.equal(sites[0].total_hits, 2);
-            done();
-          }, fail);
+          });
       });
     });
 
-    describe('isAuthorizedToView', function () {
-      it('should return false if user is not authorized', function (done) {
-        site.create({
+    describe('setUserAccessLevel/isAuthorizedToView', function () {
+      it('should return false if user is not authorized', function () {
+        return site.create({
           hostname: 'testsite.com'
         }).then(function () {
           return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
         }).then(function (isAuthorized) {
           assert.isFalse(isAuthorized);
-          done();
-        }, fail);
+        });
       });
 
-      it('should return true if user is a readonly user', function (done) {
+      it('should return true if user is a readonly user', function () {
         site.create({
-          hostname: 'testsite.com',
-          readonly_users: ['testuser@testuser.com'],
+          hostname: 'testsite.com'
+        }).then(function () {
+          return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.READONLY);
         }).then(function () {
           return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
         }).then(function (isAuthorized) {
           assert.isTrue(isAuthorized);
-          done();
-        }, fail);
+        });
       });
 
-      it('should return true if user is an admin user', function (done) {
-        site.create({
-          hostname: 'testsite.com',
-          admin_users: ['testuser@testuser.com'],
+      it('should return true if user is an admin user', function () {
+        return site.create({
+          hostname: 'testsite.com'
+        }).then(function () {
+          return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.ADMIN);
         }).then(function () {
           return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
         }).then(function (isAuthorized) {
           assert.isTrue(isAuthorized);
-          done();
-        }, fail);
+        });
       });
     });
 
-    describe('setUserAccessLevel', function () {
+    describe('setuseraccesslevel', function () {
       describe('to NONE', function () {
         it('removes a user\'s readonly access', function () {
           return site.create({
-            hostname: 'testsite.com',
-            readonly_users: ['testuser@testuser.com'],
+            hostname: 'testsite.com'
+          }).then(function () {
+            return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.READONLY);
           }).then(function () {
             return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.NONE);
           }).then(function () {
@@ -169,8 +171,9 @@ describe('database', function () {
 
         it('removes a user\'s admin access', function () {
           return site.create({
-            hostname: 'testsite.com',
-            admin_users: ['testuser@testuser.com'],
+            hostname: 'testsite.com'
+          }).then(function () {
+            return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.ADMIN);
           }).then(function () {
             return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.NONE);
           }).then(function () {
@@ -200,6 +203,8 @@ describe('database', function () {
           return site.create({
             hostname: 'testsite.com'
           }).then(function () {
+            return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.ADMIN);
+          }).then(function () {
             return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.READONLY);
           }).then(function () {
             return site.isAuthorizedToAdministrate('testuser@testuser.com', 'testsite.com');
@@ -212,7 +217,26 @@ describe('database', function () {
           });
         });
       });
+    });
 
+    describe('getSitesForUser', function () {
+      it('get sites user is owner of', function () {
+          return site.create({
+            hostname: 'testsite.com',
+            owner: 'testuser@testuser.com'
+          }).then(function () {
+            return site.create({
+              hostname: 'othersite.com',
+              owner: 'testuser@testuser.com'
+            });
+          }).then(function () {
+            return site.getSitesForUser('testuser@testuser.com');
+          }).then(function(sites) {
+            assert.equal(sites.length, 2);
+            assert.equal(sites[0].hostname, 'testsite.com');
+            assert.equal(sites[1].hostname, 'othersite.com');
+          });
+      });
     });
   });
 });

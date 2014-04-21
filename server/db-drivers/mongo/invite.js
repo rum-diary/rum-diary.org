@@ -17,8 +17,12 @@ const inviteTokenDefinition = {
     type: String,
     default: guid
   },
+  // TODO - is from_email really needed?
   from_email: String,
   to_email: String,
+  // TODO - does hostname and access_level need to be here, or is
+  // it enough to add the user to the site when the invite
+  // is created?
   hostname: String,
   access_level: Number
 };

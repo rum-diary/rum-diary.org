@@ -49,7 +49,13 @@ exports.update = withDatabase(function (model) {
     return resolver.reject('attempting to save an item that is not a model. Try create instead.');
   }
 
+  var startTime = new Date();
+  var self = this;
   model.save(function(err, model) {
+    var endTime = new Date();
+    var duration = endTime - startTime;
+    logger.info('%s->update: %s ms', self.name, duration);
+
     if (err) {
       return resolver.reject(err);
     }
@@ -193,7 +199,7 @@ exports.findOneAndUpdate = withDatabase(function (searchBy, update, options) {
 
   searchBy = this.getSearchBy(searchBy);
 
-  logger.info('%s->getOneAndUpdate: %s', name, JSON.stringify(searchBy));
+  logger.info('%s->findOneAndUpdate: %s', name, JSON.stringify(searchBy));
   return this.Model.findOneAndUpdate(searchBy, update, options).exec().then(function(model) {
     computeDuration();
     return model;
