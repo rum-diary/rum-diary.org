@@ -16,6 +16,6 @@ exports.handler = function (req, res) {
 
   return siteCollection.findOneAndDelete({ hostname: hostname })
     .then(function () {
-      res.redirect('/user');
+      res.redirect('/site');
     });
 };

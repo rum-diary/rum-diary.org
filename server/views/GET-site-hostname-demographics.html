@@ -10,6 +10,9 @@
     <li><a href="/site/">Site list</a></li>
     <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
     <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
+    {% if isAdmin %}
+    <li><a href="/site/{{ hostname }}/admin">Administration</a></li>
+    {% endif %}
   </ul>
 {% endblock %}
 

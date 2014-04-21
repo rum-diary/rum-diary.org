@@ -76,7 +76,8 @@
 
 <section class="row">
   <h2>Delete site</h2>
-  <form>
+  <form method="post" action="/site/{{ hostname }}">
+    <input type="hidden" name="_method" value="delete" />
     <button>Are you sure?</button>
   </form>
 </section>
