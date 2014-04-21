@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block title %}{{ hostname }} Administration{% endblock %}
+
+{% block navigation %}
+  <ul>
+    <li><a href="/site/">Site list</a></li>
+    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
+    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
+  </ul>
+{% endblock %}
+
+{% block header %}
+  {{ hostname }} - Administration
+{% endblock %}
+
+
+{% block body %}
+<section class="row">
+  <h2>Administrators</h2>
+  <ul>
+    <li>
+      {% if admin_users.length %}
+        {% for email in admin_users %}
+          <form method="post" action="/site/{{ hostname }}/admin/{{ email }}">
+            {{ email }}
+            <input type="hidden" name="_method" value="delete" />
+            <button type="submit">Delete</button>
+          </form>
+        {% endfor %}
+      {% else %}
+        No administrators
+      {% endif %}
+    </li>
+  </ul>
+  <form>
+    <h3>Add administrator</h3>
+    <form method="post" action="/site/{{ hostname }}/admin">
+      <label for="new_admin_user">Email address</label>
+      <input type="email" name="new_admin_user" placeholder="administrator@domain.com" />
+      <button type="submit">Add</button>
+    </form>
+  </form>
+</section>
+
+<section class="row">
+  <h2>Readonly Users</h2>
+  <ul>
+    <li>
+      {% if readonly_users.length %}
+        {% for email in readonly_users %}
+          <form method="post" action="/site/{{ hostname }}/readonly_user/{{ email }}">
+            {{ email }}
+            <input type="hidden" name="_method" value="delete" />
+            <button type="submit">Delete</button>
+          </form>
+        {% endfor %}
+      {% else %}
+        No readonly users
+      {% endif %}
+    </li>
+  </ul>
+  <form>
+    <h3>Add readonly user</h3>
+    <form method="post" action="/site/{{ hostname }}/readonly_user">
+      <label for="new_readonly_user">Email address</label>
+      <input type="email" name="new_readonly_user" placeholder="readonly_user@domain.com" />
+      <button type="submit">Add</button>
+    </form>
+  </form>
+</section>
+
+<section class="row">
+  <h2>Delete site</h2>
+  <form>
+    <button>Are you sure?</button>
+  </form>
+</section>
+
+{% endblock %}
+
+

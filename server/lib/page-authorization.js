@@ -45,6 +45,18 @@ module.exports = {
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });
+  },
+
+  /**
+   * User must be authorized to administrate the host to view a page.
+   */
+  CAN_ADMIN_HOST: function (req) {
+    if (! req.session.email) throw httpErrors.UnauthorizedError();
+
+    return db.site.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname)
+      .then(function (isAuthorized) {
+        if (! isAuthorized) throw httpErrors.ForbiddenError();
+      });
   }
 };
 

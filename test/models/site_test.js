@@ -8,6 +8,7 @@ const assert = require('chai').assert;
 
 const db = require('../../server/lib/db');
 const site = db.site;
+const accessLevels = require('../../server/lib/access-levels');
 
 const testExtras = require('../lib/test-extras');
 const cPass = testExtras.cPass;
@@ -149,6 +150,69 @@ describe('database', function () {
           done();
         }, fail);
       });
+    });
+
+    describe('setUserAccessLevel', function () {
+      describe('to NONE', function () {
+        it('removes a user\'s readonly access', function () {
+          return site.create({
+            hostname: 'testsite.com',
+            readonly_users: ['testuser@testuser.com'],
+          }).then(function () {
+            return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.NONE);
+          }).then(function () {
+            return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
+          }).then(function (isAuthorized) {
+            assert.isFalse(isAuthorized);
+          });
+        });
+
+        it('removes a user\'s admin access', function () {
+          return site.create({
+            hostname: 'testsite.com',
+            admin_users: ['testuser@testuser.com'],
+          }).then(function () {
+            return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.NONE);
+          }).then(function () {
+            return site.isAuthorizedToAdministrate('testuser@testuser.com', 'testsite.com');
+          }).then(function (isAuthorized) {
+            assert.isFalse(isAuthorized);
+          });
+        });
+      });
+
+      describe('to ADMIN', function () {
+        it('adds admin access', function () {
+          return site.create({
+            hostname: 'testsite.com'
+          }).then(function () {
+            return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.ADMIN);
+          }).then(function () {
+            return site.isAuthorizedToAdministrate('testuser@testuser.com', 'testsite.com');
+          }).then(function (isAuthorized) {
+            assert.isTrue(isAuthorized);
+          });
+        });
+      });
+
+      describe('to READONLY', function () {
+        it('adds readonly access', function () {
+          return site.create({
+            hostname: 'testsite.com'
+          }).then(function () {
+            return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.READONLY);
+          }).then(function () {
+            return site.isAuthorizedToAdministrate('testuser@testuser.com', 'testsite.com');
+          }).then(function (isAuthorized) {
+            assert.isFalse(isAuthorized);
+          }).then(function () {
+            return site.isAuthorizedToView('testuser@testuser.com', 'testsite.com');
+          }).then(function (isAuthorized) {
+            assert.isTrue(isAuthorized);
+          });
+        });
+      });
+
     });
   });
 });

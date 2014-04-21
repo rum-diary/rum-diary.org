@@ -211,6 +211,14 @@ exports.findOneAndUpdate = withDatabase(function (searchBy, update, options) {
                     name, JSON.stringify(searchBy), duration);
   }
 });
+
+exports.findOneAndDelete = withDatabase(function(searchBy) {
+  searchBy = this.getSearchBy(searchBy);
+
+  return this.Model.findOneAndRemove(searchBy).exec();
+});
+
+
 exports.clear = withDatabase(function () {
   logger.warn('clearing table: %s', this.name);
   var resolver = Promise.defer();
@@ -250,6 +258,7 @@ exports.getSearchBy = function (searchBy) {
 exports.createModel = function(data) {
   return new this.Model(data);
 };
+
 
 function withDatabase(op) {
   return function () {

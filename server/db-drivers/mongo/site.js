@@ -5,6 +5,7 @@
 // Site model
 
 const Model = require('./model');
+const accessLevels = require('../../lib/access-levels');
 
 const siteDefinition = {
   hostname: String,
@@ -12,8 +13,14 @@ const siteDefinition = {
     type: Number,
     default: 0
   },
-  admin_users: [ String ],
-  readonly_users: [ String ],
+  admin_users: {
+    type: [ String ],
+    default: []
+  },
+  readonly_users: {
+    type: [ String ],
+    default: []
+  },
   // Is a site public
   is_public: {
     type: Boolean,
@@ -46,7 +53,72 @@ SiteModel.hit = function (hostname) {
 };
 
 /**
- * Check if a user is authorized to view a page.
+ * Set a user's access level on the site.
+ */
+SiteModel.setUserAccessLevel = function(email, hostname, accessLevel) {
+  return SiteModel.getOne({ hostname: hostname })
+    .then(function (site) {
+      if (! site) {
+        throw new Error('cannot find site: ' + hostname);
+      }
+
+      // TODO - we should really be doing this as an atomic
+      // op when reading the site.
+
+      var isReadonlyUpdated = false;
+      var isAdminUpdated = false;
+
+      if (accessLevel === accessLevels.NONE) {
+        isReadonlyUpdated = removeReadonlyAccess(site, email);
+        isAdminUpdated = removeAdminAccess(site, email);
+      } else if (accessLevel === accessLevels.ADMIN) {
+        isReadonlyUpdated = removeReadonlyAccess(site, email);
+        isAdminUpdated = addAdminAccess(site, email);
+      } else if (accessLevel === accessLevels.READONLY) {
+        isReadonlyUpdated = addReadonlyAccess(site, email);
+        isAdminUpdated = removeAdminAccess(site, email);
+      }
+
+      if (isReadonlyUpdated || isAdminUpdated) {
+        return SiteModel.update(site);
+      }
+
+      return site;
+    });
+
+  function addReadonlyAccess(site, email) {
+    if (site.readonly_users.indexOf(email) === -1) {
+      site.readonly_users.push(email);
+      return true;
+    }
+  }
+
+  function removeReadonlyAccess(site, email) {
+    var readonlyIndex = site.readonly_users.indexOf(email);
+    if (readonlyIndex > -1) {
+      site.readonly_users.splice(readonlyIndex, 1);
+      return true;
+    }
+  }
+
+  function addAdminAccess(site, email) {
+    if (site.admin_users.indexOf(email) === -1) {
+      site.admin_users.push(email);
+      return true;
+    }
+  }
+
+  function removeAdminAccess(site, email) {
+    var adminIndex = site.admin_users.indexOf(email);
+    if (adminIndex > -1) {
+      site.admin_users.splice(adminIndex, 1);
+      return true;
+    }
+  }
+};
+
+/**
+ * Check if a user is authorized to view a site.
  */
 SiteModel.isAuthorizedToView = function (email, hostname) {
   return this.getOne({ hostname: hostname })
@@ -54,6 +126,19 @@ SiteModel.isAuthorizedToView = function (email, hostname) {
                 if (! model) return false;
 
                 if (model.readonly_users.indexOf(email) > -1) return true;
+                if (model.admin_users.indexOf(email) > -1) return true;
+                return false;
+              });
+};
+
+/**
+ * Check if a user is authorized to administrate a site.
+ */
+SiteModel.isAuthorizedToAdministrate = function (email, hostname) {
+  return this.getOne({ hostname: hostname })
+              .then(function (model) {
+                if (! model) return false;
+
                 if (model.admin_users.indexOf(email) > -1) return true;
                 return false;
               });
