@@ -2,15 +2,11 @@
 {% block title %}{{ hostname }} info{% endblock %}
 
 {% block header %}
-  {% include "partials/_hostname-nav.html" %}
-
   {{ hostname }} Demographics - {{ startDate }} to {{ endDate }}
 {% endblock %}
 
 {% block navigation %}
-  <ul>
-    <li><a href="/site/">Site list</a></li>
-  </ul>
+  {% include "partials/_hostname-nav.html" %}
 {% endblock %}
 
 {% block body %}

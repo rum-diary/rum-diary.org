@@ -2,13 +2,10 @@
 {% block title %}{{ hostname }} info{% endblock %}
 
 {% block navigation %}
-  <ul>
-    <li><a href="/site/">Site list</a></li>
-  </ul>
+  {% include "partials/_hostname-nav.html" %}
 {% endblock %}
 
 {% block header %}
-  {% include "partials/_hostname-nav.html" %}
   {{ hostname }} - {{ startDate | dateFormat('MMM DD') }} to {{ endDate | dateFormat('MMM DD') }}
 {% endblock %}
 

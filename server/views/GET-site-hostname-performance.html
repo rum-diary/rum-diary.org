@@ -2,17 +2,13 @@
 {% block title %}{{ hostname }} - Performance{% endblock %}
 
 {% block header %}
-  {% include "partials/_hostname-nav.html" %}
-
   {{ statName }}
   <span class="small">{{ hostname }} - {{ startDate }} to {{ endDate }}</span>
 {% endblock %}
 
 
 {% block navigation %}
-  <ul>
-    <li><a href="/site/">Site list</a></li>
-  </ul>
+  {% include "partials/_hostname-nav.html" %}
 {% endblock %}
 
 {% block body %}
