@@ -4,15 +4,11 @@
 {% block navigation %}
   <ul>
     <li><a href="/site/">Site list</a></li>
-    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
-    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
-    {% if isAdmin %}
-    <li><a href="/site/{{ hostname }}/admin">Administration</a></li>
-    {% endif %}
   </ul>
 {% endblock %}
 
 {% block header %}
+  {% include "partials/_hostname-nav.html" %}
   {{ hostname }} - {{ startDate | dateFormat('MMM DD') }} to {{ endDate | dateFormat('MMM DD') }}
 {% endblock %}
 

@@ -2,6 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Promise = require('bluebird');
 const logger = require('../lib/logger');
 const db = require('../lib/db');
 const siteCollection = db.site;
@@ -17,43 +18,45 @@ exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 exports.handler = function(req) {
 
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
-  var allResults;
 
-  return calculator.calculate({
-     tags: {
-      filter: { hostname: req.dbQuery.hostname },
-      'tags-total-hits': {
-        tags: queryTags
+  return Promise.all([
+    siteCollection.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname),
+    calculator.calculate({
+      tags: {
+        filter: { hostname: req.dbQuery.hostname },
+        'tags-total-hits': {
+          tags: queryTags
+        },
+        'tags-names': {}
       },
-      'tags-names': {}
-    },
-    pageView: {
-      filter: req.dbQuery,
-      'hits_per_day': {
-        start: req.start,
-        end: req.end
+      pageView: {
+        filter: req.dbQuery,
+        'hits_per_day': {
+          start: req.start,
+          end: req.end
+        },
+        'hits_per_page': {
+          sort: 'desc',
+          limit: 20
+        },
+        'referrers': {},
+        'unique': {},
+        'returning': {}
       },
-      'hits_per_page': {
-        sort: 'desc',
-        limit: 20
-      },
-      'referrers': {},
-      'unique': {},
-      'returning': {}
-    },
-    site: {
-      filter: { hostname: req.dbQuery.hostname },
-      'sites-total-hits': {}
-    }
-  }).then(function (_allResults) {
-    allResults = _allResults;
-    return siteCollection.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname);
-  }).then(function(isAdmin) {
-    logger.info('%s: elapsed time: %s ms', req.url, allResults.duration);
+      site: {
+        filter: { hostname: req.dbQuery.hostname },
+        'sites-total-hits': {}
+      }
+    })
+  ]).then(function (allResults) {
+    var isAdmin = allResults[0];
+    var calculatorResults = allResults[1];
 
-    var tagResults = allResults.tags;
-    var pageViewResults = allResults.pageView;
-    var siteResults = allResults.site;
+    logger.info('%s: elapsed time: %s ms', req.url, calculatorResults.duration);
+
+    var tagResults = calculatorResults.tags;
+    var pageViewResults = calculatorResults.pageView;
+    var siteResults = calculatorResults.site;
 
     var totalHits = 0;
     if (queryTags.length) {

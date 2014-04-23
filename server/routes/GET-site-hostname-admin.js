@@ -23,7 +23,8 @@ exports.handler = function(req) {
           owner: site.owner,
           admin_users: adminUsers,
           readonly_users: readonlyUsers,
-          is_public: site.is_public
+          is_public: site.is_public,
+          isAdmin: true
         };
       });
 };

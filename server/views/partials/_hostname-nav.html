@@ -1,0 +1,11 @@
+<nav class="horizontal-nav no-background-color">
+  <ul>
+    <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
+    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
+    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
+    {% if isAdmin %}
+      <li><a href="/site/{{ hostname }}/admin">Administration</a></li>
+    {% endif %}
+  </ul>
+</nav>
+

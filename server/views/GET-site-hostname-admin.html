@@ -4,17 +4,16 @@
 {% block navigation %}
   <ul>
     <li><a href="/site/">Site list</a></li>
-    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
-    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
   </ul>
 {% endblock %}
 
 {% block header %}
+  {% include "partials/_hostname-nav.html" %}
   {{ hostname }} - Administration
 {% endblock %}
 
-
 {% block body %}
+
 <section class="row">
   <h2>Owner</h2>
   {{ owner }}

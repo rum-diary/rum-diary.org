@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const moment = require('moment');
+const Promise = require('bluebird');
 const db = require('../lib/db');
+const siteCollection = db.site;
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
 
@@ -24,18 +25,25 @@ exports.handler = function(req) {
     end: req.end
   });
 
-  return db.pageView.pipe(req.dbQuery, null, reduceStream)
-    .then(function(result) {
-      reduceStream.end();
-      reduceStream = null;
-      return {
-        hostname: req.params.hostname,
-        startDate: req.start.format('MMM DD'),
-        endDate: req.end.format('MMM DD'),
-        browsers: result.browsers,
-        os: result.os,
-        os_form: result['os:form']
-      };
-    });
+  return Promise.all([
+    siteCollection.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname),
+    db.pageView.pipe(req.dbQuery, null, reduceStream)
+  ]).then(function(allResults) {
+    reduceStream.end();
+    reduceStream = null;
+
+    var isAdmin = allResults[0];
+    var demographicsResults = allResults[1];
+
+    return {
+      hostname: req.params.hostname,
+      startDate: req.start.format('MMM DD'),
+      endDate: req.end.format('MMM DD'),
+      browsers: demographicsResults.browsers,
+      os: demographicsResults.os,
+      os_form: demographicsResults['os:form'],
+      isAdmin: isAdmin
+    };
+  });
 };
 

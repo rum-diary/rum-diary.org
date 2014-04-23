@@ -2,6 +2,8 @@
 {% block title %}{{ hostname }} - Performance{% endblock %}
 
 {% block header %}
+  {% include "partials/_hostname-nav.html" %}
+
   {{ statName }}
   <span class="small">{{ hostname }} - {{ startDate }} to {{ endDate }}</span>
 {% endblock %}
@@ -10,11 +12,6 @@
 {% block navigation %}
   <ul>
     <li><a href="/site/">Site list</a></li>
-    <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
-    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
-    {% if isAdmin %}
-    <li><a href="/site/{{ hostname }}/admin">Administration</a></li>
-    {% endif %}
   </ul>
 {% endblock %}
 
