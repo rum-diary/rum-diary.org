@@ -19,60 +19,58 @@
 
   <section>
     <h2>Administrators</h2>
-    <form method="post" action="/site/{{ hostname }}/user">
-      <input type="hidden" name="_method" value="delete" />
       <ul class="list-users">
-        {% if admin_users.length %}
-          {% for email in admin_users %}
+        <form method="post" action="/site/{{ hostname }}/user">
+          <input type="hidden" name="_method" value="delete" />
+          {% if admin_users.length %}
+            {% for email in admin_users %}
+              <li>
+                <span class="email">{{ email }}</span>
+                <button type="submit" name="email" value="{{ email }}">Delete</button>
+              </li>
+            {% endfor %}
+          {% else %}
             <li>
-              <span class="email">{{ email }}</span>
-              <button type="submit" name="email" value="{{ email }}">Delete</button>
+              No administrators
             </li>
-          {% endfor %}
-        {% else %}
-          <li>
-            No administrators
-          </li>
-        {% endif %}
+          {% endif %}
+        </form>
+        <li>
+          <form method="post" action="/site/{{ hostname }}/user">
+            <input type="email" name="email" placeholder="administrator@mysite.org" />
+            <input type="hidden" name="access_level" value="ADMIN" />
+            <button type="submit">Add</button>
+          </form>
+        </li>
       </ul>
-    </form>
-
-    <form method="post" action="/site/{{ hostname }}/user">
-      <h3>Add administrator</h3>
-      <label for="email">Email address:</label>
-      <input type="email" name="email" placeholder="administrator@mysite.org" />
-      <input type="hidden" name="access_level" value="ADMIN" />
-      <button type="submit">Add</button>
-    </form>
   </section>
 
   <section>
     <h2>Readonly Users</h2>
-    <form method="post" action="/site/{{ hostname }}/user">
-      <input type="hidden" name="_method" value="delete" />
       <ul class="list-users">
-        {% if readonly_users.length %}
-          {% for email in readonly_users %}
-              <li>
-                <span class="email">{{ email }}</span>
-                <button type="submit" name="email" value="{{ email }}">Delete</button>
+        <form method="post" action="/site/{{ hostname }}/user">
+          <input type="hidden" name="_method" value="delete" />
+          {% if readonly_users.length %}
+            {% for email in readonly_users %}
+                <li>
+                  <span class="email">{{ email }}</span>
+                  <button type="submit" name="email" value="{{ email }}">Delete</button>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li>
+              No readonly users
             </li>
-          {% endfor %}
-        {% else %}
-          <li>
-            No readonly users
-          </li>
-        {% endif %}
+          {% endif %}
+        </form>
+        <li>
+          <form method="post" action="/site/{{ hostname }}/user">
+            <input type="email" name="email" placeholder="administrator@mysite.org" />
+            <input type="hidden" name="access_level" value="READONLY" />
+            <button type="submit">Add</button>
+          </form>
+        </li>
       </ul>
-    </form>
-
-    <form method="post" action="/site/{{ hostname }}/user">
-      <h3>Add readonly user</h3>
-      <label for="email">Email address:</label>
-      <input type="email" name="email" placeholder="readonly_user@mysite.org" />
-      <input type="hidden" name="access_level" value="READONLY" />
-      <button type="submit">Add</button>
-    </form>
   </section>
 
   <section>
