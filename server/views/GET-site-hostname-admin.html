@@ -11,72 +11,81 @@
 
 {% block body %}
 
-<section class="row">
-  <h2>Owner</h2>
-  {{ owner }}
-</section>
+<div id="admin">
+  <section>
+    <h2>Owner</h2>
+    {{ owner }}
+  </section>
 
-<section class="row">
-  <h2>Administrators</h2>
-  <ul>
-    <li>
-      {% if admin_users.length %}
-        {% for email in admin_users %}
-          <form method="post" action="/site/{{ hostname }}/user">
-            {{ email }}
-            <input type="hidden" name="email" value="{{ email }}" />
-            <input type="hidden" name="_method" value="delete" />
-            <button type="submit">Delete</button>
-          </form>
-        {% endfor %}
-      {% else %}
-        No administrators
-      {% endif %}
-    </li>
-  </ul>
-  <form method="post" action="/site/{{ hostname }}/user">
-    <h3>Add administrator</h3>
-    <label for="email">Email address</label>
-    <input type="email" name="email" placeholder="administrator@domain.com" />
-    <input type="hidden" name="access_level" value="ADMIN" />
-    <button type="submit">Add</button>
-  </form>
-</section>
+  <section>
+    <h2>Administrators</h2>
+    <form method="post" action="/site/{{ hostname }}/user">
+      <input type="hidden" name="_method" value="delete" />
+      <ul class="list-users">
+        {% if admin_users.length %}
+          {% for email in admin_users %}
+            <li>
+              <span class="email">{{ email }}</span>
+              <button type="submit" name="email" value="{{ email }}">Delete</button>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li>
+            No administrators
+          </li>
+        {% endif %}
+      </ul>
+    </form>
 
-<section class="row">
-  <h2>Readonly Users</h2>
-  <ul>
-    <li>
-      {% if readonly_users.length %}
-        {% for email in readonly_users %}
-          <form method="post" action="/site/{{ hostname }}/user">
-            {{ email }}
-            <input type="hidden" name="email" value="{{ email }}" />
-            <input type="hidden" name="_method" value="delete" />
-            <button type="submit">Delete</button>
-          </form>
-        {% endfor %}
-      {% else %}
-        No readonly users
-      {% endif %}
-    </li>
-  </ul>
-  <form method="post" action="/site/{{ hostname }}/user">
-    <h3>Add readonly user</h3>
-    <label for="email">Email address</label>
-    <input type="email" name="email" placeholder="readonly_user@domain.com" />
-    <input type="hidden" name="access_level" value="READONLY" />
-    <button type="submit">Add</button>
-  </form>
-</section>
+    <form method="post" action="/site/{{ hostname }}/user">
+      <h3>Add administrator</h3>
+      <label for="email">Email address:</label>
+      <input type="email" name="email" placeholder="administrator@mysite.org" />
+      <input type="hidden" name="access_level" value="ADMIN" />
+      <button type="submit">Add</button>
+    </form>
+  </section>
 
-<section class="row">
-  <h2>Delete site</h2>
-  <form method="post" action="/site/{{ hostname }}">
-    <input type="hidden" name="_method" value="delete" />
-    <button>Are you sure?</button>
-  </form>
-</section>
+  <section>
+    <h2>Readonly Users</h2>
+    <form method="post" action="/site/{{ hostname }}/user">
+      <input type="hidden" name="_method" value="delete" />
+      <ul class="list-users">
+        {% if readonly_users.length %}
+          {% for email in readonly_users %}
+              <li>
+                <span class="email">{{ email }}</span>
+                <button type="submit" name="email" value="{{ email }}">Delete</button>
+            </li>
+          {% endfor %}
+        {% else %}
+          <li>
+            No readonly users
+          </li>
+        {% endif %}
+      </ul>
+    </form>
+
+    <form method="post" action="/site/{{ hostname }}/user">
+      <h3>Add readonly user</h3>
+      <label for="email">Email address:</label>
+      <input type="email" name="email" placeholder="readonly_user@mysite.org" />
+      <input type="hidden" name="access_level" value="READONLY" />
+      <button type="submit">Add</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Delete site</h2>
+    <form method="post" action="/site/{{ hostname }}">
+      <input type="hidden" name="_method" value="delete" />
+
+      <label for="hostname">Enter hostname to confirm:</label>
+      <input type="hostname" name="hostname" placeholder="mysite.org" />
+      <button type="submit" class="scary">Are you sure?</button>
+    </form>
+  </section>
+</div>
 
 {% endblock %}
 

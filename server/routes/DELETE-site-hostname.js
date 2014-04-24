@@ -6,6 +6,7 @@
 
 const db = require('../lib/db');
 const siteCollection = db.site;
+const httpErrors = require('../lib/http-errors');
 
 exports.path = '/site/:hostname';
 exports.verb = 'delete';
@@ -13,6 +14,12 @@ exports.authorization = require('../lib/page-authorization').IS_OWNER_HOST;
 
 exports.handler = function (req, res) {
   var hostname = req.params.hostname;
+  var verificationHostname = req.body.hostname;
+
+  // uh oh, verification hostname is not the same as the real hostname.
+  if (hostname !== verificationHostname) {
+    throw new httpErrors.ForbiddenError();
+  }
 
   return siteCollection.findOneAndDelete({ hostname: hostname })
     .then(function () {
