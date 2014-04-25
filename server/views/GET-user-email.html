@@ -4,22 +4,6 @@
 {% block body %}
   Email: {{ email }}
 
-  <h3>Sites</h3>
-  <ul>
-    {% for site in sites %}
-      {% if site.hostname %}
-        <li><a href="/site/{{ site.hostname }}">{{ site.hostname }}</a></li>
-      {% endif %}
-    {% endfor %}
-  </ul>
-
-  <form method="post" action="/user/{{ email }}/site">
-    <label for="hostname">Site to measure</label>
-    <input type="text" placeholder="site-to-measure.com" name="hostname" required />
-    <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
-    <button>Add site</button>
-  </form>
-
   <form method="post" action="/session">
     <input type="hidden" name="_method" value="delete" />
     <input type="hidden" name="_csrf" value="{{ csrftoken }}" />

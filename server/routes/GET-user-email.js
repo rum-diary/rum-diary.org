@@ -5,7 +5,6 @@
 const httpErrors = require('../lib/http-errors');
 const db = require('../lib/db');
 const userCollection = db.user;
-const siteCollection = db.site;
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/user/:email';
@@ -16,6 +15,7 @@ exports.authorization = require('../lib/page-authorization').IS_USER;
 
 exports.handler = function (req, res, next) {
   var email = decodeURIComponent(req.params.email);
+  var user;
 
   if (email === 'new') return next();
 
@@ -26,11 +26,6 @@ exports.handler = function (req, res, next) {
     if (! user) {
       throw httpErrors.NotFoundError();
     }
-
-    return userCollection.getSites(email);
-  })
-  .then(function(sites) {
-    user.sites = sites;
     return user;
   });
 };
