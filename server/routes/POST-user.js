@@ -21,10 +21,12 @@ exports.validation = {
 
 exports.handler = function (req, res) {
   const name = req.body.name;
-  const hostname = req.body.hostname.replace(/^https?:\/\//, '');;
+  const hostname = req.body.hostname.replace(/^https?:\/\//, '');
   const assertion = req.body.assertion;
 
   var email;
+  var isNewSite = false;
+  var canViewExistingSite = false;
 
   return verifier.verify(assertion)
      .then(function (_email) {
@@ -45,14 +47,31 @@ exports.handler = function (req, res) {
         });
       })
      .then(function () {
-        // create site if it does not already exist, throw error otherwise.
-        return siteCollection.registerNewSite(hostname, email);
+        return siteCollection.getOne({ hostname: hostname });
+      })
+     .then(function (site) {
+        if (! site) {
+          // non-existent site - create it.
+          return siteCollection.registerNewSite(hostname, email)
+             .then(function () {
+                isNewSite = true;
+              });
+        }
+
+        // site already exists, see if user is authorized.
+        return siteCollection.isAuthorizedToView(email, hostname)
+          .then(function (isAuthorized) {
+            console.error('is user authorized: %s', isAuthorized);
+            canViewExistingSite = isAuthorized;
+          });
       })
      .then(function () {
         // sign the user in, visit their page.
         req.session.email = email;
         req.session.name = name;
         req.session.hostname = hostname;
+        req.session.isNewSite = isNewSite;
+        req.session.canViewExistingSite = canViewExistingSite;
 
         res.redirect('/welcome');
       });

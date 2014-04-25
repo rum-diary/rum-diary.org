@@ -24,7 +24,8 @@ exports.handler = function(req) {
           admin_users: adminUsers,
           readonly_users: readonlyUsers,
           is_public: site.is_public,
-          isAdmin: true
+          isAdmin: true,
+          isOwner: site.owner === req.session.email
         };
       });
 };

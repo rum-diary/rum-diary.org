@@ -16,10 +16,18 @@ exports.handler = function(req, res) {
   const name = req.session.name;
   delete req.session.name;
 
+  const isNewSite = req.session.isNewSite;
+  delete req.session.isNewSite;
+
+  const canViewExistingSite = req.session.canViewExistingSite;
+  delete req.session.canViewExistingSite;
+
   return {
     email: req.session.email,
     name: name,
     hostname: hostname,
-    rum_diary_hostname: req.host
+    rum_diary_hostname: req.host,
+    is_new_site: isNewSite,
+    has_access: canViewExistingSite,
   };
 };

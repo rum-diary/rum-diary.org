@@ -73,16 +73,18 @@
       </ul>
   </section>
 
-  <section>
-    <h2>Delete site</h2>
-    <form method="post" action="/site/{{ hostname }}">
-      <input type="hidden" name="_method" value="delete" />
+  {% if isOwner %}
+    <section>
+      <h2>Delete site</h2>
+      <form method="post" action="/site/{{ hostname }}">
+        <input type="hidden" name="_method" value="delete" />
 
-      <label for="hostname">Enter hostname to confirm:</label>
-      <input type="hostname" name="hostname" placeholder="mysite.org" />
-      <button type="submit" class="scary">Are you sure?</button>
-    </form>
-  </section>
+        <label for="hostname">Enter hostname to confirm:</label>
+        <input type="hostname" name="hostname" placeholder="mysite.org" />
+        <button type="submit" class="scary">Are you sure?</button>
+      </form>
+    </section>
+  {% endif %}
 </div>
 
 {% endblock %}
