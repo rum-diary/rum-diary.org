@@ -4,6 +4,8 @@
 
 const inputValidation = require('../lib/input-validation');
 const db = require('../lib/db');
+const userCollection = db.user;
+const siteCollection = db.site;
 const verifier = require('../lib/verifier');
 
 exports.path = '/user';
@@ -19,17 +21,19 @@ exports.validation = {
 
 exports.handler = function (req, res) {
   const name = req.body.name;
-  const hostname = req.body.hostname.replace(/^https?:\/\//, '');;
+  const hostname = req.body.hostname.replace(/^https?:\/\//, '');
   const assertion = req.body.assertion;
 
   var email;
+  var isNewSite = false;
+  var canViewExistingSite = false;
 
   return verifier.verify(assertion)
      .then(function (_email) {
         email = _email;
 
         // Check if user already exists.
-        return db.user.getOne({
+        return userCollection.getOne({
           email: email
         });
       })
@@ -37,27 +41,37 @@ exports.handler = function (req, res) {
         // just sign the user in.
         if (existingUser) return;
 
-        return db.user.create({
+        return userCollection.create({
           name: name,
           email: email
         });
       })
      .then(function () {
-        // create site to track if it does not already exist.
-        return db.site.ensureExists(hostname);
+        return siteCollection.getOne({ hostname: hostname });
       })
      .then(function (site) {
-        // add user to admin_users.
-        if (site.admin_users.indexOf(email) === -1) {
-          site.admin_users.push(email);
-          return db.site.update(site);
+        if (! site) {
+          // non-existent site - create it.
+          return siteCollection.registerNewSite(hostname, email)
+             .then(function () {
+                isNewSite = true;
+              });
         }
+
+        // site already exists, see if user is authorized.
+        return siteCollection.isAuthorizedToView(email, hostname)
+          .then(function (isAuthorized) {
+            console.error('is user authorized: %s', isAuthorized);
+            canViewExistingSite = isAuthorized;
+          });
       })
      .then(function () {
         // sign the user in, visit their page.
         req.session.email = email;
         req.session.name = name;
         req.session.hostname = hostname;
+        req.session.isNewSite = isNewSite;
+        req.session.canViewExistingSite = canViewExistingSite;
 
         res.redirect('/welcome');
       });

@@ -1,6 +1,7 @@
 @import "variables";
 
 /* border box everything! */
+*,
 *:before,
 *:after {
   -webkit-box-sizing: border-box;
@@ -291,6 +292,13 @@ main {
     &:hover, &:focus {
       background-color: $button-focus-background-color;
     }
+
+    &.scary {
+      background-color: $button-scary-background-color;
+    }
+    &.scary:hover, &.scary:focus {
+      background-color: $button-scary-focus-background-color;
+    }
   }
 
 }
@@ -514,4 +522,32 @@ path {
     }
 
   }
+}
+
+#admin {
+  button {
+    padding: 0.25rem 1rem;
+  }
+
+  label {
+    display: block;
+  }
+
+  input[type=email] {
+    width: 25rem;
+  }
+}
+
+.list-users {
+  li {
+    margin: 0.5rem 0;
+
+    .email {
+      display: inline-block;
+      min-width: 25rem;
+    }
+  }
+
+
+  margin-bottom: 1rem;
 }

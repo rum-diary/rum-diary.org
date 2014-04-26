@@ -4,6 +4,8 @@
 
 const clientResources = require('../lib/client-resources');
 const db = require('../lib/db');
+const siteCollection = db.site;
+const userCollection = db.user;
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
@@ -22,9 +24,7 @@ exports.handler = function (req, res, next) {
   var email = req.params.email;
   var hostname = req.body.hostname;
 
-  var userModel, siteModel;
-
-  return db.user.getOne({
+  return userCollection.getOne({
     email: email
   })
   .then(function (user) {
@@ -32,19 +32,23 @@ exports.handler = function (req, res, next) {
       throw httpErrors.NotFoundError();
     }
 
-    userModel = user;
+    return siteCollection.registerNewSite(hostname, email)
+      .then(function() {
+        return true;
+      }, function (err) {
+        // if the site already exists, inform the user, but do not fail.
+        if (err.message === 'already exists') return false;
 
-    // create site if it does not already exist.
-    return db.site.ensureExists(hostname);
+        // all other errors fail.
+        throw err;
+      });
   })
-  .then(function (site) {
-    if (site.admin_users.indexOf(email) === -1) {
-      site.admin_users.push(email);
-      return db.site.update(site);
+  .then(function (isCreated) {
+    if (isCreated) {
+      // go back to the original page.
+      res.redirect(req.get('referrer'));
+    } else {
+      // site already exists, cannot create as owner, and cannot self add.
     }
-  })
-  .then(function () {
-    // go back to the original page.
-    res.redirect(req.get('referrer'));
   });
 };

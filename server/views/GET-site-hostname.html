@@ -2,11 +2,7 @@
 {% block title %}{{ hostname }} info{% endblock %}
 
 {% block navigation %}
-  <ul>
-    <li><a href="/site/">Site list</a></li>
-    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
-    <li><a href="/site/{{ hostname }}/demographics">Demographics</a></li>
-  </ul>
+  {% include "partials/_hostname-nav.html" %}
 {% endblock %}
 
 {% block header %}

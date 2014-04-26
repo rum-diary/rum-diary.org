@@ -2,7 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+const Promise = require('bluebird');
 const db = require('../lib/db');
+const siteCollection = db.site;
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
 
@@ -31,25 +33,31 @@ exports.handler = function(req) {
     }
   });
 
-  return db.pageView.pipe(req.dbQuery, null, reduceStream)
-            .then(function(results) {
-              reduceStream.end();
-              reduceStream = null;
+  return Promise.all([
+    siteCollection.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname),
+    db.pageView.pipe(req.dbQuery, null, reduceStream)
+  ]).then(function(allResults) {
+    reduceStream.end();
+    reduceStream = null;
 
-              return {
-                baseURL: req.url.replace(/\?.*/, ''),
-                histogram: results['navigation-histogram'],
-                cdf: results['navigation-cdf'],
-                statName: statName,
-                hostname: req.params.hostname,
-                startDate: req.start.format('MMM DD'),
-                endDate: req.end.format('MMM DD'),
-                navigationTimingFields: getNavigationTimingFields(),
-                first_q: results.navigation['25'],
-                second_q: results.navigation['50'],
-                third_q: results.navigation['75']
-              };
-            });
+    var isAdmin = allResults[0];
+    var performanceResults = allResults[1];
+
+    return {
+      baseURL: req.url.replace(/\?.*/, ''),
+      histogram: performanceResults['navigation-histogram'],
+      cdf: performanceResults['navigation-cdf'],
+      statName: statName,
+      hostname: req.params.hostname,
+      startDate: req.start.format('MMM DD'),
+      endDate: req.end.format('MMM DD'),
+      navigationTimingFields: getNavigationTimingFields(),
+      first_q: performanceResults.navigation['25'],
+      second_q: performanceResults.navigation['50'],
+      third_q: performanceResults.navigation['75'],
+      isAdmin: isAdmin
+    };
+  });
 };
 
 function getNavigationTimingFields() {

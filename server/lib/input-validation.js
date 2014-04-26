@@ -5,6 +5,7 @@
 // A simple wrapper around joi with some helper functions.
 
 const joi = require('joi');
+const accessLevels = Object.keys(require('./access-levels'));
 
 'use strict';
 
@@ -28,6 +29,11 @@ exports.hostname = function () {
 // TODO - is there a generic form?
 exports.assertion = function () {
   return joi.string().min(10).max(5000);
+};
+
+// An email
+exports.email = function () {
+  return joi.string().email();
 };
 
 // A CSRF token.
@@ -104,3 +110,7 @@ exports.events = function () {
   return joi.array(joi.any());
 };
 
+// page access levels.
+exports.accessLevel = function () {
+  return joi.string().allow(accessLevels);
+};

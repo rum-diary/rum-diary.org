@@ -442,7 +442,7 @@
     } else {
       */
       Micrajax.ajax({
-        // async otherwise the browser closes the connection.
+        // sync otherwise the browser closes the connection.
         async: false,
         // put to update the data.
         type: 'POST',

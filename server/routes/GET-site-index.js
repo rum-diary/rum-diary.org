@@ -5,7 +5,7 @@
 // Show a list of hostnames.
 
 const logger = require('../lib/logger');
-const calculator = require('../lib/calculator');
+calculator = require('../lib/calculator');
 
 exports.path = '/site';
 exports.verb = 'get';
@@ -19,8 +19,8 @@ exports.handler = function (req, res) {
     site: {
       filter: {
         $or: [
-          { admin_users: email },
-          { readonly_users: email }
+          { owner: email },
+          { 'users.email': email }
         ]
       },
       'site:hostname': {

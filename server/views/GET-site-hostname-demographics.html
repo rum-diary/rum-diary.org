@@ -6,15 +6,10 @@
 {% endblock %}
 
 {% block navigation %}
-  <ul>
-    <li><a href="/site/">Site list</a></li>
-    <li><a href="/site/{{ hostname }}">{{ hostname }}</a></li>
-    <li><a href="/site/{{ hostname }}/performance">Performance</a></li>
-  </ul>
+  {% include "partials/_hostname-nav.html" %}
 {% endblock %}
 
 {% block body %}
-
 
 <section class="row">
   <article class="row-left half">

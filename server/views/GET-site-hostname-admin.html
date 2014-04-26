@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% block title %}{{ hostname }} Administration{% endblock %}
+
+{% block navigation %}
+  {% include "partials/_hostname-nav.html" %}
+{% endblock %}
+
+{% block header %}
+  {{ hostname }} - Administration
+{% endblock %}
+
+{% block body %}
+
+<div id="admin">
+  <section>
+    <h2>Owner</h2>
+    {{ owner }}
+  </section>
+
+  <section>
+    <h2>Administrators</h2>
+      <ul class="list-users">
+        <form method="post" action="/site/{{ hostname }}/user">
+          <input type="hidden" name="_method" value="delete" />
+          {% if admin_users.length %}
+            {% for email in admin_users %}
+              <li>
+                <span class="email">{{ email }}</span>
+                <button type="submit" name="email" value="{{ email }}">Delete</button>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li>
+              No administrators
+            </li>
+          {% endif %}
+        </form>
+        <li>
+          <form method="post" action="/site/{{ hostname }}/user">
+            <input type="email" name="email" placeholder="administrator@mysite.org" />
+            <input type="hidden" name="access_level" value="ADMIN" />
+            <button type="submit">Add</button>
+          </form>
+        </li>
+      </ul>
+  </section>
+
+  <section>
+    <h2>Readonly Users</h2>
+      <ul class="list-users">
+        <form method="post" action="/site/{{ hostname }}/user">
+          <input type="hidden" name="_method" value="delete" />
+          {% if readonly_users.length %}
+            {% for email in readonly_users %}
+                <li>
+                  <span class="email">{{ email }}</span>
+                  <button type="submit" name="email" value="{{ email }}">Delete</button>
+              </li>
+            {% endfor %}
+          {% else %}
+            <li>
+              No readonly users
+            </li>
+          {% endif %}
+        </form>
+        <li>
+          <form method="post" action="/site/{{ hostname }}/user">
+            <input type="email" name="email" placeholder="readonly@mysite.org" />
+            <input type="hidden" name="access_level" value="READONLY" />
+            <button type="submit">Add</button>
+          </form>
+        </li>
+      </ul>
+  </section>
+
+  {% if isOwner %}
+    <section>
+      <h2>Delete site</h2>
+      <form method="post" action="/site/{{ hostname }}">
+        <input type="hidden" name="_method" value="delete" />
+
+        <label for="hostname">Enter hostname to confirm:</label>
+        <input type="hostname" name="hostname" placeholder="mysite.org" />
+        <button type="submit" class="scary">Are you sure?</button>
+      </form>
+    </section>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+

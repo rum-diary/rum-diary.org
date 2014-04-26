@@ -6,19 +6,30 @@
     Welcome to RUM Diary!
   </p>
 
-  </p>
-    Add the following snippet to the <code>HEAD</code> element of <code>{{ hostname }}</code>
-    to start collecting Real User Metrics:
+  {% if is_new_site %}
+    </p>
+      Add the following snippet to the <code>HEAD</code> element of <code>{{ hostname }}</code>
+      to start collecting Real User Metrics:
 
-    <pre>
-      <code>
-        &lt;script src="https://{{ rum_diary_hostname }}/include.js" async /&gt;
-      </code>
-    </pre>
-  </p>
+      <pre>
+        <code>
+          &lt;script src="https://{{ rum_diary_hostname }}/include.js" async /&gt;
+        </code>
+      </pre>
+    </p>
 
 
-  <a href="/site/{{ hostname }}">Done, I want to view some stats!</a>
+    <a href="/site/{{ hostname }}">Done, I want to view some stats!</a>
+  {% elif has_access %}
+    <a href="/site/{{ hostname }}">I want to view some stats!</a>
+
+  {% else %}
+    <p>
+      Sorry, {{ hostname }} has alrady been registered (we cannot say by whom). Please contact the site administrator of {{ hostname }} to request access.
+    </p>
+
+    <a href="/site/">Register another site</a>
+  {% endif %}
 
 {% endblock %}
 
