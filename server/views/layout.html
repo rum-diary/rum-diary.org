@@ -20,20 +20,20 @@
         <h1>rum-diary.org</h1><h2>Metrics with ethics</h2>
 
         <nav class="header-nav">
+          <ul>
           {% block navigation %}
-          &nbsp;
           {% endblock %}
-
-          <section class="session">
-            {% if email %}
-              <a href="/user/{{ email }}">{{ email }}</a>,
-              <form method="post" action="/session">
-                <input type="hidden" name="_method" value="delete" />
-                <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
-                <button>Sign out</button>
-              </form>
-            {% endif %}
-          </section>
+            <li class="session">
+              {% if email %}
+                <a class="username" href="/user/{{ email }}">{{ email }}</a>
+                <form method="post" action="/session">
+                  <input type="hidden" name="_method" value="delete" />
+                  <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
+                  <button>Sign out</button>
+                </form>
+              {% endif %}
+            </li>
+          </ul>
         </nav>
       </div>
     </header>
