@@ -112,7 +112,7 @@ header {
         }
       }
 
-      ul {
+     ul {
         li {
           a, button {
             border-bottom: none;
@@ -579,13 +579,10 @@ path {
 }
 
 .date-range {
-  display: flex;
-  flex-direction: row;
+  margin: -1rem 0 1rem 0;
 
   > .form-row {
     flex: 2 1 auto;
-    padding-right: 1.5rem;
-    width: 10px;
 
     > input {
       width: 100%;
@@ -593,16 +590,40 @@ path {
   }
 
   > .submit {
-    flex: 1 1 auto;
     margin: 0;
-    width: 10px;
 
     > button {
-      margin-top: 20px;
       padding: 0.25rem 0;
       width: 100%;
     }
+  }
+}
 
+@media only screen and (max-width: 550px) {
+  .date-range {
+    margin-top: 0;
+  }
+}
+
+@media only screen and (min-width: 550px) {
+  .date-range {
+    display: flex;
+    flex-direction: row;
+
+    > .form-row {
+      flex: 2 1 auto;
+      margin-right: 1rem;
+      width: 10px;
+    }
+
+    > .submit {
+      flex: 1 1 auto;
+      width: 10px;
+
+      > button {
+        margin-top: 20px;
+      }
+    }
   }
 }
 
