@@ -1,6 +1,10 @@
 {% extends "layout.html" %}
 {% block title %}{{ name }}{% endblock %}
 
+{% block navigation %}
+  <li><a href="/site/">Site list</a></li>
+{% endblock %}
+
 {% block body %}
   Email: {{ email }}
 

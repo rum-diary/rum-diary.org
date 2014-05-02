@@ -11,6 +11,19 @@
 
 
 {% block body %}
+  <form method="get" action="{{ root_url }}" class="date-range">
+    <div class="form-row">
+      <label for="start">Start date</label>
+      <input type="datepicker" name="start" value="{{ startDate | dateFormat('YYYY-MM-DD') }}" />
+    </div>
+    <div class="form-row">
+      <label for="end">End date</label>
+      <input type="datepicker" name="end" value="{{ endDate | dateFormat('YYYY-MM-DD') }}" />
+    </div>
+    <p class="submit">
+      <button>Update</button>
+    </p>
+  </form>
 <section class="row narrow-left">
   <article id="overview" class="row-left">
     <h2>Overview</h2>

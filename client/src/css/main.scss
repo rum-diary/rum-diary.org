@@ -82,10 +82,8 @@ header {
   background-color: $header-background-color;
   color: $header-text-color;
   margin-bottom: 1rem;
-  text-align: center;
 
   nav {
-    line-height: 22px;
     font-size: 0.8rem;
 
     .session {
@@ -93,18 +91,57 @@ header {
         display: inline;
       }
     }
+
   }
 }
 
-@media only screen and (min-width: 500px) {
+@media only screen and (max-width: 500px) {
   header {
-    text-align: left;
+    nav {
+      font-size: 1.2rem;
+    }
   }
 }
+
+@media only screen and (max-width: 700px) {
+  header {
+    nav {
+      .session {
+        .username {
+          display: block;
+        }
+      }
+
+     ul {
+        li {
+          a, button {
+            border-bottom: none;
+            display: block;
+            padding: 0.5rem 0;
+            text-align: left;
+            text-decoration: underline;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
 
 @media only screen and (min-width: 700px) {
   header {
     nav {
+      line-height: 22px;
+
+      .session {
+        .username {
+          &:after {
+            content: (',');
+          }
+        }
+      }
+
       ul {
         display: inline;
         > li {
@@ -113,11 +150,19 @@ header {
         }
       }
 
-      .session {
-        float: right;
-        display: inline;
-      }
     }
+  }
+}
+
+@media only screen and (min-width: 900px) {
+  .session {
+    float: right;
+    display: inline;
+  }
+
+  // if session is the only element, no float.
+  .session:first-child {
+    float: none;
   }
 }
 
@@ -132,7 +177,7 @@ footer {
   text-align: center;
 }
 
-@media only screen and (min-width: 980px) {
+@media only screen and (min-width: 700px) {
   header {
     h1, h2 {
       display: inline-block;
@@ -146,7 +191,7 @@ footer {
   }
 }
 
-@media only screen and (max-width: 980px) {
+@media only screen and (max-width: 700px) {
   header {
     h2 {
       font-size: 1.1rem;
@@ -224,6 +269,19 @@ footer {
   }
 }
 
+@media only screen and (max-width: 550px) {
+  .multi-column-nav {
+    li {
+      display: block;
+      width: auto;
+
+      a {
+        padding: 1rem;
+      }
+    }
+  }
+}
+
 .referrers li {
   line-height: 1.6;
 }
@@ -276,7 +334,7 @@ main {
     margin-bottom: 0.5rem;
   }
 
-  input[type=text] {
+  input[type=text], input[type=email] {
     border: 1px solid #999;
     color: #333;
     padding: 0.25rem 0.75rem;
@@ -301,6 +359,30 @@ main {
     }
   }
 
+}
+
+@media only screen and (max-width: 550px) {
+  main {
+    h1 {
+      margin-bottom: 0.5rem;
+    }
+
+    section {
+      margin-bottom: 1rem;
+    }
+
+    input[type=text], input[type=email] {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+@media only screen and (min-width: 500px) {
+  input[type=text], input[type=email] {
+    width: 25rem;
+    margin-bottom: 0.5rem;
+  }
 }
 
 .content-width {
@@ -344,7 +426,7 @@ main {
   }
 }
 
-@media only screen and (max-width: 500px) {
+@media only screen and (max-width: 550px) {
   .overview > li {
     width: 49%;
   }
@@ -497,13 +579,10 @@ path {
 }
 
 .date-range {
-  display: flex;
-  flex-direction: row;
+  margin: -1rem 0 1rem 0;
 
   > .form-row {
     flex: 2 1 auto;
-    padding-right: 1.5rem;
-    width: 10px;
 
     > input {
       width: 100%;
@@ -511,16 +590,40 @@ path {
   }
 
   > .submit {
-    flex: 1 1 auto;
     margin: 0;
-    width: 10px;
 
     > button {
-      margin-top: 20px;
       padding: 0.25rem 0;
       width: 100%;
     }
+  }
+}
 
+@media only screen and (max-width: 550px) {
+  .date-range {
+    margin-top: 0;
+  }
+}
+
+@media only screen and (min-width: 550px) {
+  .date-range {
+    display: flex;
+    flex-direction: row;
+
+    > .form-row {
+      flex: 2 1 auto;
+      margin-right: 1rem;
+      width: 10px;
+    }
+
+    > .submit {
+      flex: 1 1 auto;
+      width: 10px;
+
+      > button {
+        margin-top: 20px;
+      }
+    }
   }
 }
 
@@ -531,10 +634,6 @@ path {
 
   label {
     display: block;
-  }
-
-  input[type=email] {
-    width: 25rem;
   }
 }
 
@@ -548,6 +647,19 @@ path {
     }
   }
 
-
   margin-bottom: 1rem;
 }
+
+@media only screen and (max-width: 550px) {
+  .list-users {
+    li {
+      margin-bottom: 1.5rem;
+
+      .email {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+}
+
