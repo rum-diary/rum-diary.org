@@ -42,9 +42,18 @@ Real user metrics with ethics.
 * https://github.com/shane-tomlinson
 * @shane_tomlinson
 
-## Getting involved:
+## Get involved:
 
-Lots of work needs to be done!
+Lots of work needs to be done! I obviously am not a designer, marketer, database administrator, or data engineer. Work needs done everywhere, from the landing page, through to capturing data in a privacy sensitive way and presenting awesome insights to site operators.
+
+More concretely:
+
+* Ensure a site visitor's privacy is respected through anonymisation and aggregation.
+* Present site administrators with visitor valuable insights.
+* Simplify site administration.
+* Make the site aesthetically beautiful.
+* Simplify local deployment.
+* Crunch numbers in a performant way.
 
 ## License:
 This software is available under version 2.0 of the MPL:
