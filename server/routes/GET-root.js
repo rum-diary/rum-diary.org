@@ -5,7 +5,8 @@
 exports.verb = 'get';
 exports.path = '/';
 exports.authorization = require('../lib/page-authorization').ANY;
+exports.template = 'GET-root.html';
 
 exports.handler = function(req, res) {
-  res.render('GET-root.html');
+  return {};
 };
