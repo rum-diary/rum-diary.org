@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block title %}Verify{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+
+{% block body %}
+  <p>
+    Hi {{ to_email }}, {{ from_email }} invited you to view
+    site statistics for {{ hostname }}.
+  </p>
+
+  <form method="post" action="/invitation/{{ token }}">
+    <div>
+      <label for="real_name">Real name</label>
+      <input type="text" name="name" required />
+    </div>
+    <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
+    <button>Sign up to view stats for {{ hostname }}</button>
+  </form>
+
+  <p>
+    <small>The next time you sign in, you will sign in using <a href="https://login.persona.org">Mozilla Persona</a></small>
+  </p>
+{% endblock %}
+

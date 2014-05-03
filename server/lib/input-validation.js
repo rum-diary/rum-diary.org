@@ -113,3 +113,9 @@ exports.events = function () {
 exports.accessLevel = function () {
   return joi.string().allow(accessLevels);
 };
+
+
+// A user's real name.
+exports.userRealName = function () {
+  return joi.string().min(3).max(50);
+};

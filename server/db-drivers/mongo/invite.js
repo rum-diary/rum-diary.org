@@ -11,7 +11,6 @@ const Promise = require('bluebird');
 const Model = require('./model');
 const userCollection = require('./user');
 
-const config = require('../../lib/config');
 const guid = require('../../lib/guid');
 const emailer = require('../../lib/emailer');
 const invitationEmail = require('../../lib/invitation-email');
@@ -58,7 +57,7 @@ InviteTokenModel.createAndSendIfInviteeDoesNotExist = function(item) {
         var htmlEmail = invitationEmail.generateHtml(invitation);
         var textEmail = invitationEmail.generateText(invitation);
 
-        var subject = 'Invitation to view site stats for %s on rum-diary.org'.replace('%s', item.hostname);;
+        var subject = 'Invitation to view site stats for %s on rum-diary.org'.replace('%s', item.hostname);
         return emailer.send(item.to_email, subject, htmlEmail, textEmail);
       })
       .then(function() {
@@ -67,23 +66,20 @@ InviteTokenModel.createAndSendIfInviteeDoesNotExist = function(item) {
   });
 };
 
-InviteTokenModel.isTokenValid = function (token) {
-  return this.getOne({ token: token })
-    .then(function (invitation) {
-      return !! invitation;
-    });
-};
-
-InviteTokenModel.doesInviteeExist = function (token) {
+InviteTokenModel.tokenInfo = function(token) {
   return this.getOne({ token: token })
     .then(function (invitation) {
       if (! invitation) {
-        throw new Error('invalid invitation');
+        return { isValid: false };
       }
 
       return userCollection.getOne({ email: invitation.to_email })
         .then(function (user) {
-          return !! user;
+
+          invitation.isValid = true;
+          invitation.doesInviteeExist = !!user;
+
+          return invitation;
         });
     });
 };

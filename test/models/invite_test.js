@@ -113,31 +113,29 @@ describe('invite', function () {
     });
   });
 
-  describe('isTokenValid', function () {
-    it('should return true if token is valid', function () {
+  describe('tokenInfo', function () {
+    it('should return token info if token is valid', function () {
       return invite.create({
         from_email: 'from@testuser.com',
         to_email: 'to@testuser.com',
         hostname: 'testsite.com',
         access_level: accessLevels.ADMIN
       }).then(function (invitation) {
-        // a token is created on creation.
-        return invite.isTokenValid(invitation.token);
-      }).then(function (isValid) {
-        assert.isTrue(isValid);
+        return invite.tokenInfo(invitation.token);
+      }).then(function (tokenInfo) {
+        assert.ok(tokenInfo);
+        assert.isTrue(tokenInfo.isValid);
       });
     });
 
     it('should return false if token is valid', function () {
-      return invite.isTokenValid('invalid token')
-        .then(function(isValid) {
-          assert.isFalse(isValid);
+      return invite.tokenInfo('invalid token')
+        .then(function(tokenInfo) {
+          assert.isFalse(tokenInfo.isValid);
         });
     });
-  });
 
-  describe('doesInviteeExist', function () {
-    it('should return true if invitee exists', function () {
+    it('should return tokenInfo with doesInviteeExist: true if invitee exists', function () {
       var invitation;
 
       return invite.create({
@@ -152,22 +150,22 @@ describe('invite', function () {
           email: 'to@testuser.com'
         });
       }).then(function () {
-        return invite.doesInviteeExist(invitation.token);
-      }).then(function (isValid) {
-        assert.isTrue(isValid);
+        return invite.tokenInfo(invitation.token);
+      }).then(function (tokenInfo) {
+        assert.isTrue(tokenInfo.doesInviteeExist);
       });
     });
 
-    it('should return false if invitee does not exist', function () {
+    it('should return tokenInfo with doesInviteeExist: false if invitee does not exist', function () {
       return invite.create({
         from_email: 'from@testuser.com',
         to_email: 'to@testuser.com',
         hostname: 'testsite.com',
         access_level: accessLevels.ADMIN
       }).then(function (invitation) {
-        return invite.doesInviteeExist(invitation.token);
-      }).then(function (isValid) {
-        assert.isFalse(isValid);
+        return invite.tokenInfo(invitation.token);
+      }).then(function (tokenInfo) {
+        assert.isFalse(tokenInfo.doesInviteeExist);
       });
     });
   });
