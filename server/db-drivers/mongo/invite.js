@@ -6,10 +6,15 @@
 // sent out in an email verification. When a user verifies, the entry
 // is removed from the table.
 
-const Model = require('./model');
-const User = require('./user');
+const Promise = require('bluebird');
 
+const Model = require('./model');
+const userCollection = require('./user');
+
+const config = require('../../lib/config');
 const guid = require('../../lib/guid');
+const emailer = require('../../lib/emailer');
+const invitationEmail = require('../../lib/invitation-email');
 
 const inviteTokenDefinition = {
   token: {
@@ -29,6 +34,39 @@ const inviteTokenDefinition = {
 const InviteTokenModel = Object.create(Model);
 InviteTokenModel.init('InviteToken', inviteTokenDefinition);
 
+InviteTokenModel.createAndSendIfInviteeDoesNotExist = function(item) {
+  var invitation;
+  var self = this;
+  // TODO - validate item.
+
+  return Promise.all([
+    userCollection.getOne({ email: item.to_email }),
+    self.getOne({ to_email: item.to_email, hostname: item.hostname })
+  ])
+  .then(function(allResults) {
+    var user = allResults[0];
+    var existingInvitation = allResults[1];
+    if (user || existingInvitation) {
+      // user already exists or already has an invitation for this host, bail.
+      return;
+    }
+
+    return self.create(item)
+      .then(function(_invitation) {
+        invitation = _invitation;
+
+        var htmlEmail = invitationEmail.generateHtml(invitation);
+        var textEmail = invitationEmail.generateText(invitation);
+
+        var subject = 'Invitation to view site stats for %s on rum-diary.org'.replace('%s', item.hostname);;
+        return emailer.send(item.to_email, subject, htmlEmail, textEmail);
+      })
+      .then(function() {
+        return invitation;
+      });
+  });
+};
+
 InviteTokenModel.isTokenValid = function (token) {
   return this.getOne({ token: token })
     .then(function (invitation) {
@@ -43,7 +81,7 @@ InviteTokenModel.doesInviteeExist = function (token) {
         throw new Error('invalid invitation');
       }
 
-      return User.getOne({ email: invitation.to_email })
+      return userCollection.getOne({ email: invitation.to_email })
         .then(function (user) {
           return !! user;
         });
@@ -68,7 +106,7 @@ InviteTokenModel.verifyExistingUser = function (token) {
         throw new Error('invalid invitation');
       }
 
-      return User.getOne({ email: invitation.to_email });
+      return userCollection.getOne({ email: invitation.to_email });
     })
     .then(function (_user) {
       if (! _user) {
@@ -78,7 +116,7 @@ InviteTokenModel.verifyExistingUser = function (token) {
       user = _user;
 
       // delete the token last in case of any failures along the way.
-      return self.findOneAndDelete({ token: token })
+      return self.findOneAndDelete({ token: token });
     })
     .then(function () {
       return user;
@@ -98,14 +136,14 @@ InviteTokenModel.verifyNewUser = function (token, name) {
 
       email = invitation.to_email;
 
-      return User.getOne({ email: email });
+      return userCollection.getOne({ email: email });
     })
     .then(function (_user) {
       if (_user) {
         throw new Error('user already exists');
       }
 
-      return User.create({
+      return userCollection.create({
         email: email,
         name: name
       });

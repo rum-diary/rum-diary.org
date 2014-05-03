@@ -9,6 +9,10 @@ module.exports = {
     format: String,
     'default': undefined
   },
+  public_url: {
+    format: String,
+    'default': undefined
+  },
   http_port: {
     format: 'port',
     'default': 80,
@@ -88,6 +92,36 @@ module.exports = {
     format: String,
     'default': 'wild and crazy cats',
     env: 'SESSION_COOKIE_SECRET'
+  },
+
+  emailer: {
+    sending_user: {
+      doc: 'The user emails are addressed from',
+      format: String,
+      'default': 'noresponse'
+    },
+    transport: {
+      doc: 'Type of transport to use',
+      format: ['sendmail', 'smtp', 'console'],
+      'default': 'sendmail'
+    },
+    smtp: {
+      host: {
+        doc: 'Outgoing email server',
+        format: String,
+        'default': '127.0.0.1'
+      },
+      useSecureConnection: {
+        doc: 'Whether to use an SSL connection to the email server',
+        format: Boolean,
+        'default': false
+      },
+      port: {
+        doc: 'Port to send email',
+        format: 'port',
+        'default': 9999
+      }
+    }
   },
 
   proc_name: getProcName()

@@ -9,24 +9,26 @@ const fs = require('fs');
 const logger = require('./logger');
 const schema = require('./config-schema');
 
-var conf = convict(schema);
+var config = convict(schema);
 
 useDevConfigIfNoneDefined();
 loadConfigFiles();
 setNodeEnv();
 
-conf.validate();
+config.validate();
 
-module.exports = conf;
+config.set('public_url', getPublicUrl());
+
+module.exports = config;
 
 function setNodeEnv() {
   if ( ! process.env.NODE_ENV) {
-    process.env.NODE_ENV = conf.get('env');
+    process.env.NODE_ENV = config.get('env');
   }
 }
 
 function useDevConfigIfNoneDefined() {
-  var DEV_CONFIG_PATH = path.join(conf.get('config_dir'), 'local.json');
+  var DEV_CONFIG_PATH = path.join(config.get('config_dir'), 'local.json');
   if ( ! process.env.CONFIG_FILES && fs.existsSync(DEV_CONFIG_PATH)) {
     process.env.CONFIG_FILES = DEV_CONFIG_PATH;
   }
@@ -41,8 +43,19 @@ function loadConfigFiles() {
     files.forEach(function(file) {
       logger.info('loading config file', file);
     });
-    conf.loadFile(files);
+    config.loadFile(files);
   }
 }
 
+function getPublicUrl() {
+  var hostname = config.get('hostname');
+  var useSSL = config.get('ssl');
+  var httpPort = config.get('http_port');
+  var httpsPort = config.get('https_port');
 
+  var protocol = useSSL ? 'https' : 'http';
+  var port = useSSL ? (httpsPort === 443 ? '' : ':' + httpsPort) :
+                      (httpPort === 80 ? '' : ':' + httpPort);
+
+  return protocol + '://' + hostname + port;
+}

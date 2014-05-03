@@ -29,6 +29,7 @@
     "moment": "2.4.0",
     "mongoose": "3.8.7",
     "mongoose-timestamp": "0.1.1",
+    "nodemailer": "0.6.3",
     "nunjucks": "1.0.1",
     "glob-require": "0.0.1",
     "spdy": "1.17.10",

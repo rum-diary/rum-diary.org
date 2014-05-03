@@ -13,12 +13,12 @@ const invite = db.invite;
 const user = db.user;
 
 describe('invite', function () {
-  beforeEach(function (done) {
-    db.clear(done);
+  beforeEach(function () {
+    return db.clear();
   });
 
-  afterEach(function (done) {
-    db.clear(done);
+  afterEach(function () {
+    return db.clear();
   });
 
   describe('create', function () {
@@ -38,6 +38,78 @@ describe('invite', function () {
         assert.equal(invitation.hostname, 'testsite.com');
         assert.strictEqual(invitation.access_level, accessLevels.ADMIN);
       });
+    });
+
+    it('should throw an error if from_email is not a valid user', function () {
+      return invite.create({
+        from_email: 'from@testuser.com',
+        to_email: 'to@testuser.com',
+        hostname: 'testsite.com',
+        access_level: accessLevels.ADMIN
+      }).then(null, function (err) {
+        // check for error.
+      });
+    });
+
+    it('should throw an error if hostname is not a valid site', function () {
+      return invite.create({
+        from_email: 'from@testuser.com',
+        to_email: 'to@testuser.com',
+        hostname: 'testsite.com',
+        access_level: accessLevels.ADMIN
+      }).then(null, function (err) {
+        // check for error.
+      });
+    });
+  });
+
+  describe('createAndSendIfInviteeDoesNotExist', function () {
+    it('should create an invite and send an email if the invitee does not exist', function () {
+      return invite.createAndSendIfInviteeDoesNotExist({
+        from_email: 'from@testuser.com',
+        to_email: 'to@testuser.com',
+        hostname: 'testsite.com',
+        access_level: accessLevels.ADMIN
+      }).then(function (invitation) {
+        // an invitation is returned.
+        assert.ok(invitation.token);
+      });
+    });
+
+    it('should do nothing if the invitee is already a user', function () {
+      return user.create({ email: 'to@testuser.com' })
+        .then(function () {
+          return invite.createAndSendIfInviteeDoesNotExist({
+            from_email: 'from@testuser.com',
+            to_email: 'to@testuser.com',
+            hostname: 'testsite.com',
+            access_level: accessLevels.ADMIN
+          });
+        }).then(function (invitation) {
+          assert.isUndefined(invitation);
+        });
+    });
+
+    it('should do nothing if the user is already invited', function () {
+        return invite.createAndSendIfInviteeDoesNotExist({
+          from_email: 'from@testuser.com',
+          to_email: 'to@testuser.com',
+          hostname: 'testsite.com',
+          access_level: accessLevels.ADMIN
+        }).then(function (invitation) {
+          // First invitation is sent.
+          assert.ok(invitation);
+
+          return invite.createAndSendIfInviteeDoesNotExist({
+            from_email: 'from@testuser.com',
+            to_email: 'to@testuser.com',
+            hostname: 'testsite.com',
+            access_level: accessLevels.ADMIN
+          });
+        }).then(function (invitation) {
+          // User is already invited, no need to invite again.
+          assert.isUndefined(invitation);
+        });
     });
   });
 
