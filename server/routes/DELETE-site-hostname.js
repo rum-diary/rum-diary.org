@@ -7,10 +7,17 @@
 const db = require('../lib/db');
 const siteCollection = db.site;
 const httpErrors = require('../lib/http-errors');
+const inputValidation = require('../lib/input-validation');
 
 exports.path = '/site/:hostname';
 exports.verb = 'delete';
 exports.authorization = require('../lib/page-authorization').IS_OWNER_HOST;
+
+exports.validation = {
+  _csrf: inputValidation.csrf(),
+  hostname: inputValidation.hostname()
+};
+
 
 exports.handler = function (req, res) {
   var hostname = req.params.hostname;

@@ -28,7 +28,7 @@ exports.hostname = function () {
 // A BrowserID assertion
 // TODO - is there a generic form?
 exports.assertion = function () {
-  return joi.string().min(10).max(5000);
+  return joi.string().min(10).max(5000).required();
 };
 
 // An email
@@ -36,10 +36,9 @@ exports.email = function () {
   return joi.string().email();
 };
 
-// A CSRF token.
-// TODO - is there a generic form?
+// A CSRF token. Always required.
 exports.csrf = function () {
-  return joi.string().max(1000);
+  return joi.string().max(1000).required();
 };
 
 // A referrer for navigation data.

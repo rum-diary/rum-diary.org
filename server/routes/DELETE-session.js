@@ -5,10 +5,16 @@
 // Delete a user's session.
 
 const httpErrors = require('../lib/http-errors');
+const inputValidation = require('../lib/input-validation');
 
 exports.path = '/session';
 exports.verb = 'delete';
 exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
+
+exports.validation = {
+  _csrf: inputValidation.csrf()
+};
+
 
 exports.handler = function (req, res) {
   var email = req.session.email;
