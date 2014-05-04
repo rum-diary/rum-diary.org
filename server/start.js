@@ -17,6 +17,7 @@ const routes = require('./lib/routes.js');
 const ssl = require('./lib/ssl');
 const templates = require('./lib/templates');
 const csrf = require('./lib/middleware/csrf');
+const session = require('./lib/middleware/session');
 
 const SessionStore = require('./lib/session-store');
 
@@ -29,15 +30,8 @@ SessionStore.create().then(function (sessionStore) {
 
   app.use(express.cookieParser());
 
-  app.use(express.session({
-    cookie: {
-      maxAge: config.get('session_duration_ms'),
-      httpOnly: true,
-      secure: config.get('ssl'),
-    },
-    key: config.get('session_cookie_name'),
-    secret: config.get('session_cookie_secret'),
-    store: sessionStore
+  app.use(session({
+    sessionStore: sessionStore
   }));
 
   app.use(csrf());

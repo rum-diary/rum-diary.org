@@ -14,9 +14,9 @@ const express = require('express');
 const csrfMiddleware = express.csrf();
 module.exports = function () {
   return function (req, res, next) {
-    // /navigation requires no CSRF token so as to not
-    // give us the ability to track RP users.
+    // These two do not require CSRF tokens.
     if (req.url === '/navigation') return next();
+    if (req.url === '/unload') return next();
 
     csrfMiddleware(req, res, function () {
       // All other requests get a csrf token, the logout button is a form POST.
