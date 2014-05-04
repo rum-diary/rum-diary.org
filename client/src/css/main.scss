@@ -43,6 +43,11 @@ ul, li {
 }
 
 
+ul.disc {
+  li {
+    list-style: disc;
+  }
+}
 
 /* 
  * wrapper is set to min-height: 100% to allow the footer 
