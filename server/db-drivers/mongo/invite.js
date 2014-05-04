@@ -6,11 +6,14 @@
 // sent out in an email verification. When a user verifies, the entry
 // is removed from the table.
 
+const Promise = require('bluebird');
+
 const Model = require('./model');
-const User = require('./user');
-const Site = require('./site');
+const userCollection = require('./user');
 
 const guid = require('../../lib/guid');
+const emailer = require('../../lib/emailer');
+const invitationEmail = require('../../lib/invitation-email');
 
 const inviteTokenDefinition = {
   token: {
@@ -30,55 +33,126 @@ const inviteTokenDefinition = {
 const InviteTokenModel = Object.create(Model);
 InviteTokenModel.init('InviteToken', inviteTokenDefinition);
 
-/**
- * TODO - is it possible to do this without a name?
- */
-/**
- * The general idea is tokens are only sent if a person
- * is not already a user. verify can also be called if
- * one person has multiple invitations.
- */
-InviteTokenModel.verify = function (token, name) {
+InviteTokenModel.createAndSendIfInviteeDoesNotExist = function(item) {
   var invitation;
-  var user;
+  var self = this;
+  // TODO - validate item.
 
-  return this.findOneAndDelete({ token: token })
-    .then(function (_invitation) {
-      if (! _invitation) {
+  return Promise.all([
+    userCollection.getOne({ email: item.to_email }),
+    self.getOne({ to_email: item.to_email, hostname: item.hostname })
+  ])
+  .then(function(allResults) {
+    var user = allResults[0];
+    var existingInvitation = allResults[1];
+    if (user || existingInvitation) {
+      // user already exists or already has an invitation for this host, bail.
+      return;
+    }
+
+    return self.create(item)
+      .then(function(_invitation) {
+        invitation = _invitation;
+
+        var htmlEmail = invitationEmail.generateHtml(invitation);
+        var textEmail = invitationEmail.generateText(invitation);
+
+        var subject = 'Invitation to view site stats for %s on rum-diary.org'.replace('%s', item.hostname);
+        return emailer.send(item.to_email, subject, htmlEmail, textEmail);
+      })
+      .then(function() {
+        return invitation;
+      });
+  });
+};
+
+InviteTokenModel.tokenInfo = function(token) {
+  return this.getOne({ token: token })
+    .then(function (invitation) {
+      if (! invitation) {
+        return { isValid: false };
+      }
+
+      return userCollection.getOne({ email: invitation.to_email })
+        .then(function (user) {
+
+          invitation.isValid = true;
+          invitation.doesInviteeExist = !!user;
+
+          return invitation;
+        });
+    });
+};
+
+/**
+ * Invitatations are only sent if the addressee is not
+ * a user at the time of the invitation. The user could
+ * have created an account before this invitation is
+ * verified. If the user is already created, do nothing
+ * besides delete the token. If the user is not created,
+ * create them and let the user set the name.
+ */
+
+InviteTokenModel.verifyExistingUser = function (token) {
+  var user;
+  var self = this;
+  return this.getOne({ token: token })
+    .then(function (invitation) {
+      if (! invitation) {
         throw new Error('invalid invitation');
       }
 
-      invitation = _invitation;
+      return userCollection.getOne({ email: invitation.to_email });
+    })
+    .then(function (_user) {
+      if (! _user) {
+        throw new Error('invalid user');
+      }
 
-      return ensureUserExists(invitation.to_email, name);
+      user = _user;
+
+      // delete the token last in case of any failures along the way.
+      return self.findOneAndDelete({ token: token });
+    })
+    .then(function () {
+      return user;
+    });
+};
+
+InviteTokenModel.verifyNewUser = function (token, name) {
+  var email;
+  var user;
+
+  var self = this;
+  return this.getOne({ token: token })
+    .then(function (invitation) {
+      if (! invitation) {
+        throw new Error('invalid invitation');
+      }
+
+      email = invitation.to_email;
+
+      return userCollection.getOne({ email: email });
+    })
+    .then(function (_user) {
+      if (_user) {
+        throw new Error('user already exists');
+      }
+
+      return userCollection.create({
+        email: email,
+        name: name
+      });
     }).then(function (_user) {
       user = _user;
 
-      // TODO - this is wrong, we should get the user's access level on
-      // the site, and if the new level is > than the old level, then
-      // update it.
-      return Site.setUserAccessLevel(
-          invitation.to_email,
-          invitation.hostname,
-          invitation.access_level
-      );
-    }).then(function () {
+      // delete the token last in case the user creation fails, the user
+      // should be able to try again.
+      return self.findOneAndDelete({ token: token });
+    })
+    .then(function () {
       return user;
     });
-
-  function ensureUserExists(email, name) {
-    return User.getOne({ email: email })
-      .then(function (user) {
-        if (! user) {
-          return User.create({
-            email: email,
-            name: name
-          });
-        }
-
-        return user;
-      });
-  }
 };
 
 module.exports = InviteTokenModel;

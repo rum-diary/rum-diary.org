@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const nunjucks = require('nunjucks');
 const path = require('path');
 const spdy = require('spdy');
 const connect_fonts = require('connect-fonts');
@@ -11,12 +10,12 @@ const connect_fonts_vera_sans = require('connect-fonts-bitstream-vera-sans');
 const gzip_static = require('connect-gzip-static');
 const helmet = require('helmet');
 const cachify = require('connect-cachify');
-const moment = require('moment');
 
 const config = require('./lib/config');
 const logger = require('./lib/logger');
 const routes = require('./lib/routes.js');
 const ssl = require('./lib/ssl');
+const templates = require('./lib/templates');
 const csrf = require('./lib/middleware/csrf');
 
 const SessionStore = require('./lib/session-store');
@@ -57,22 +56,7 @@ SessionStore.create().then(function (sessionStore) {
     'default-src': ['\'self\'', 'https://login.persona.org']
   }));
 
-  // Template setup.
-  var env = nunjucks.configure(config.get('views_dir'), {
-    autoescape: true,
-    express: app
-  });
-
-  // sets up a filter to use in the templates that allows for cachifying.
-  env.addFilter('cachify', function(str) {
-    if (config.get('strong_http_caching')) return cachify.cachify(str);
-    return str;
-  });
-
-  // Add the ability to convert dates using moment.
-  env.addFilter('dateFormat', function(date, format) {
-    return moment(new Date(date)).format(format);
-  });
+  templates.setup(app);
 
   // We need to get info out of the request bodies sometimes.
   app.use(express.bodyParser());

@@ -4,6 +4,7 @@
 
 const db = require('../lib/db');
 const siteCollection = db.site;
+const inviteCollection = db.invite;
 const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
 const accessLevels = require('../lib/access-levels');
@@ -30,6 +31,14 @@ exports.handler = function (req, res) {
   // Adds a user to the site whether they exist or not.
   logger.info('setting access level: %s, %s, %s', email, hostname, accessLevel);
   return siteCollection.setUserAccessLevel(email, hostname, accessLevel)
+    .then(function () {
+      return inviteCollection.createAndSendIfInviteeDoesNotExist({
+        from_email: req.session.email,
+        to_email: email,
+        hostname: hostname,
+        access_level: accessLevel
+      });
+    })
     .then(function () {
       // go back to the original page.
       res.redirect(req.get('referrer'));

@@ -2,11 +2,12 @@
 
 Real user metrics with ethics.
 
-## Guiding values
-* Sites need web site usage information to make good business decisions.
-* Users have a right to privacy.
+## Guiding principles
+* Site operators need visitor information to make good business decisions.
+* Site visitors have a right to privacy. Visitors give the sites they visit a level of trust that is not automatically extended to third parties.
 * Data should be collected about a user only when necessary.
-* Collected data should be anonymized.
+* Visitors should know what data is collected, how that data is used, with whom it is shared, how long it is retained, and whether it can be deleted.
+* Every effort should be made to minimize fingerprintability by collecting as little data as necessary and anonymizing and aggregating the data that is collected.
 
 ## Prerequisites:
 

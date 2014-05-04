@@ -1,6 +1,9 @@
 {
   "env": "test",
   "static_dir": "",
-  "verify_assertion": false
+  "verify_assertion": false,
+  "emailer": {
+    "transport": "console"
+  }
 }
 
