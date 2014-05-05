@@ -28,6 +28,9 @@ const STATIC_ROOT = path.join(config.get('static_root'),
 SessionStore.create().then(function (sessionStore) {
   const app = express();
 
+  // allow PUT/DELETE methods via POST in HTML forms.
+  app.use(express.methodOverride());
+
   app.use(express.cookieParser());
 
   app.use(session({
@@ -54,9 +57,6 @@ SessionStore.create().then(function (sessionStore) {
 
   // We need to get info out of the request bodies sometimes.
   app.use(express.bodyParser());
-
-  // allow PUT/DELETE methods via POST in HTML forms.
-  app.use(express.methodOverride());
 
   // Send all express logs to our logger.
   app.use(express.logger({

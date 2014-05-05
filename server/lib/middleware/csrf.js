@@ -15,6 +15,7 @@ const csrfMiddleware = express.csrf();
 module.exports = function () {
   return function (req, res, next) {
     // These two do not require CSRF tokens.
+    if (req.url === '/include.js') return next();
     if (req.url === '/navigation') return next();
     if (req.url === '/unload') return next();
 
