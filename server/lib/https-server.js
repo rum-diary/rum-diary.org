@@ -12,10 +12,13 @@ const HTTPS_PORT = config.get('https_port');
 
 exports.start = function (options) {
   // Set up SPDY.
+
+  var isSslEnabled = config.get('ssl');
+
   var spdyOptions = {
-    key: ssl.getKey(),
-    cert: ssl.getCert(),
-    ssl: config.get('ssl'),
+    key: isSslEnabled && ssl.getKey(),
+    cert: isSslEnabled && ssl.getCert(),
+    ssl: isSslEnabled,
     plain: true
   };
 
