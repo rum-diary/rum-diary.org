@@ -13,6 +13,9 @@ node_js:
 services:
   - mongodb
 
+before_script:
+  - cp server/etc/local.json-sample server/etc/local.json
+
 script:
   - npm test
 
