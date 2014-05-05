@@ -12,6 +12,7 @@ const request = require('request');
 
 const config = require('../server/lib/config');
 const baseURL = 'http://localhost:' + config.get('https_port');
+const guid = require('../server/lib/guid');
 
 
 const startStop = require('./lib/start-stop');
@@ -74,18 +75,30 @@ describe('routes module', function () {
   });
 
   describe('POST /unload', function () {
-    it('should respond with 400 if no uuid sent', function (done) {
-      request.post(baseURL + '/unload', function (err, response) {
-        assert.equal(response.statusCode, 400);
-
+    it('should respond with 500 if guid is invalid', function (done) {
+      request.post({
+        url: baseURL + '/unload',
+        json: { uuid: 'invalid guid' }
+      }, function (err, response) {
+        assert.equal(response.statusCode, 500);
         done();
       });
     });
 
-    it('should respond with 200 and CORS headers if valid', function (done) {
+    it('should respond with 500 if guid is missing', function (done) {
       request.post({
         url: baseURL + '/unload',
-        json: { uuid: 'the-uuid-to-update' }
+        json: { uuid: 'invalid guid' }
+      }, function (err, response) {
+        assert.equal(response.statusCode, 500);
+        done();
+      });
+    });
+
+    it('should respond with 200 and CORS headers, if guid is valid', function (done) {
+      request.post({
+        url: baseURL + '/unload',
+        json: { uuid: guid() }
       }, function (err, response) {
         assert.equal(response.statusCode, 200);
 
@@ -95,24 +108,6 @@ describe('routes module', function () {
         testCommonResponseHeaders(response);
 
 
-        done();
-      });
-    });
-  });
-
-  describe('POST /user', function () {
-    it('with real name and assertion should respond with a 302', function (done) {
-      request.post({
-        url: baseURL + '/user',
-        json: {
-          name: 'Test User',
-          hostname: 'localhost',
-          assertion: 'A_fake_assertion'
-        }
-      }, function (err, response) {
-        // redirect user to the welcome screen.
-        assert.equal(response.statusCode, 302);
-        assert.equal(response.headers.location, '/welcome');
         done();
       });
     });
