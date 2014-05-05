@@ -5,8 +5,20 @@
 const express = require('express');
 const config = require('../config');
 
+const userCollection = require('../db').user;
+
 module.exports = function (options) {
-  const sessionMiddleware = express.session({
+  const sessionMiddleware = createSessionMiddleware(options);
+
+  return function middlewareProxy(req, res, next) {
+    if (isUrlSessionless(req.url)) return next();
+
+    sessionMiddleware(req, res, validateSession.bind(null, req, res, next));
+  };
+};
+
+function createSessionMiddleware(options) {
+  return express.session({
     cookie: {
       maxAge: config.get('session_duration_ms'),
       httpOnly: true,
@@ -16,16 +28,44 @@ module.exports = function (options) {
     secret: config.get('session_cookie_secret'),
     store: options.sessionStore
   });
+}
 
-  return function (req, res, next) {
-    // These items do not receive cookies because they are part of
-    // the RP API. Eliminate the ability to track their users.
-    if (req.url === '/include.js') return next();
-    if (req.url === '/navigation') return next();
-    if (req.url === '/unload') return next();
-
-    sessionMiddleware(req, res, next);
-  };
+// These items do not receive cookies because they are part of
+// the RP API. Eliminate the ability to track their users.
+const SESSIONLESS_URLS = {
+  '/include.js': 1,
+  '/navigation': 1,
+  '/unload': 1
 };
 
+function isUrlSessionless(url) {
+  return SESSIONLESS_URLS[url];
+}
+
+function validateSession(req, res, next) {
+  var email = req.session.email;
+  if (email) {
+    return checkUserExists(email, req, res, next);
+  }
+
+  next();
+}
+
+function checkUserExists(email, req, res, next) {
+  userCollection.getOne({ email: email })
+    .then(function (user) {
+      if (! user) {
+        return destroySessionAndRedirect(req, res);
+      }
+
+      next();
+    });
+}
+
+function destroySessionAndRedirect(req, res) {
+  // user no longer exists, delete the session.
+  req.session.destroy(function () {
+    res.redirect('/user');
+  });
+}
 
