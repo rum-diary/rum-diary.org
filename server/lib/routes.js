@@ -7,7 +7,7 @@ const path = require('path');
 const cors = require('cors');
 const corsMiddleware = cors();
 const joi = require('joi');
-const requireSubdir = require('require-subdir');
+const globRequire = require('glob-require');
 
 const Router = require('express').Router;
 const router = new Router();
@@ -26,7 +26,7 @@ const ROUTES_DIR = path.join(__dirname, '..', 'routes');
 loadAllRoutes();
 
 function loadAllRoutes() {
-  requireSubdir(ROUTES_DIR, function (err, routes) {
+  globRequire(ROUTES_DIR, function (err, routes) {
     routes.forEach(function(route) {
       addRoute(route.exports, router);
     });
