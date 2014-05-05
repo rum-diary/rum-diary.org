@@ -23,7 +23,7 @@ exports.start = function () {
   });
 
   http.listen(HTTP_PORT, function() {
-    logger.info('http listening on port', HTTP_PORT);
+    logger.error('http listening on port', HTTP_PORT);
   });
 };
 

@@ -15,21 +15,25 @@ process.on('exit', function () {
 exports.start = function start(done) {
   var START_PATH = path.join(__dirname, '..', '..', 'server', 'start.js');
   proc = spawn('node', [ START_PATH ]);
-  proc.stdout.on('data', function(buf) {
+
+  proc.stdout.on('data', function (buf) {
+    console.log(buf.toString());
+  });
+
+  proc.stderr.on('data', function (buf) {
+    console.error(buf.toString());
+
     var str = buf.toString();
     if (done && /listening on port/.test(str)) {
       done();
       done = null;
     }
   });
-  proc.stderr.on('data', function(buf) {
-    console.error(buf.toString());
-  });
 }
 
 exports.stop = function stop(done) {
   proc.kill('SIGINT');
-  proc.on('exit', function() {
+  proc.on('exit', function () {
     proc = null;
     if (done) done();
   });

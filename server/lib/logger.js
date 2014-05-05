@@ -6,6 +6,8 @@ const intel = require('intel');
 const path = require('path');
 const mkdirp = require('mkdirp');
 
+const config = require('./config');
+
 // TODO - we cannot include config.js here because there would be a
 // circular dependency. UGH.
 const LOGGING_DIR = path.join(__dirname, '..', 'var', 'log');
@@ -46,8 +48,8 @@ var intelConfig = {
 };
 
 intelConfig.loggers[PROCESS_NAME] = {
-  level: 'DEBUG',
-  handlers: ['console', 'file'],
+  level: config.get('logging.level'),
+  handlers: config.get('logging.handlers'),
   propagate: false,
   handleExceptions: true,
   exitOnError: false
