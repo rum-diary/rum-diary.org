@@ -4,8 +4,7 @@
 
 const nodemailer = require('nodemailer');
 const config = require('../config');
-
-// TODO - pipe to the logger instead.
+const logger = require('../logger');
 
 // Pipes all messages to stdout
 
@@ -14,11 +13,19 @@ function ConsoleTransport(options) {
 }
 
 ConsoleTransport.prototype.sendMail = function (emailMessage, callback) {
-  emailMessage.pipe(process.stdout);
+  var message = '';
+
+  emailMessage.on('data', function (buffer) {
+    message += buffer.toString();
+  });
+
   emailMessage.on('error', function (err) {
     callback(err);
   });
+
   emailMessage.on('end', function () {
+    logger.verbose(message);
+
     callback(null, {
       messageId: emailMessage._messageId
     });
