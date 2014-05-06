@@ -55,7 +55,7 @@
     "grunt-zopfli": "0.3.2",
     "jshint-stylish": "0.1.4",
     "load-grunt-tasks": "0.2.1",
-    "mocha": "1.16.1",
+    "mocha": "1.18.2",
     "mold-source-map": "0.3.0",
     "request": "2.34.0",
     "time-grunt": "0.2.5"

@@ -108,8 +108,8 @@ function routeHandler(req, res, next) {
   // XXX Consider moving rendering functions to their own middleware.
   function render(templateData) {
     if (! self.template) return;
+    if (templateData === false) return;
 
-    templateData = templateData || {};
     // XXX This should probably be somewhere else,
     // perhaps in its own middleware
     if (! templateData.email && req.session.email) {

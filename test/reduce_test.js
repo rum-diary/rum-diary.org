@@ -67,7 +67,7 @@ describe('reduce', function () {
       }, fail);
   });
 
-  it('mapReduce', function (done) {
+  it('mapReduce', function () {
     var copy = [];
 
     // give us a respectable amount of data
@@ -83,7 +83,7 @@ describe('reduce', function () {
       }
     });
 
-    reduce.mapReduce(copy, [
+    return reduce.mapReduce(copy, [
       'hostnames',
       'hits_per_page',
       'referrers',
@@ -99,13 +99,12 @@ describe('reduce', function () {
         calculate: ['median']
       }
     }).then(function (data) {
-      console.log('processing time full: %s ms', data.processing_time);
-      done();
-    }, fail);
+      /*console.log('processing time full: %s ms', data.processing_time);*/
+    });
   });
 
-  it('mapReduce with navigation quartiles', function (done) {
-    reduce.mapReduce(navigationTimingData, [
+  it('mapReduce with navigation quartiles', function () {
+    return reduce.mapReduce(navigationTimingData, [
       'navigation'
     ], {
       start: moment(new Date()).subtract('days', 30),
@@ -114,13 +113,11 @@ describe('reduce', function () {
         calculate: ['quartiles']
       }
     }).then(function (data) {
-      console.log('processing time quartiles: %s ms', data.processing_time);
+      /*console.log('processing time quartiles: %s ms', data.processing_time);*/
       assert.ok(data.navigation['25']);
       assert.ok(data.navigation['50']);
       assert.ok(data.navigation['75']);
-
-      done();
-    }, fail);
+    });
   });
 
   it('mapReduce to calculate unique visitors', function (done) {

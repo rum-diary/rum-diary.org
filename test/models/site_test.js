@@ -10,81 +10,73 @@ const db = require('../../server/lib/db');
 const site = db.site;
 const accessLevels = require('../../server/lib/access-levels');
 
-const testExtras = require('../lib/test-extras');
-const cPass = testExtras.cPass;
-const fail = testExtras.fail;
-
 describe('database', function () {
-  beforeEach(function (done) {
-    db.clear(done);
+  beforeEach(function () {
+    return db.clear();
   });
 
-  afterEach(function (done) {
-    db.clear(done);
+  afterEach(function () {
+    return db.clear();
   });
 
   describe('site', function () {
     describe('create', function () {
-      it('should create an item', function (done) {
-        site.create({
+      it('should create an item', function () {
+        return site.create({
           hostname: 'testsite.com'
         }).then(function (site) {
           assert.equal(site.hostname, 'testsite.com');
           assert.equal(site.total_hits, 0);
-
-          done();
-        }, fail);
+        });
       });
     });
 
     describe('getOne', function () {
-      beforeEach(function (done) {
-        site.create({
+      beforeEach(function () {
+        return site.create({
           hostname: 'testsite.com'
         }).then(function () {
           return site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(cPass(done), fail);
+        });
       });
 
-      it('should get one matched hostname', function (done) {
-        site.getOne({
+      it('should get one matched hostname', function () {
+        return site.getOne({
           hostname: 'testsite.com'
         }).then(function (site) {
           assert.equal(site.hostname, 'testsite.com');
           assert.equal(site.total_hits, 0);
-          done();
-        }, fail);
+        });
       });
     });
 
     describe('get', function () {
-      beforeEach(function (done) {
-        site.create({
+      beforeEach(function () {
+        return site.create({
           hostname: 'testsite.com'
         }).then(function () {
           return site.create({
             hostname: 'rum-diary.org'
           });
-        }).then(cPass(done), fail);
+        });
       });
 
-      it('should return one or more matches', function (done) {
-        site.get({}).then(function (sites) {
+      it('should return one or more matches', function () {
+        return site.get({}).then(function (sites) {
           assert.equal(sites.length, 2);
           assert.equal(sites[0].hostname, 'testsite.com');
           assert.equal(sites[0].total_hits, 0);
           assert.equal(sites[1].hostname, 'rum-diary.org');
           assert.equal(sites[1].total_hits, 0);
-          done();
-        }, fail);
+        });
       });
     });
 
     describe('ensureExists', function () {
-      it('ensures the site exists', function (done) {
-        site.ensureExists('testsite.com')
+      it('ensures the site exists', function () {
+        return site.ensureExists('testsite.com')
           .then(function (siteReturned) {
             assert.equal(siteReturned.hostname, 'testsite.com');
             assert.equal(siteReturned.total_hits, 0);
@@ -94,8 +86,7 @@ describe('database', function () {
           .then(function (siteFetched) {
             assert.equal(siteFetched.hostname, 'testsite.com');
             assert.equal(siteFetched.total_hits, 0);
-            done();
-          }, fail);
+          });
       });
     });
 
@@ -129,7 +120,7 @@ describe('database', function () {
       });
 
       it('should return true if user is a readonly user', function () {
-        site.create({
+        return site.create({
           hostname: 'testsite.com'
         }).then(function () {
           return site.setUserAccessLevel('testuser@testuser.com', 'testsite.com', accessLevels.READONLY);
@@ -153,7 +144,7 @@ describe('database', function () {
       });
     });
 
-    describe('setuseraccesslevel', function () {
+    describe('setUserAccessLevel', function () {
       describe('to NONE', function () {
         it('removes a user\'s readonly access', function () {
           return site.create({
@@ -221,21 +212,21 @@ describe('database', function () {
 
     describe('getSitesForUser', function () {
       it('get sites user is owner of', function () {
+        return site.create({
+          hostname: 'testsite.com',
+          owner: 'testuser@testuser.com'
+        }).then(function () {
           return site.create({
-            hostname: 'testsite.com',
+            hostname: 'othersite.com',
             owner: 'testuser@testuser.com'
-          }).then(function () {
-            return site.create({
-              hostname: 'othersite.com',
-              owner: 'testuser@testuser.com'
-            });
-          }).then(function () {
-            return site.getSitesForUser('testuser@testuser.com');
-          }).then(function(sites) {
-            assert.equal(sites.length, 2);
-            assert.equal(sites[0].hostname, 'testsite.com');
-            assert.equal(sites[1].hostname, 'othersite.com');
           });
+        }).then(function () {
+          return site.getSitesForUser('testuser@testuser.com');
+        }).then(function(sites) {
+          assert.equal(sites.length, 2);
+          assert.equal(sites[0].hostname, 'testsite.com');
+          assert.equal(sites[1].hostname, 'othersite.com');
+        });
       });
     });
   });

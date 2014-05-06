@@ -116,7 +116,7 @@ describe('a route handler', function () {
     });
   });
 
-  describe('that returns nothing', function () {
+  describe('that returns false', function () {
     routes.addRoute({
       path: '/return_nothing',
       verb: 'get',
@@ -125,6 +125,7 @@ describe('a route handler', function () {
         return true;
       },
       handler: function() {
+        return false;
       }
     }, routerMock);
 
@@ -133,12 +134,14 @@ describe('a route handler', function () {
       request.verb = 'get';
       request.url = '/return_nothing';
 
-      routerMock.handle(request, {
+      return routerMock.handle(request, {
         send: function() {
-          assert(false, 'unexpected');
+          console.trace();
+          assert(false, 'unexpected send');
         },
         render: function() {
-          assert(false, 'unexpected');
+          console.trace();
+          assert(false, 'unexpected render');
         }
       });
     });

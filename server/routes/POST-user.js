@@ -61,7 +61,6 @@ exports.handler = function (req, res) {
         // site already exists, see if user is authorized.
         return siteCollection.isAuthorizedToView(email, hostname)
           .then(function (isAuthorized) {
-            console.error('is user authorized: %s', isAuthorized);
             canViewExistingSite = isAuthorized;
           });
       })

@@ -50,7 +50,6 @@ function sortHostnamesByCount(countByHostname) {
       try {
         return b.count - a.count;
       } catch(e) {
-        console.error('error comparing');
       }
     }
   });

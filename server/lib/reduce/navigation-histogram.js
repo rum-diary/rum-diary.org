@@ -5,6 +5,7 @@
 const util = require('util');
 const ThinkStats = require('think-stats');
 
+const logger = require('../logger');
 const ReduceStream = require('../reduce-stream');
 util.inherits(Stream, ReduceStream);
 
@@ -44,7 +45,9 @@ Stream.prototype.result = function() {
 
   var d = bucketed.bucket(buckets);
   d.forEach(function(bucket) {
-    if (! (bucket && bucket.hasOwnProperty('count'))) { console.error('invalid bucket', bucket); }
+    if (! (bucket && bucket.hasOwnProperty('count'))) {
+      logger.debug('invalid bucket: %s', bucket);
+    }
     for (var i = 0; i < bucket.count; ++i) {
       values.push(bucket.bucket);
     }
