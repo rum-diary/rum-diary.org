@@ -6,7 +6,7 @@
     "transport": "console"
   },
   "logging": {
-    "level": "ERROR"
+    "level": "CRITICAL"
   }
 }
 

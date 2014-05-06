@@ -127,7 +127,7 @@ module.exports = {
   logging: {
     level: {
       doc: 'Minimum level to log',
-      format: ['DEBUG', 'INFO', 'WARN', 'ERROR'],
+      format: ['TRACE', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'],
       'default': 'DEBUG'
     },
     handlers: {

@@ -23,7 +23,8 @@ exports.start = function (options) {
   };
 
   spdy.createServer(spdyOptions, options.app).listen(HTTPS_PORT, function() {
-    logger.error('https listening on port', HTTPS_PORT);
+    console.log('https listening on port', HTTPS_PORT);
+    logger.info('https listening on port', HTTPS_PORT);
   });
 };
 

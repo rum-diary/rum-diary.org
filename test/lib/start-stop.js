@@ -17,17 +17,15 @@ exports.start = function start(done) {
   proc = spawn('node', [ START_PATH ]);
 
   proc.stdout.on('data', function (buf) {
-    console.log(buf.toString());
+    var str = buf.toString();
+    if (done && /https listening on port/.test(str)) {
+      done();
+      done = null;
+    }
   });
 
   proc.stderr.on('data', function (buf) {
     console.error(buf.toString());
-
-    var str = buf.toString();
-    if (done && /listening on port/.test(str)) {
-      done();
-      done = null;
-    }
   });
 }
 
