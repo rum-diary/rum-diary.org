@@ -15,7 +15,7 @@ exports.template = 'GET-site-hostname.html';
 exports['js-resources'] = clientResources('rum-diary.min.js');
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
-exports.handler = function(req) {
+exports.handler = function (req, res) {
 
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
 

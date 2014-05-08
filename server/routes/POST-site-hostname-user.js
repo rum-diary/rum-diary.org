@@ -32,7 +32,7 @@ exports.handler = function (req, res) {
   logger.info('setting access level: %s, %s, %s', email, hostname, accessLevel);
   return siteCollection.setUserAccessLevel(email, hostname, accessLevel)
     .then(function () {
-      return inviteCollection.createAndSendIfInviteeDoesNotExist({
+      return inviteCollection.createAndSendIfNotAlreadyInvited({
         from_email: req.session.email,
         to_email: email,
         hostname: hostname,
