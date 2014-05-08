@@ -4,6 +4,9 @@
   "verify_assertion": false,
   "emailer": {
     "transport": "console"
+  },
+  "logging": {
+    "level": "CRITICAL"
   }
 }
 

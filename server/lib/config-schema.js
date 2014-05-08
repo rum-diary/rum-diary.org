@@ -121,6 +121,19 @@ module.exports = {
         format: 'port',
         'default': 9999
       }
+    },
+  },
+
+  logging: {
+    level: {
+      doc: 'Minimum level to log',
+      format: ['TRACE', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'],
+      'default': 'DEBUG'
+    },
+    handlers: {
+      doc: 'Handlers to user',
+      format: Array,
+      'default': ['console', 'file']
     }
   },
 
