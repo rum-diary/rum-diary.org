@@ -11,6 +11,7 @@ const Promise = require('bluebird');
 const mongoose = require('mongoose');
 
 const logger = require('../lib/logger');
+const config = require('../lib/config');
 
 exports.connect = connect;
 
@@ -24,7 +25,11 @@ function connect() {
   var databaseURI = 'mongodb://localhost/test';
   logger.info('connecting to database: %s', databaseURI);
 
-  mongoose.connect(databaseURI);
+  mongoose.connect(databaseURI, {
+    user: config.get('mongo.user'),
+    pass: config.get('mongo.password')
+  });
+
   var db = mongoose.connection;
 
   db.on('error', function (err) {

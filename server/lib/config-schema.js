@@ -137,6 +137,21 @@ module.exports = {
     }
   },
 
+  mongo: {
+    user: {
+      doc: 'Mongo username',
+      format: String,
+      'default': undefined,
+      env: 'MONGO_USER'
+    },
+    password: {
+      doc: 'Mongo password',
+      format: String,
+      'default': undefined,
+      env: 'MONGO_PASS'
+    }
+  },
+
   proc_name: getProcName()
 };
 
