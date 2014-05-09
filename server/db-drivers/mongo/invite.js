@@ -6,7 +6,6 @@
 // sent out in an email verification. When a user verifies, the entry
 // is removed from the table.
 
-const Promise = require('bluebird');
 
 const Model = require('./model');
 const userCollection = require('./user');
@@ -33,37 +32,32 @@ const inviteTokenDefinition = {
 const InviteTokenModel = Object.create(Model);
 InviteTokenModel.init('InviteToken', inviteTokenDefinition);
 
-InviteTokenModel.createAndSendIfInviteeDoesNotExist = function(item) {
+InviteTokenModel.createAndSendIfNotAlreadyInvited = function(item) {
   var invitation;
   var self = this;
   // TODO - validate item.
 
-  return Promise.all([
-    userCollection.getOne({ email: item.to_email }),
-    self.getOne({ to_email: item.to_email, hostname: item.hostname })
-  ])
-  .then(function(allResults) {
-    var user = allResults[0];
-    var existingInvitation = allResults[1];
-    if (user || existingInvitation) {
-      // user already exists or already has an invitation for this host, bail.
-      return;
-    }
+  return self.getOne({ to_email: item.to_email, hostname: item.hostname })
+    .then(function(existingInvitation) {
+      if (existingInvitation) {
+        // user already has an invitation for this host, bail.
+        return;
+      }
 
-    return self.create(item)
-      .then(function(_invitation) {
-        invitation = _invitation;
+      return self.create(item)
+        .then(function(_invitation) {
+          invitation = _invitation;
 
-        var htmlEmail = invitationEmail.generateHtml(invitation);
-        var textEmail = invitationEmail.generateText(invitation);
+          var htmlEmail = invitationEmail.generateHtml(invitation);
+          var textEmail = invitationEmail.generateText(invitation);
 
-        var subject = 'Invitation to view site stats for %s on rum-diary.org'.replace('%s', item.hostname);
-        return emailer.send(item.to_email, subject, htmlEmail, textEmail);
-      })
-      .then(function() {
-        return invitation;
-      });
-  });
+          var subject = 'Invitation to view site stats for %s on rum-diary.org'.replace('%s', item.hostname);
+          return emailer.send(item.to_email, subject, htmlEmail, textEmail);
+        })
+        .then(function() {
+          return invitation;
+        });
+    });
 };
 
 InviteTokenModel.tokenInfo = function(token) {
@@ -85,11 +79,9 @@ InviteTokenModel.tokenInfo = function(token) {
 };
 
 /**
- * Invitatations are only sent if the addressee is not
- * a user at the time of the invitation. The user could
- * have created an account before this invitation is
- * verified. If the user is already created, do nothing
- * besides delete the token. If the user is not created,
+ * Invitatations are sent whether invitee is a user or not.
+ * If the user is already created, do nothing besides
+ * delete the token. If the user is not created,
  * create them and let the user set the name.
  */
 

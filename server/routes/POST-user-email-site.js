@@ -16,8 +16,7 @@ exports.authorization = require('../lib/page-authorization').IS_USER;
 
 exports.validation = {
   _csrf: inputValidation.csrf(),
-  hostname: inputValidation.hostname(),
-  assertion: inputValidation.assertion()
+  hostname: inputValidation.hostname()
 };
 
 exports.handler = function (req, res, next) {
