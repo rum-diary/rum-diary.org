@@ -1,6 +1,13 @@
 {% extends "layout.html" %}
 {% block title %}Home{% endblock %}
 
+{% block navigation %}
+  {% if email %}
+    <li><a href="/site/">Site list</a></li>
+  {% endif %}
+{% endblock %}
+
+
 {% block body %}
 
 <p>
