@@ -1,6 +1,12 @@
 {% extends "layout.html" %}
 {% block title %}Welcome to RUM Diary!{% endblock %}
 
+{% block navigation %}
+  {% if email %}
+    <li><a href="/site/">Site list</a></li>
+  {% endif %}
+{% endblock %}
+
 {% block body %}
   <p>
     Welcome to RUM Diary!
