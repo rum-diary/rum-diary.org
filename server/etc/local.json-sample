@@ -11,7 +11,7 @@
   "strong_http_caching": false,
   "session_cookie_secret": "CHANGE_ME_NOW!!!!!!!!",
   "mongo": {
-    databaseURI: "mongodb://localhost/rum-diary-test"
+    "databaseURI": "mongodb://localhost/rum-diary-test"
   }
 }
 
