@@ -22,8 +22,11 @@ function connect() {
   }
   connectionResolver = Promise.defer();
 
-  var databaseURI = 'mongodb://localhost/test';
-  logger.info('connecting to database: %s', databaseURI);
+  var databaseURI = config.get('mongo.databaseURI');
+  var user = config.get('mongo.user');
+  var password = config.get('mongo.password');
+
+  logger.info('connecting to database: `%s` as user `%s`', databaseURI, user);
 
   mongoose.connect(databaseURI, {
     user: config.get('mongo.user'),
