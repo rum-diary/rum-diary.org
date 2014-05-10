@@ -11,6 +11,7 @@ const Promise = require('bluebird');
 const mongoose = require('mongoose');
 
 const logger = require('../lib/logger');
+const config = require('../lib/config');
 
 exports.connect = connect;
 
@@ -21,10 +22,17 @@ function connect() {
   }
   connectionResolver = Promise.defer();
 
-  var databaseURI = 'mongodb://localhost/test';
-  logger.info('connecting to database: %s', databaseURI);
+  var databaseURI = config.get('mongo.databaseURI');
+  var user = config.get('mongo.user');
+  var password = config.get('mongo.password');
 
-  mongoose.connect(databaseURI);
+  logger.info('connecting to database: `%s` as user `%s`', databaseURI, user);
+
+  mongoose.connect(databaseURI, {
+    user: config.get('mongo.user'),
+    pass: config.get('mongo.password')
+  });
+
   var db = mongoose.connection;
 
   db.on('error', function (err) {

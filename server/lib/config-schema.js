@@ -137,6 +137,27 @@ module.exports = {
     }
   },
 
+  mongo: {
+    databaseURI: {
+      doc: 'Mongo database URI',
+      format: String,
+      'default': 'mongodb://localhost/rum-diary-test',
+      env: 'MONGO_DB_URI'
+    },
+    user: {
+      doc: 'Mongo username',
+      format: String,
+      'default': undefined,
+      env: 'MONGO_USER'
+    },
+    password: {
+      doc: 'Mongo password',
+      format: String,
+      'default': undefined,
+      env: 'MONGO_PASS'
+    }
+  },
+
   proc_name: getProcName()
 };
 
