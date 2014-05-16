@@ -7,11 +7,10 @@ module.exports = function (grunt) {
 
   grunt.config('mocha', {
     test: {
-      src: ['client/tests/index.html'],
+      src: ['<%= app.src_test %>/index.html'],
       options: {
         run: true
       }
     }
   });
 };
-
