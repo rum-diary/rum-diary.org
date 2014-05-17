@@ -8,6 +8,9 @@
   },
   "author": "Shane Tomlinson <shane@shanetomlinson.com>",
   "license": "MPL 2.0",
+  "repository": "shane-tomlinson/rum-diary.org",
+  "homepage": "https://github.com/shane-tomlinson/rum-diary.org/",
+  "bugs": "https://github.com/shane-tomlinson/rum-diary.org/issues/",
   "dependencies": {
     "allhttperrors": "0.3.1",
     "bluebird": "0.11.5-1",
