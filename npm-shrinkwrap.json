@@ -654,8 +654,14 @@
       }
     },
     "mongoose-timestamp": {
-      "version": "0.2.1",
-      "from": "mongoose-timestamp@0.2.1"
+      "version": "0.1.1",
+      "from": "mongoose-timestamp@0.1.1",
+      "dependencies": {
+        "bson": {
+          "version": "0.2.2",
+          "from": "bson@0.2.2"
+        }
+      }
     },
     "nodemailer": {
       "version": "0.6.5",
