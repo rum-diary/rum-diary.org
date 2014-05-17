@@ -11,7 +11,7 @@ module.exports = function (grunt) {
         // most files
         expand: true,
         cwd: '<%= app.src %>',
-        src: [ 'css/*', 'i/*', 'js/**/*.js', 'js/**/*.css' ],
+        src: [ 'css/*.css', 'i/*', 'js/**/*.js', 'js/**/*.css' ],
         dest: '<%= app.dist %>'
       }, {
         // uncompressed include.js
