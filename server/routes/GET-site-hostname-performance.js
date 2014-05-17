@@ -11,7 +11,7 @@ const clientResources = require('../lib/client-resources');
 exports.path = '/site/:hostname/performance';
 exports.verb = 'get';
 exports.template = 'GET-site-hostname-performance.html';
-exports['js-resources'] = clientResources('rum-diary.min.js');
+exports['js-resources'] = clientResources('js/rum-diary.min.js');
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {
