@@ -9,15 +9,20 @@ module.exports = function (grunt) {
     'clean',
     'selectconfig:dist',
     'jshint',
+    'useminPrepare',
     'preprocess',
     'browserify:dist',
     'sass',
     'autoprefixer',
     'mocha',
     'clean',
+    'concat',
+    'cssmin',
     'copy',
     'uglify',
-    'zopfli'
+    'zopfli',
+    'rev',
+    'usemin'
   ]);
 };
 

@@ -5,16 +5,14 @@
 module.exports = function (grunt) {
   'use strict';
 
-  grunt.config('clean', {
+  grunt.config('rev', {
     dist: {
-      files: [{
-        dot: true,
+      files: {
         src: [
-          '<%= app.temp %>',
-          '<%= app.dist %>/*',
-          '<%= app.static_template_dist %>',
+          '<%= app.dist %>/css/{,*/}*.css',
+          '<%= app.dist %>/i/{,*/}*.{png,jpg,jpeg,gif,webp}'
         ]
-      }]
+      }
     }
   });
 };

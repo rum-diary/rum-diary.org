@@ -4,5 +4,7 @@ client/src/include.js
 server/var
 client/src/css/main.css
 local.json
+server/views/dist/
+.tmp
 
 *bundle*.js

@@ -12,6 +12,7 @@
   "session_cookie_secret": "CHANGE_ME_NOW!!!!!!!!",
   "mongo": {
     "databaseURI": "mongodb://localhost/rum-diary-test"
-  }
+  },
+  "views_dir": "src"
 }
 

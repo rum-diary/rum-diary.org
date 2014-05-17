@@ -8,11 +8,12 @@ module.exports = function (grunt) {
   grunt.config('copy', {
     dist: {
       files: [{
-        // most files. JS will be copied in the uglify task.
+        // image files.
+        // JS will be copied in the uglify task.
+        // CSS will be copied in the cssmin task
         expand: true,
         cwd: '<%= app.src %>',
         src: [
-          '**/*.css',
           'i/*'
         ],
         dest: '<%= app.dist %>'
@@ -21,7 +22,18 @@ module.exports = function (grunt) {
         cwd: '<%= app.src %>',
         src: '<%= app.src %>/include.js',
         dest: '<%= app.dist %>/include.orig.js'
-      }]
+      }, {
+        // server side rendered templates. Copied so embedded css
+        // links can be updated to use concatenated/minified versions.
+        expand: true,
+        dot: true,
+        cwd: '<%= app.static_template_src %>',
+        dest: '<%= app.static_template_dist %>',
+        src: [
+          '**/*.html'
+        ]
+      }
+      ]
     }
   });
 };
