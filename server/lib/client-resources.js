@@ -12,6 +12,9 @@ const config = require('./config');
  *   value: array of resources to include.
  */
 const DEPENDENCIES = {
+  'include.js': [
+    'include.js'
+  ],
   'rum-diary.min.js': [
     '/js/bower_components/d3/d3.js',
     '/js/app.bundle.js'
@@ -40,6 +43,8 @@ module.exports.unconcatenated = function(namespace) {
     return dep;
   });
 };
+
+module.exports.all = DEPENDENCIES;
 
 module.exports.testing = function(namespace) {
   var deps = DEPENDENCIES[namespace];

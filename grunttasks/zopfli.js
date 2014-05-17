@@ -12,18 +12,20 @@ module.exports = function (grunt) {
     'dist': {
       'files': [
         {
-          'cwd': '<%= app.static_root %>',
-          'src': ['dist/**/*.js'],
-          'dest': '<%= app.static_root %>',
-          'expand': true,
-          'ext': '.js.gz'
+          cwd: '<%= app.static_root %>',
+          src: ['dist/**/*.js'],
+          dest: '<%= app.static_root %>',
+          expand: true,
+          ext: '.js.gz',
+          extDot: 'last'
         },
         {
-          'cwd': '<%= app.static_root %>',
-          'src': ['dist/**/*.css'],
-          'dest': '<%= app.static_root %>',
-          'expand': true,
-          'ext': '.css.gz'
+          cwd: '<%= app.static_root %>',
+          src: ['dist/**/*.css'],
+          dest: '<%= app.static_root %>',
+          expand: true,
+          ext: '.css.gz',
+          extDot: 'last'
         }
       ]
     }

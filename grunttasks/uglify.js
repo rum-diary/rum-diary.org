@@ -17,27 +17,26 @@ module.exports = function (grunt) {
     // load up local config before the selectconfig task has been run.
     var client_deps = require('../server/lib/client-resources');
 
-    // TODO - see if this can be automated by using the keys in
-    // client-resources
+    var files = {};
+    for (var key in client_deps.all) {
+      files[ '<%= app.dist %>' + client_deps.concatenated(key)] = getDevResourcePaths(key);
+    }
+
     grunt.config('do-uglify', {
       options: {
         banner: grunt.file.read(path.join(__dirname, '..', 'LICENSE'))
       },
       dist: {
-        files: {
-          '<%= app.dist %>/include.js': [ '<%= app.src %>/include.js' ],
-          '<%= app.dist %>/rum-diary.min.js': getClientDeps('rum-diary.min.js'),
-          '<%= app.dist %>/signin.min.js': getClientDeps('signin.min.js')
-        }
+        files: files
       }
     });
 
     grunt.task.run(['do-uglify']);
 
-    function getClientDeps(key) {
+    function getDevResourcePaths(key) {
       var deps = client_deps.unconcatenated(key);
       return deps.map(function(dep) {
-        return '<%= app.dist %>/' + dep;
+        return '<%= app.src %>/' + dep;
       });
     }
   });
