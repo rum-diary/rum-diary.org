@@ -3,12 +3,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // Send all express logs to our custom logger.
-const express = require('express');
+const morgan = require('morgan');
 
 const logger = require('../logger');
 
 module.exports = function () {
-  return express.logger({
+  return morgan({
     format: 'tiny',
     stream: {
       write: function(x) {

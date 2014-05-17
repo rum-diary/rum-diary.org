@@ -145,5 +145,5 @@ function routeHandler(req, res, next) {
 }
 
 
-module.exports = router.middleware;
+module.exports = router;
 module.exports.addRoute = addRoute;

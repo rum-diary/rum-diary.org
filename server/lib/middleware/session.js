@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const express = require('express');
+const session = require('express-session');
 const config = require('../config');
 
 const userCollection = require('../db').user;
@@ -18,13 +18,13 @@ module.exports = function (options) {
 };
 
 function createSessionMiddleware(options) {
-  return express.session({
+  return session({
     cookie: {
       maxAge: config.get('session_duration_ms'),
       httpOnly: true,
       secure: config.get('ssl'),
     },
-    key: config.get('session_cookie_name'),
+    name: config.get('session_cookie_name'),
     secret: config.get('session_cookie_secret'),
     store: options.sessionStore
   });
