@@ -1,0 +1,849 @@
+{
+  "name": "rum-diary.org",
+  "version": "0.0.1",
+  "dependencies": {
+    "allhttperrors": {
+      "version": "0.3.1",
+      "from": "allhttperrors@0.3.1"
+    },
+    "bluebird": {
+      "version": "1.2.4",
+      "from": "bluebird@1.2.4"
+    },
+    "browserid-verify": {
+      "version": "0.1.2",
+      "from": "browserid-verify@0.1.2",
+      "dependencies": {
+        "tunnel": {
+          "version": "0.0.3",
+          "from": "tunnel@0.0.x"
+        }
+      }
+    },
+    "connect-cachify": {
+      "version": "0.0.17",
+      "from": "connect-cachify@0.0.17"
+    },
+    "connect-fonts": {
+      "version": "2.0.1",
+      "from": "connect-fonts@2.0.1",
+      "dependencies": {
+        "filed": {
+          "version": "0.1.0",
+          "from": "filed@0.1.0"
+        },
+        "node-font-face-generator": {
+          "version": "0.1.3",
+          "from": "node-font-face-generator@0.1.3",
+          "dependencies": {
+            "ejs": {
+              "version": "0.8.5",
+              "from": "ejs@0.8.5"
+            },
+            "useragent": {
+              "version": "2.0.7",
+              "from": "useragent@2.0.7",
+              "dependencies": {
+                "lru-cache": {
+                  "version": "2.2.4",
+                  "from": "lru-cache@2.2.x"
+                }
+              }
+            }
+          }
+        },
+        "mime": {
+          "version": "1.2.11",
+          "from": "mime@~1.2.9"
+        },
+        "oppressor": {
+          "version": "0.0.1",
+          "from": "oppressor@0.0.1",
+          "dependencies": {
+            "through": {
+              "version": "0.1.4",
+              "from": "through@~0.1.4"
+            },
+            "response-stream": {
+              "version": "0.0.0",
+              "from": "response-stream@~0.0.0"
+            },
+            "negotiator": {
+              "version": "0.2.8",
+              "from": "negotiator@~0.2.5"
+            }
+          }
+        },
+        "tmp": {
+          "version": "0.0.23",
+          "from": "tmp@0.0.23"
+        }
+      }
+    },
+    "connect-fonts-bitstream-vera-sans": {
+      "version": "0.0.1",
+      "from": "connect-fonts-bitstream-vera-sans@0.0.1"
+    },
+    "connect-gzip-static": {
+      "version": "0.1.1",
+      "from": "connect-gzip-static@git://github.com/shane-tomlinson/connect-gzip-static.git#3625997d2a8f83ef8040632c20e8ae3e9bf9fced",
+      "resolved": "git://github.com/shane-tomlinson/connect-gzip-static.git#3625997d2a8f83ef8040632c20e8ae3e9bf9fced",
+      "dependencies": {
+        "debug": {
+          "version": "0.7.4",
+          "from": "debug@0.7.4"
+        },
+        "connect": {
+          "version": "2.12.0",
+          "from": "connect@2.12.0",
+          "dependencies": {
+            "batch": {
+              "version": "0.5.0",
+              "from": "batch@0.5.0"
+            },
+            "qs": {
+              "version": "0.6.6",
+              "from": "qs@~0.6.0"
+            },
+            "cookie-signature": {
+              "version": "1.0.1",
+              "from": "cookie-signature@1.0.1"
+            },
+            "buffer-crc32": {
+              "version": "0.2.1",
+              "from": "buffer-crc32@0.2.1"
+            },
+            "cookie": {
+              "version": "0.1.0",
+              "from": "cookie@0.1.0"
+            },
+            "send": {
+              "version": "0.1.4",
+              "from": "send@0.1.4",
+              "dependencies": {
+                "range-parser": {
+                  "version": "0.0.4",
+                  "from": "range-parser@0.0.4"
+                }
+              }
+            },
+            "bytes": {
+              "version": "0.2.1",
+              "from": "bytes@0.2.1"
+            },
+            "fresh": {
+              "version": "0.2.0",
+              "from": "fresh@0.2.0"
+            },
+            "pause": {
+              "version": "0.0.1",
+              "from": "pause@0.0.1"
+            },
+            "uid2": {
+              "version": "0.0.3",
+              "from": "uid2@0.0.3"
+            },
+            "methods": {
+              "version": "0.1.0",
+              "from": "methods@0.1.0"
+            },
+            "raw-body": {
+              "version": "1.1.2",
+              "from": "raw-body@1.1.2"
+            },
+            "negotiator": {
+              "version": "0.3.0",
+              "from": "negotiator@0.3.0"
+            },
+            "multiparty": {
+              "version": "2.2.0",
+              "from": "multiparty@2.2.0",
+              "dependencies": {
+                "readable-stream": {
+                  "version": "1.1.13-1",
+                  "from": "readable-stream@1.1",
+                  "dependencies": {
+                    "core-util-is": {
+                      "version": "1.0.1",
+                      "from": "core-util-is@~1.0.0"
+                    },
+                    "isarray": {
+                      "version": "0.0.1",
+                      "from": "isarray@0.0.1"
+                    },
+                    "string_decoder": {
+                      "version": "0.10.25-1",
+                      "from": "string_decoder@~0.10.x"
+                    },
+                    "inherits": {
+                      "version": "2.0.1",
+                      "from": "inherits@~2.0.1"
+                    }
+                  }
+                },
+                "stream-counter": {
+                  "version": "0.2.0",
+                  "from": "stream-counter@~0.2.0"
+                }
+              }
+            }
+          }
+        },
+        "mime": {
+          "version": "1.2.11",
+          "from": "mime@1.2.11"
+        }
+      }
+    },
+    "connect-mongo": {
+      "version": "0.4.1",
+      "from": "connect-mongo@0.4.1",
+      "dependencies": {
+        "mongodb": {
+          "version": "1.3.23",
+          "from": "mongodb@1.3.x",
+          "dependencies": {
+            "bson": {
+              "version": "0.2.5",
+              "from": "bson@0.2.5"
+            },
+            "kerberos": {
+              "version": "0.0.3",
+              "from": "kerberos@0.0.3"
+            }
+          }
+        }
+      }
+    },
+    "convict": {
+      "version": "0.4.2",
+      "from": "convict@0.4.2",
+      "dependencies": {
+        "cjson": {
+          "version": "0.3.0",
+          "from": "cjson@0.3.0",
+          "dependencies": {
+            "jsonlint": {
+              "version": "1.6.0",
+              "from": "jsonlint@1.6.0",
+              "dependencies": {
+                "nomnom": {
+                  "version": "1.6.2",
+                  "from": "nomnom@>= 1.5.x",
+                  "dependencies": {
+                    "colors": {
+                      "version": "0.5.1",
+                      "from": "colors@0.5.x"
+                    },
+                    "underscore": {
+                      "version": "1.4.4",
+                      "from": "underscore@~1.4.4"
+                    }
+                  }
+                },
+                "JSV": {
+                  "version": "4.0.2",
+                  "from": "JSV@>= 4.0.x"
+                }
+              }
+            }
+          }
+        },
+        "validator": {
+          "version": "1.5.1",
+          "from": "validator@1.5.1"
+        },
+        "moment": {
+          "version": "2.3.1",
+          "from": "moment@2.3.1"
+        },
+        "optimist": {
+          "version": "0.6.0",
+          "from": "optimist@0.6.0",
+          "dependencies": {
+            "wordwrap": {
+              "version": "0.0.2",
+              "from": "wordwrap@~0.0.2"
+            },
+            "minimist": {
+              "version": "0.0.10",
+              "from": "minimist@~0.0.1"
+            }
+          }
+        }
+      }
+    },
+    "cors": {
+      "version": "2.3.1",
+      "from": "cors@2.3.1"
+    },
+    "easierobject": {
+      "version": "0.0.4",
+      "from": "easierobject@0.0.4"
+    },
+    "express": {
+      "version": "3.5.1",
+      "from": "express@3.5.1",
+      "dependencies": {
+        "connect": {
+          "version": "2.14.1",
+          "from": "connect@2.14.1",
+          "dependencies": {
+            "basic-auth-connect": {
+              "version": "1.0.0",
+              "from": "basic-auth-connect@1.0.0"
+            },
+            "cookie-parser": {
+              "version": "1.0.1",
+              "from": "cookie-parser@1.0.1",
+              "dependencies": {
+                "cookie": {
+                  "version": "0.1.0",
+                  "from": "cookie@0.1.0"
+                }
+              }
+            },
+            "compression": {
+              "version": "1.0.0",
+              "from": "compression@1.0.0",
+              "dependencies": {
+                "negotiator": {
+                  "version": "0.3.0",
+                  "from": "negotiator@0.3.0"
+                },
+                "compressible": {
+                  "version": "1.0.0",
+                  "from": "compressible@1.0.0"
+                }
+              }
+            },
+            "connect-timeout": {
+              "version": "1.0.0",
+              "from": "connect-timeout@1.0.0"
+            },
+            "csurf": {
+              "version": "1.0.0",
+              "from": "csurf@1.0.0",
+              "dependencies": {
+                "uid2": {
+                  "version": "0.0.3",
+                  "from": "uid2@~0.0.2"
+                }
+              }
+            },
+            "errorhandler": {
+              "version": "1.0.0",
+              "from": "errorhandler@1.0.0"
+            },
+            "express-session": {
+              "version": "1.0.2",
+              "from": "express-session@1.0.2",
+              "dependencies": {
+                "utils-merge": {
+                  "version": "1.0.0",
+                  "from": "utils-merge@1.0.0"
+                },
+                "cookie": {
+                  "version": "0.1.0",
+                  "from": "cookie@0.1.0"
+                },
+                "uid2": {
+                  "version": "0.0.3",
+                  "from": "uid2@~0.0.2"
+                },
+                "debug": {
+                  "version": "0.7.4",
+                  "from": "debug@0.7.4"
+                }
+              }
+            },
+            "method-override": {
+              "version": "1.0.0",
+              "from": "method-override@1.0.0"
+            },
+            "morgan": {
+              "version": "1.0.0",
+              "from": "morgan@1.0.0"
+            },
+            "qs": {
+              "version": "0.6.6",
+              "from": "qs@~0.6.0"
+            },
+            "response-time": {
+              "version": "1.0.0",
+              "from": "response-time@1.0.0"
+            },
+            "serve-index": {
+              "version": "1.0.1",
+              "from": "serve-index@1.0.1",
+              "dependencies": {
+                "batch": {
+                  "version": "0.5.0",
+                  "from": "batch@0.5.0"
+                },
+                "negotiator": {
+                  "version": "0.4.2",
+                  "from": "negotiator@0.4.2"
+                }
+              }
+            },
+            "serve-static": {
+              "version": "1.0.2",
+              "from": "serve-static@1.0.2"
+            },
+            "static-favicon": {
+              "version": "1.0.0",
+              "from": "static-favicon@1.0.0"
+            },
+            "vhost": {
+              "version": "1.0.0",
+              "from": "vhost@1.0.0"
+            },
+            "bytes": {
+              "version": "0.2.1",
+              "from": "bytes@0.2.1"
+            },
+            "pause": {
+              "version": "0.0.1",
+              "from": "pause@0.0.1"
+            },
+            "raw-body": {
+              "version": "1.1.3",
+              "from": "raw-body@1.1.3"
+            },
+            "multiparty": {
+              "version": "2.2.0",
+              "from": "multiparty@2.2.0",
+              "dependencies": {
+                "readable-stream": {
+                  "version": "1.1.13-1",
+                  "from": "readable-stream@~1.1.9",
+                  "dependencies": {
+                    "core-util-is": {
+                      "version": "1.0.1",
+                      "from": "core-util-is@~1.0.0"
+                    },
+                    "isarray": {
+                      "version": "0.0.1",
+                      "from": "isarray@0.0.1"
+                    },
+                    "string_decoder": {
+                      "version": "0.10.25-1",
+                      "from": "string_decoder@~0.10.x"
+                    },
+                    "inherits": {
+                      "version": "2.0.1",
+                      "from": "inherits@~2.0.1"
+                    }
+                  }
+                },
+                "stream-counter": {
+                  "version": "0.2.0",
+                  "from": "stream-counter@~0.2.0"
+                }
+              }
+            }
+          }
+        },
+        "commander": {
+          "version": "1.3.2",
+          "from": "commander@1.3.2",
+          "dependencies": {
+            "keypress": {
+              "version": "0.1.0",
+              "from": "keypress@0.1.x"
+            }
+          }
+        },
+        "range-parser": {
+          "version": "1.0.0",
+          "from": "range-parser@1.0.0"
+        },
+        "mkdirp": {
+          "version": "0.3.5",
+          "from": "mkdirp@0.3.5"
+        },
+        "cookie": {
+          "version": "0.1.1",
+          "from": "cookie@0.1.1"
+        },
+        "buffer-crc32": {
+          "version": "0.2.1",
+          "from": "buffer-crc32@0.2.1"
+        },
+        "fresh": {
+          "version": "0.2.2",
+          "from": "fresh@0.2.2"
+        },
+        "methods": {
+          "version": "0.1.0",
+          "from": "methods@0.1.0"
+        },
+        "send": {
+          "version": "0.2.0",
+          "from": "send@0.2.0",
+          "dependencies": {
+            "mime": {
+              "version": "1.2.11",
+              "from": "mime@~1.2.9"
+            }
+          }
+        },
+        "cookie-signature": {
+          "version": "1.0.3",
+          "from": "cookie-signature@1.0.3"
+        },
+        "merge-descriptors": {
+          "version": "0.0.2",
+          "from": "merge-descriptors@0.0.2"
+        },
+        "debug": {
+          "version": "0.8.1",
+          "from": "debug@>= 0.7.3 < 1"
+        }
+      }
+    },
+    "fast-stats": {
+      "version": "0.0.2",
+      "from": "fast-stats@0.0.2"
+    },
+    "helmet": {
+      "version": "0.2.1",
+      "from": "helmet@0.2.1",
+      "dependencies": {
+        "platform": {
+          "version": "1.0.0",
+          "from": "platform@1.0.x"
+        }
+      }
+    },
+    "intel": {
+      "version": "0.5.2",
+      "from": "intel@0.5.2",
+      "dependencies": {
+        "bluebird": {
+          "version": "1.0.8",
+          "from": "bluebird@1.0.x"
+        },
+        "chalk": {
+          "version": "0.4.0",
+          "from": "chalk@0.4.0",
+          "dependencies": {
+            "has-color": {
+              "version": "0.1.7",
+              "from": "has-color@~0.1.0"
+            },
+            "ansi-styles": {
+              "version": "1.0.0",
+              "from": "ansi-styles@~1.0.0"
+            },
+            "strip-ansi": {
+              "version": "0.1.1",
+              "from": "strip-ansi@~0.1.0"
+            }
+          }
+        },
+        "dbug": {
+          "version": "0.2.0",
+          "from": "dbug@0.2.x"
+        },
+        "stack-trace": {
+          "version": "0.0.8",
+          "from": "stack-trace@0.0.8"
+        },
+        "strftime": {
+          "version": "0.8.0",
+          "from": "strftime@0.8.0"
+        },
+        "symbol": {
+          "version": "0.1.0",
+          "from": "symbol@0.1.0"
+        },
+        "utcstring": {
+          "version": "0.1.0",
+          "from": "utcstring@0.1.0"
+        }
+      }
+    },
+    "joi": {
+      "version": "3.1.0",
+      "from": "joi@3.1.0",
+      "dependencies": {
+        "hoek": {
+          "version": "2.1.0",
+          "from": "hoek@2.x.x"
+        }
+      }
+    },
+    "mkdirp": {
+      "version": "0.5.0",
+      "from": "mkdirp@0.5.0",
+      "dependencies": {
+        "minimist": {
+          "version": "0.0.8",
+          "from": "minimist@0.0.8"
+        }
+      }
+    },
+    "moment": {
+      "version": "2.6.0",
+      "from": "moment@2.6.0"
+    },
+    "mongoose": {
+      "version": "3.8.9",
+      "from": "mongoose@3.8.9",
+      "dependencies": {
+        "hooks": {
+          "version": "0.2.1",
+          "from": "hooks@0.2.1"
+        },
+        "mongodb": {
+          "version": "1.4.3",
+          "from": "mongodb@1.4.3",
+          "dependencies": {
+            "bson": {
+              "version": "0.2.7",
+              "from": "bson@0.2.7",
+              "dependencies": {
+                "nan": {
+                  "version": "0.8.0",
+                  "from": "nan@~0.8.0"
+                }
+              }
+            },
+            "kerberos": {
+              "version": "0.0.3",
+              "from": "kerberos@0.0.3"
+            }
+          }
+        },
+        "ms": {
+          "version": "0.1.0",
+          "from": "ms@0.1.0"
+        },
+        "sliced": {
+          "version": "0.0.5",
+          "from": "sliced@0.0.5"
+        },
+        "muri": {
+          "version": "0.3.1",
+          "from": "muri@0.3.1"
+        },
+        "mpromise": {
+          "version": "0.4.3",
+          "from": "mpromise@0.4.3"
+        },
+        "mpath": {
+          "version": "0.1.1",
+          "from": "mpath@0.1.1"
+        },
+        "regexp-clone": {
+          "version": "0.0.1",
+          "from": "regexp-clone@0.0.1"
+        },
+        "mquery": {
+          "version": "0.7.0",
+          "from": "mquery@0.7.0",
+          "dependencies": {
+            "debug": {
+              "version": "0.7.4",
+              "from": "debug@0.7.4"
+            }
+          }
+        }
+      }
+    },
+    "mongoose-timestamp": {
+      "version": "0.2.1",
+      "from": "mongoose-timestamp@0.2.1"
+    },
+    "nodemailer": {
+      "version": "0.6.5",
+      "from": "nodemailer@0.6.5",
+      "dependencies": {
+        "mailcomposer": {
+          "version": "0.2.11",
+          "from": "mailcomposer@~0.2.10",
+          "dependencies": {
+            "mimelib": {
+              "version": "0.2.16",
+              "from": "mimelib@~0.2.15",
+              "dependencies": {
+                "encoding": {
+                  "version": "0.1.7",
+                  "from": "encoding@~0.1.7",
+                  "dependencies": {
+                    "iconv-lite": {
+                      "version": "0.2.11",
+                      "from": "iconv-lite@~0.2.11"
+                    }
+                  }
+                },
+                "addressparser": {
+                  "version": "0.2.1",
+                  "from": "addressparser@~0.2.1"
+                }
+              }
+            },
+            "mime": {
+              "version": "1.2.11",
+              "from": "mime@~1.2.9"
+            },
+            "punycode": {
+              "version": "1.2.4",
+              "from": "punycode@~1.2.4"
+            },
+            "follow-redirects": {
+              "version": "0.0.3",
+              "from": "follow-redirects@0.0.3"
+            },
+            "dkim-signer": {
+              "version": "0.1.2",
+              "from": "dkim-signer@~0.1.1"
+            }
+          }
+        },
+        "simplesmtp": {
+          "version": "0.3.31",
+          "from": "simplesmtp@~0.2 || ~0.3.30",
+          "dependencies": {
+            "rai": {
+              "version": "0.1.11",
+              "from": "rai@~0.1.11"
+            },
+            "xoauth2": {
+              "version": "0.1.8",
+              "from": "xoauth2@~0.1.8"
+            }
+          }
+        },
+        "directmail": {
+          "version": "0.1.8",
+          "from": "directmail@~0.1.7"
+        },
+        "he": {
+          "version": "0.3.6",
+          "from": "he@~0.3.6"
+        },
+        "public-address": {
+          "version": "0.1.1",
+          "from": "public-address@~0.1.1"
+        },
+        "readable-stream": {
+          "version": "1.1.13-1",
+          "from": "readable-stream@~1.1.9",
+          "dependencies": {
+            "core-util-is": {
+              "version": "1.0.1",
+              "from": "core-util-is@~1.0.0"
+            },
+            "isarray": {
+              "version": "0.0.1",
+              "from": "isarray@0.0.1"
+            },
+            "string_decoder": {
+              "version": "0.10.25-1",
+              "from": "string_decoder@~0.10.x"
+            },
+            "inherits": {
+              "version": "2.0.1",
+              "from": "inherits@~2.0.1"
+            }
+          }
+        }
+      }
+    },
+    "nunjucks": {
+      "version": "1.0.5",
+      "from": "nunjucks@1.0.5",
+      "dependencies": {
+        "optimist": {
+          "version": "0.6.1",
+          "from": "optimist@*",
+          "dependencies": {
+            "wordwrap": {
+              "version": "0.0.2",
+              "from": "wordwrap@~0.0.2"
+            },
+            "minimist": {
+              "version": "0.0.10",
+              "from": "minimist@~0.0.1"
+            }
+          }
+        },
+        "chokidar": {
+          "version": "0.8.2",
+          "from": "chokidar@~0.8.2",
+          "dependencies": {
+            "fsevents": {
+              "version": "0.2.0",
+              "from": "fsevents@0.2.0",
+              "dependencies": {
+                "nan": {
+                  "version": "0.8.0",
+                  "from": "nan@~0.8.0"
+                }
+              }
+            },
+            "recursive-readdir": {
+              "version": "0.0.2",
+              "from": "recursive-readdir@0.0.2"
+            }
+          }
+        }
+      }
+    },
+    "glob-require": {
+      "version": "0.0.1",
+      "from": "glob-require@0.0.1",
+      "dependencies": {
+        "glob": {
+          "version": "3.2.9",
+          "from": "glob@3.2.9",
+          "dependencies": {
+            "minimatch": {
+              "version": "0.2.14",
+              "from": "minimatch@~0.2.11",
+              "dependencies": {
+                "lru-cache": {
+                  "version": "2.5.0",
+                  "from": "lru-cache@2"
+                },
+                "sigmund": {
+                  "version": "1.0.0",
+                  "from": "sigmund@~1.0.0"
+                }
+              }
+            },
+            "inherits": {
+              "version": "2.0.1",
+              "from": "inherits@2"
+            }
+          }
+        }
+      }
+    },
+    "spdy": {
+      "version": "1.26.0",
+      "from": "spdy@1.26.0"
+    },
+    "think-stats": {
+      "version": "0.0.21",
+      "from": "think-stats@0.0.21"
+    },
+    "underscore": {
+      "version": "1.6.0",
+      "from": "underscore@1.6.0"
+    },
+    "useragent": {
+      "version": "2.0.8",
+      "from": "useragent@2.0.8",
+      "dependencies": {
+        "lru-cache": {
+          "version": "2.2.4",
+          "from": "lru-cache@2.2.x"
+        }
+      }
+    }
+  }
+}
