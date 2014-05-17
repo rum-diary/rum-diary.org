@@ -1,11 +1,11 @@
 $font-family: "Bitstream Vera Sans", "sans-serif", "serif";
 
-/*$body-background-color: #00c4ad;*/ /* A green color */
+// $body-background-color: #00c4ad; // A green color
 $body-background-color: #f1f1f1;
-/*$body-text-color: #fff;*/
+// $body-text-color: #fff;
 $body-text-color: #574243;
 
-/*$header-background-color: #ffa200;*/ /* An orange color */
+// $header-background-color: #ffa200; // An orange color
 $header-text-color: #fff;
 $header-background-color: #604F4C;
 $footer-background-color: #5a4042;
@@ -25,11 +25,8 @@ $button-focus-background-color: #1a9e8c;
 $button-scary-background-color: #fc8901;
 $button-scary-focus-background-color: #fca601;
 
-/**
- * hits graph colors
- */
+// hits graph colors
 $line-graph-line-color: #ffa200;
 $line-graph-text-color: #00c4ad;
 $line-graph-axis-color: $body-text-color;
 $line-graph-fill-color: #42BDAB;
-
