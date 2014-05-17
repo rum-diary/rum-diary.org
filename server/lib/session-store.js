@@ -8,8 +8,8 @@
  */
 
 const Promise = require('bluebird');
-const express = require('express');
-const MongoStore = require('connect-mongo')(express);
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const dbConnection = require('./db').connection;
 
 var resolver;

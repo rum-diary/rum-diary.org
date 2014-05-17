@@ -9,9 +9,8 @@
 //
 // Tracking our own users, while on our site. That's OK.
 
-const express = require('express');
+const csrfMiddleware = require('csurf')();
 
-const csrfMiddleware = express.csrf();
 module.exports = function () {
   return function (req, res, next) {
     // These two do not require CSRF tokens.

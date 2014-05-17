@@ -7,6 +7,9 @@ const path = require('path');
 const gzip_static = require('connect-gzip-static');
 const helmet = require('helmet');
 const cachify = require('connect-cachify');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const methodOverride = require('method-override');
 
 const config = require('./lib/config');
 const routes = require('./lib/routes.js');
@@ -33,13 +36,13 @@ SessionStore.create().then(function (sessionStore) {
 
   app.use(logging({ app: app }));
 
-  app.use(express.bodyParser());
+  app.use(bodyParser());
 
   // allow PUT/DELETE methods via POST in HTML forms.
   // requires bodyParser.
-  app.use(express.methodOverride());
+  app.use(methodOverride());
 
-  app.use(express.cookieParser());
+  app.use(cookieParser());
 
   // requires cookieParser.
   app.use(session({

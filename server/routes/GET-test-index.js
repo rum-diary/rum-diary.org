@@ -12,7 +12,7 @@ if (config.get('env') !== 'test') return;
 
 logger.info('woohoo! we are testing!');
 
-exports.path = '/tests/(?:index\.html)?';
+exports.path = /tests\/(?:index\.html)?/;
 exports.verb = 'get';
 exports.authorization = require('../lib/page-authorization').ANY;
 
