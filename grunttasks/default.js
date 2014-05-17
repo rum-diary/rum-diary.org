@@ -2,16 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-'use strict';
-
 module.exports = function (grunt) {
-  // show elapsed time at the end
-  require('time-grunt')(grunt);
+  'use strict';
 
-  // load all grunt tasks
-  require('load-grunt-tasks')(grunt);
-
-  grunt.loadTasks('grunttasks');
+  grunt.registerTask('default', [
+    'jshint',
+    'preprocess',
+    /*'mocha'*/
+  ]);
 };
-
-

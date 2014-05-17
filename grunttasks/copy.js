@@ -8,10 +8,13 @@ module.exports = function (grunt) {
   grunt.config('copy', {
     dist: {
       files: [{
-        // most files
+        // most files. JS will be copied in the uglify task.
         expand: true,
         cwd: '<%= app.src %>',
-        src: [ 'css/*', 'i/*', 'js/**/*.js', 'js/**/*.css' ],
+        src: [
+          '**/*.css',
+          'i/*'
+        ],
         dest: '<%= app.dist %>'
       }, {
         // uncompressed include.js

@@ -19,7 +19,7 @@ exports.setParams = function (req) {
 };
 
 exports.template = 'GET-site-hostname-path.html';
-exports['js-resources'] = clientResources('rum-diary.min.js');
+exports['js-resources'] = clientResources('js/rum-diary.min.js');
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {
