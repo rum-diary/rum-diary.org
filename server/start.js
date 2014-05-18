@@ -21,7 +21,6 @@ const httpsServer = require('./lib/https-server');
 const csrf = require('./lib/middleware/csrf');
 const logging = require('./lib/middleware/logging');
 const session = require('./lib/middleware/session');
-const fonts = require('./lib/middleware/fonts');
 
 const SessionStore = require('./lib/session-store');
 
@@ -66,8 +65,6 @@ SessionStore.create().then(function (sessionStore) {
   app.use(helmet.csp({
     'default-src': ['\'self\'', 'https://login.persona.org']
   }));
-
-  app.use(fonts());
 
   // Get all of our routes.
   app.use(routes);

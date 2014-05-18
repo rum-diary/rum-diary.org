@@ -38,10 +38,6 @@ module.exports = {
     env: 'NODE_ENV'
   },
   views_root: path.join(__dirname, '..', 'views'),
-  views_dir: {
-    format: String,
-    'default': 'dist'
-  },
   static_root: path.join(__dirname, '..', '..', 'client'),
   static_dir: {
     doc: 'Which static root to use for client side resources, select \'\' for testing',

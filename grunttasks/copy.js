@@ -14,7 +14,8 @@ module.exports = function (grunt) {
         expand: true,
         cwd: '<%= app.src %>',
         src: [
-          'i/*'
+          'i/*',
+          'fonts/{,*/}*.{woff,svg,ofl,eot,ttf}'
         ],
         dest: '<%= app.dist %>'
       }, {

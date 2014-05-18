@@ -9,6 +9,8 @@ module.exports = function (grunt) {
     'clean',
     'selectconfig:dist',
     'jshint',
+    'connect_fonts_copy',
+    'connect_fonts',
     'useminPrepare',
     'preprocess',
     'browserify:dist',
@@ -20,9 +22,9 @@ module.exports = function (grunt) {
     'cssmin',
     'copy',
     'uglify',
-    'zopfli',
     'rev',
-    'usemin'
+    'usemin',
+    'zopfli'
   ]);
 };
 

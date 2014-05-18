@@ -10,7 +10,8 @@ module.exports = function (grunt) {
       files: {
         src: [
           '<%= app.dist %>/css/{,*/}*.css',
-          '<%= app.dist %>/i/{,*/}*.{png,jpg,jpeg,gif,webp}'
+          '<%= app.dist %>/i/{,*/}*.{png,jpg,jpeg,gif,webp}',
+          '<%= app.dist %>/fonts/{,*/}*.{woff,svg,ofl,eot,ttf}'
         ]
       }
     }

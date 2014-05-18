@@ -24,7 +24,7 @@ function getNunjucksConfig(app) {
 
 exports.setup = function (app) {
   var nunjucksConfig = getNunjucksConfig(app);
-  var templateRoot = path.join(config.get('views_root'), config.get('views_dir'));
+  var templateRoot = path.join(config.get('views_root'), config.get('static_dir'));
   var env = nunjucks.configure(templateRoot, nunjucksConfig);
 
   // sets up a filter to use in the templates that allows for cachifying.
