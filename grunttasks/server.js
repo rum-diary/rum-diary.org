@@ -18,6 +18,8 @@ module.exports = function (grunt) {
       selectConfig,
       'jshint',
       'autoprefixer',
+      'connect_fonts_copy',
+      'connect_fonts',
       'preprocess',
       'sass',
       browserifyConfig,

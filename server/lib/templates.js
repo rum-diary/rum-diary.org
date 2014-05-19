@@ -5,6 +5,7 @@
 const nunjucks = require('nunjucks');
 const moment = require('moment');
 const cachify = require('connect-cachify');
+const path = require('path');
 
 const config = require('./config');
 
@@ -23,7 +24,8 @@ function getNunjucksConfig(app) {
 
 exports.setup = function (app) {
   var nunjucksConfig = getNunjucksConfig(app);
-  var env = nunjucks.configure(config.get('views_dir'), nunjucksConfig);
+  var templateRoot = path.join(config.get('views_root'), config.get('static_dir'));
+  var env = nunjucks.configure(templateRoot, nunjucksConfig);
 
   // sets up a filter to use in the templates that allows for cachifying.
   env.addFilter('cachify', function(str) {
