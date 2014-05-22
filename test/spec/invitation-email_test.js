@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const assert = require('chai').assert;
-const config = require('../server/lib/config');
-const invitationEmail = require('../server/lib/invitation-email');
+const config = require('../../server/lib/config');
+const invitationEmail = require('../../server/lib/invitation-email');
 
 const UNENCODED_TOKEN = 'this is a token';
 const ENCODED_TOKEN = encodeURIComponent(UNENCODED_TOKEN);

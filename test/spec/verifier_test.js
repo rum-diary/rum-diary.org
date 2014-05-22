@@ -5,8 +5,8 @@
 const mocha = require('mocha');
 const assert = require('chai').assert;
 
-const verifier = require('../server/lib/verifier');
-const config = require('../server/lib/config');
+const verifier = require('../../server/lib/verifier');
+const config = require('../../server/lib/config');
 
 describe('verifier', function () {
   var origValue = config.get('verify_assertion');

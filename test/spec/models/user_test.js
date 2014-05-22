@@ -7,13 +7,13 @@
 const assert = require('chai').assert;
 const Promise = require('bluebird');
 
-const db = require('../../server/lib/db');
+const db = require('../../../server/lib/db');
 const userCollection = db.user;
 const siteCollection = db.site;
 
-const accessLevels = require('../../server/lib/access-levels');
+const accessLevels = require('../../../server/lib/access-levels');
 
-const testExtras = require('../lib/test-extras');
+const testExtras = require('../../lib/test-extras');
 const fail = testExtras.fail;
 
 describe('user', function () {

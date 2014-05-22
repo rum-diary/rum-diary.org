@@ -12,8 +12,8 @@
 const assert = require('chai').assert;
 const Promise = require('bluebird');
 
-const routes = require('../server/lib/routes');
-const httpErrors = require('../server/lib/http-errors');
+const routes = require('../../server/lib/routes');
+const httpErrors = require('../../server/lib/http-errors');
 
 var RequestMock = {
   query: {},

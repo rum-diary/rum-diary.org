@@ -6,7 +6,7 @@ const mocha = require('mocha');
 const assert = require('chai').assert;
 const moment = require('moment');
 
-const getQuery = require('../server/lib/site-query');
+const getQuery = require('../../server/lib/site-query');
 
 describe('site-query', function() {
   it('should get the hostname from req.params.hostname', function() {

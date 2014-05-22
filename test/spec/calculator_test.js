@@ -9,7 +9,7 @@
 const mocha = require('mocha');
 const assert = require('chai').assert;
 
-const Calculator = require('../server/lib/calculator');
+const Calculator = require('../../server/lib/calculator');
 const DbMock = {
   table_name: {
     calculate: function(config) {

@@ -4,17 +4,17 @@
 
 const mocha = require('mocha');
 const assert = require('chai').assert;
-const navigationTimingData = require('../data/navigation-timing.json');
+const navigationTimingData = require('../../data/navigation-timing.json');
 
-const Stream = require('../../server/lib/reduce/internal-transfer-from');
+const Stream = require('../../../server/lib/reduce/internal-transfer-to');
 
-const testExtras = require('../lib/test-extras');
+const testExtras = require('../../lib/test-extras');
 const cPass = testExtras.cPass;
 const fail = testExtras.fail;
 
 /*global describe, it */
 
-describe('reduce/internal-transfer-from', function () {
+describe('reduce/internal-transfer-to', function () {
   var stream;
 
   beforeEach(function () {
@@ -30,13 +30,13 @@ describe('reduce/internal-transfer-from', function () {
   });
 
   describe('result', function () {
-    it('returns pages with referrers on the same hostname whose paths are different', function () {
+    it('returns pages with refer_to on the same hostname whose paths are different', function () {
       var result = stream.result();
 
-      assert.equal(result.by_dest['/site/localhost']['/site'], 7);
+      assert.equal(result.by_dest['/site/localhost/performance']['/site/localhost'], 2);
       assert.equal(Object.keys(result.by_dest).length, 1);
 
-      assert.equal(result.by_source['/site']['/site/localhost'], 7);
+      assert.equal(result.by_source['/site/localhost']['/site/localhost/performance'], 2);
       assert.equal(Object.keys(result.by_source).length, 1);
     });
   });

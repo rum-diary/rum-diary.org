@@ -4,18 +4,17 @@
 
 const mocha = require('mocha');
 const assert = require('chai').assert;
-const navigationTimingData = require('../data/navigation-timing.json');
+const navigationTimingData = require('../../data/navigation-timing.json');
 
-const Stream = require('../../server/lib/reduce/exit');
+const Stream = require('../../../server/lib/reduce/entrance');
 
-const testExtras = require('../lib/test-extras');
+const testExtras = require('../../lib/test-extras');
 const cPass = testExtras.cPass;
 const fail = testExtras.fail;
 
-
 /*global describe, it */
 
-describe('reduce/exit', function () {
+describe('reduce/entrance', function () {
   var stream;
 
   beforeEach(function () {
@@ -31,10 +30,10 @@ describe('reduce/exit', function () {
   });
 
   describe('result', function () {
-    it('returns pages with is_exit set to true', function () {
+    it('returns pages with missing or external referrers', function () {
       var result = stream.result();
 
-      assert.equal(result['/site/localhost'], 3);
+      assert.equal(result['/site/localhost'], 1);
       assert.equal(Object.keys(result).length, 1);
     });
   });
