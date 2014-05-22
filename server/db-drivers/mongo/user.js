@@ -7,7 +7,6 @@
 const Promise = require('bluebird');
 const Model = require('./model');
 const Site = require('./site');
-const accessLevels = require('../../lib/access-levels');
 
 const userDefinition = {
   name: String,
@@ -30,13 +29,11 @@ UserModel.getSites = function (email) {
  * they have access to.
  */
 UserModel.deleteUser = function (email) {
-  var self = this;
-  return p.all([
-      Site.deleteSitesOwnedByUser(email),
-      Site.clearAccessLevelByUser(email)
-    ]).then(function () {
-      // finally, remove the user.
-      return UserModel.findOneAndDelete({ email: email });
+  return Site.deleteSitesOwnedByUser(email)
+    .then(function () {
+      return Site.clearAccessLevelByUser(email);
+    }).then(function () {
+      return UserModel.findOneAndDelete({ email: email })
     });
 };
 

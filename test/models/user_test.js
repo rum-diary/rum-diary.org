@@ -4,14 +4,16 @@
 
 /*global describe, beforeEach, afterEach, it*/
 
-const mocha = require('mocha');
 const assert = require('chai').assert;
+const Promise = require('bluebird');
 
 const db = require('../../server/lib/db');
-const user = db.user;
+const userCollection = db.user;
+const siteCollection = db.site;
+
+const accessLevels = require('../../server/lib/access-levels');
 
 const testExtras = require('../lib/test-extras');
-const cPass = testExtras.cPass;
 const fail = testExtras.fail;
 
 describe('user', function () {
@@ -25,7 +27,7 @@ describe('user', function () {
 
   describe('create', function () {
     it('should create an item', function (done) {
-      user.create({
+      userCollection.create({
         name: 'Site Administrator',
         email: 'testuser@testuser.com'
       }).then(function (user) {
@@ -39,16 +41,16 @@ describe('user', function () {
 
   describe('get', function () {
     it('should get one or more saved users', function (done) {
-      user.create({
+      userCollection.create({
         name: 'Site Administrator',
         email: 'testuser@testuser.com'
       }).then(function () {
-        return user.create({
+        return userCollection.create({
           name: 'Another Administrator',
           email: 'testuser2@testuser.com'
         });
       }).then(function () {
-        return user.get({
+        return userCollection.get({
           email: 'testuser2@testuser.com'
         });
       }).then(function (users) {
@@ -61,16 +63,16 @@ describe('user', function () {
 
   describe('getOne', function () {
     it('should get a saved user', function (done) {
-      user.create({
+      userCollection.create({
         name: 'Site Administrator',
         email: 'testuser@testuser.com'
       }).then(function () {
-        return user.create({
+        return userCollection.create({
           name: 'Another Administrator',
           email: 'testuser2@testuser.com'
         });
       }).then(function () {
-        return user.getOne({
+        return userCollection.getOne({
           email: 'testuser@testuser.com'
         });
       }).then(function (user) {
@@ -78,6 +80,45 @@ describe('user', function () {
         assert.equal(user.email, 'testuser@testuser.com');
         done();
       }, fail);
+    });
+  });
+
+  describe('deleteUser', function () {
+    beforeEach(function () {
+      return Promise.all([
+        userCollection.create({
+          name: 'test user',
+          email: 'testuser@testuser.com'
+        }),
+        userCollection.create({
+          name: 'an owner',
+          email: 'owner@another.com'
+        }),
+      ])
+      .then(function () {
+        return Promise.all([
+          siteCollection.registerNewSite('testuser.com', 'testuser@testuser.com'),
+          siteCollection.registerNewSite('another.com', 'owner@another.com')
+        ]);
+      })
+      .then(function () {
+        return siteCollection.setUserAccessLevel('testuser@testuser.com', 'another.com', accessLevels.ADMIN);
+      });
+    });
+
+    it('should delete a user, remove any sites they own, and remove access to any sites they have access to', function () {
+      return userCollection.deleteUser('testuser@testuser.com')
+          .then(function () {
+            return userCollection.getOne({ email: 'testuser@testuser.com' });
+          })
+          .then(function(user) {
+            assert.isNull(user);
+
+            return siteCollection.getSitesForUser('testuser@testuser.com');
+          })
+          .then(function (sites) {
+            assert.equal(sites.length, 0);
+          });
     });
   });
 });
