@@ -4,9 +4,9 @@
 
 const mocha = require('mocha');
 const assert = require('chai').assert;
-const navigationTimingData = require('../data/navigation-timing.json');
+const navigationTimingData = require('../../data/navigation-timing.json');
 
-const Filter = require('../../server/lib/filter/referrer');
+const Filter = require('../../../server/lib/filter/referrer');
 
 // cPass - curried pass - call done when done.
 function cPass(done) {

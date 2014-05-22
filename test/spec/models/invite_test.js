@@ -6,8 +6,8 @@
 
 const assert = require('chai').assert;
 
-const db = require('../../server/lib/db');
-const accessLevels  = require('../../server/lib/access-levels');
+const db = require('../../../server/lib/db');
+const accessLevels  = require('../../../server/lib/access-levels');
 
 const invite = db.invite;
 const user = db.user;

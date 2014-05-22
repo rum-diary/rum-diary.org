@@ -7,10 +7,10 @@
 const mocha = require('mocha');
 const assert = require('chai').assert;
 
-const db = require('../../server/lib/db');
+const db = require('../../../server/lib/db');
 const pageView = db.pageView;
 
-const testExtras = require('../lib/test-extras');
+const testExtras = require('../../lib/test-extras');
 const cPass = testExtras.cPass;
 const fail = testExtras.fail;
 

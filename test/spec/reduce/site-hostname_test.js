@@ -4,7 +4,7 @@
 
 const assert = require('chai').assert;
 
-const Stream = require('../../server/lib/reduce/site-hostname');
+const Stream = require('../../../server/lib/reduce/site-hostname');
 
 
 /*global afterEach, describe, it */

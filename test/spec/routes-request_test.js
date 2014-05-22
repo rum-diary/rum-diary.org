@@ -10,12 +10,12 @@ const mocha = require('mocha');
 const assert = require('chai').assert;
 const request = require('request');
 
-const config = require('../server/lib/config');
+const config = require('../../server/lib/config');
 const baseURL = 'http://localhost:' + config.get('https_port');
-const guid = require('../server/lib/guid');
+const guid = require('../../server/lib/guid');
 
 
-const startStop = require('./lib/start-stop');
+const startStop = require('../lib/start-stop');
 
 var ROUTES = {
   'GET /'                             : 200,

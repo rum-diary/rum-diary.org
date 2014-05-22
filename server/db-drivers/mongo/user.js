@@ -4,8 +4,8 @@
 
 // User model
 
+const Promise = require('bluebird');
 const Model = require('./model');
-const Schema = require('mongoose').Schema;
 const Site = require('./site');
 
 const userDefinition = {
@@ -22,6 +22,19 @@ UserModel.init('User', userDefinition);
  */
 UserModel.getSites = function (email) {
   return Site.getSitesForUser(email);
+};
+
+/**
+ * Delete a user, remove any sites they own, and remove access to any sites
+ * they have access to.
+ */
+UserModel.deleteUser = function (email) {
+  return Site.deleteSitesOwnedByUser(email)
+    .then(function () {
+      return Site.clearAccessLevelByUser(email);
+    }).then(function () {
+      return UserModel.findOneAndDelete({ email: email })
+    });
 };
 
 module.exports = UserModel;

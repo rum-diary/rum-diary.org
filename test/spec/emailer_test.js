@@ -5,7 +5,7 @@
 /*global describe, it*/
 
 const assert = require('chai').assert;
-const emailer = require('../server/lib/emailer');
+const emailer = require('../../server/lib/emailer');
 
 describe('emailer', function() {
   describe('send', function () {

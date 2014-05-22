@@ -6,9 +6,9 @@
 
 const assert = require('chai').assert;
 
-const db = require('../../server/lib/db');
+const db = require('../../../server/lib/db');
 const site = db.site;
-const accessLevels = require('../../server/lib/access-levels');
+const accessLevels = require('../../../server/lib/access-levels');
 
 describe('database', function () {
   beforeEach(function () {

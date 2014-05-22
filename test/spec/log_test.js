@@ -7,9 +7,9 @@ const assert = require('chai').assert;
 const path = require('path');
 const fs = require('fs');
 
-const startStop = require('./lib/start-stop');
+const startStop = require('../lib/start-stop');
 
-const config = require('../server/lib/config');
+const config = require('../../server/lib/config');
 
 const LOG_DIR = config.get('logging_dir');
 const LOG_PATH = path.join(LOG_DIR, config.get('proc_name'));

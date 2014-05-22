@@ -4,11 +4,11 @@
 
 const mocha = require('mocha');
 const assert = require('chai').assert;
-const navigationTimingData = require('../data/bounce.json');
+const navigationTimingData = require('../../data/bounce.json');
 
-const Stream = require('../../server/lib/reduce/bounce');
+const Stream = require('../../../server/lib/reduce/bounce');
 
-const testExtras = require('../lib/test-extras');
+const testExtras = require('../../lib/test-extras');
 const cPass = testExtras.cPass;
 const fail = testExtras.fail;
 

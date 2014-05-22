@@ -6,11 +6,11 @@ const mocha = require('mocha');
 const assert = require('chai').assert;
 const moment = require('moment');
 const url = require('url');
-const navigationTimingData = require('./data/navigation-timing.json');
+const navigationTimingData = require('../data/navigation-timing.json');
 
-const reduce = require('../server/lib/reduce');
+const reduce = require('../../server/lib/reduce');
 
-const testExtras = require('./lib/test-extras');
+const testExtras = require('../lib/test-extras');
 const cPass = testExtras.cPass;
 const fail = testExtras.fail;
 
