@@ -12,7 +12,6 @@ module.exports = function (grunt) {
     'connect_fonts_copy',
     'connect_fonts',
     'useminPrepare',
-    'preprocess',
     'browserify:dist',
     'sass',
     'autoprefixer',

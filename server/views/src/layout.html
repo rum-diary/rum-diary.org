@@ -55,7 +55,7 @@
       </div>
     </footer>
   </div>
-  <script defer src="/include.js" data-tags="zopfli,cache"></script>
+  <script defer src="/include.js"></script>
   {% block footerjs %}
     {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
     {% endfor %}

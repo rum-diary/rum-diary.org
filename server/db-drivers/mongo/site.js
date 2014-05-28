@@ -32,6 +32,7 @@ const siteDefinition = {
 const SiteModel = Object.create(Model);
 SiteModel.init('Site', siteDefinition);
 
+// TODO - this should no longer exist.
 SiteModel.ensureExists = function (hostname) {
   var self = this;
   return this.getOne({ hostname: hostname })

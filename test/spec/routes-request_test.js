@@ -59,54 +59,15 @@ describe('routes module', function () {
     }
   });
 
-  describe('POST /navigation', function () {
+  describe('POST /metrics', function () {
     it('should have CORS `access-control-allow-origin: *` header', function (done) {
-      request.post(baseURL + '/navigation', function (err, response) {
+      request.post(baseURL + '/metrics', function (err, response) {
         assert.equal(response.statusCode, 200, baseURL);
 
-        // CORS is allowed for POST /navigation
+        // CORS is allowed for POST /metrics
         assert.equal(response.headers['access-control-allow-origin'], '*');
 
         testCommonResponseHeaders(response);
-
-        done();
-      });
-    });
-  });
-
-  describe('POST /unload', function () {
-    it('should respond with 500 if guid is invalid', function (done) {
-      request.post({
-        url: baseURL + '/unload',
-        json: { uuid: 'invalid guid' }
-      }, function (err, response) {
-        assert.equal(response.statusCode, 500);
-        done();
-      });
-    });
-
-    it('should respond with 500 if guid is missing', function (done) {
-      request.post({
-        url: baseURL + '/unload',
-        json: { uuid: 'invalid guid' }
-      }, function (err, response) {
-        assert.equal(response.statusCode, 500);
-        done();
-      });
-    });
-
-    it('should respond with 200 and CORS headers, if guid is valid', function (done) {
-      request.post({
-        url: baseURL + '/unload',
-        json: { uuid: guid() }
-      }, function (err, response) {
-        assert.equal(response.statusCode, 200);
-
-        // CORS is allowed for POST /unload
-        assert.equal(response.headers['access-control-allow-origin'], '*');
-
-        testCommonResponseHeaders(response);
-
 
         done();
       });
@@ -135,7 +96,7 @@ function respondsWith(key, expectedCode) {
     }, function (err, response) {
       assert.equal(response.statusCode, expectedCode);
 
-      // CORS is only allowed for POST /navigation
+      // CORS is only allowed for POST /metrics
       assert.isUndefined(response.headers['access-control-allow-origin']);
 
       testCommonResponseHeaders(response);

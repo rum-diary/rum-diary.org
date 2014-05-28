@@ -20,7 +20,7 @@ module.exports = function (grunt) {
       'autoprefixer',
       'connect_fonts_copy',
       'connect_fonts',
-      'preprocess',
+      'string-replace',
       'sass',
       browserifyConfig,
       'serverproc'

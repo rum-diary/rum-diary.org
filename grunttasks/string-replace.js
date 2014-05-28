@@ -5,30 +5,31 @@
 module.exports = function (grunt) {
   'use strict';
 
-  grunt.task.renameTask('preprocess', 'do-preprocess');
+  grunt.task.renameTask('string-replace', 'do-string-replace');
   grunt.task.registerTask(
-    'preprocess',
-    'preprocess client side configuration',
+    'string-replace',
+    'preprocess include.js based off of client side configuration',
     function() {
       // Correct configuration will be loaded based
       // on process.env.CONFIG_FILES when the selectconfig task is run. If
       // selectconfig is not run, local.json will be used by default.
       var config = require('../server/lib/config');
-      var context = {
-        dataCollectionServer: config.get('data_collection_server')
-      };
 
-      grunt.config('do-preprocess', {
+      grunt.config('do-string-replace', {
         js: {
-          src: '<%= app.src %>/js-templates/include.js',
-          dest: '<%= app.src %>/include.js',
+          files: {
+            '<%= app.src %>/include.js': '<%= app.src %>/bower_components/rum-diary-js-client/dist/rum-diary-js-client.js',
+          },
           options: {
-            context: context
+            replacements: [{
+              pattern: /https:\/\/rum-diary.org/g,
+              replacement: config.get('data_collection_server')
+            }]
           }
         }
       });
 
-      grunt.task.run(['do-preprocess']);
+      grunt.task.run(['do-string-replace']);
     }
   );
 };

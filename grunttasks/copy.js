@@ -19,7 +19,12 @@ module.exports = function (grunt) {
         ],
         dest: '<%= app.dist %>'
       }, {
-        // uncompressed include.js
+        // original include.js
+        cwd: '<%= app.src %>',
+        src: '<%= app.src %>/bower_components/rum-diary-js-client/dist/rum-diary-js-client.js',
+        dest: '<%= app.src %>/include.js'
+      }, {
+        // uncompressed copy include.js
         cwd: '<%= app.src %>',
         src: '<%= app.src %>/include.js',
         dest: '<%= app.dist %>/include.orig.js'

@@ -29,3 +29,6 @@ server/views/dist/
 ### grunt temp directory ###
 .tmp
 
+### bower artifacts ###
+client/src/bower_components
+
