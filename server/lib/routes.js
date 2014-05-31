@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Promise = require('bluebird');
+const Promises = require('bluebird');
 const path = require('path');
 const cors = require('cors');
 const corsMiddleware = cors();
@@ -23,12 +23,16 @@ const ROUTES_DIR = path.join(__dirname, '..', 'routes');
 //  * verb - get, post, put, delete, etc.
 //  * path - path the respond to
 //  * handler - function to handle the route.
-loadAllRoutes();
+loadRoutesFromDirectory(ROUTES_DIR, router);
 
-function loadAllRoutes() {
-  globRequire(ROUTES_DIR, function (err, routes) {
-    routes.forEach(function(route) {
-      addRoute(route.exports, router);
+function loadRoutesFromDirectory(root, router) {
+  globRequire(root, function (err, modules) {
+    modules.forEach(function(module) {
+      var route = module.exports;
+      if (typeof route === 'function') {
+        route = new route();
+      }
+      addRoute(route, router);
     });
   });
 }
@@ -66,7 +70,7 @@ function routeHandler(req, res, next) {
   req.start = req.dbQuery.start;
   req.end = req.dbQuery.end;
 
-  Promise
+  Promises
     .try(validateInput)
     .then(authorizeUser)
     .then(processRoute)
@@ -146,4 +150,5 @@ function routeHandler(req, res, next) {
 
 
 module.exports = router;
+module.exports.loadRoutesFromDirectory = loadRoutesFromDirectory;
 module.exports.addRoute = addRoute;
