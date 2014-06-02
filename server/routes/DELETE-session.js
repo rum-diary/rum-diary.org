@@ -8,7 +8,7 @@ const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 
 exports.path = '/session';
-exports.verb = 'delete';
+exports.method = 'delete';
 exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 
 exports.validation = {

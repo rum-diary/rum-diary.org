@@ -8,7 +8,7 @@ const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
 
 exports.path = '/unload';
-exports.verb = 'post';
+exports.method = 'post';
 exports.enable_cors = true;
 exports.authorization = require('../lib/page-authorization').ANY;
 

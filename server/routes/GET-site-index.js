@@ -8,7 +8,7 @@ const logger = require('../lib/logger');
 calculator = require('../lib/calculator');
 
 exports.path = '/site';
-exports.verb = 'get';
+exports.method = 'get';
 exports.template = 'GET-site-index.html';
 exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 
@@ -30,7 +30,8 @@ exports.handler = function (req, res) {
   }).then(function (allResults) {
     var sites = allResults ? allResults.site['site:hostname'] : []
     return {
-      sites: sites
+      sites: sites,
+      email: email
     };
   });
 };

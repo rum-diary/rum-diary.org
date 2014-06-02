@@ -41,7 +41,7 @@ module.exports = {
   CAN_READ_HOST: function (req) {
     if (! req.session.email) throw httpErrors.UnauthorizedError();
 
-    return db.site.isAuthorizedToView(req.session.email, req.dbQuery.hostname)
+    return db.site.isAuthorizedToView(req.session.email, req.params.hostname)
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });
@@ -53,7 +53,7 @@ module.exports = {
   CAN_ADMIN_HOST: function (req) {
     if (! req.session.email) throw httpErrors.UnauthorizedError();
 
-    return db.site.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname)
+    return db.site.isAuthorizedToAdministrate(req.session.email, req.params.hostname)
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });
@@ -62,7 +62,7 @@ module.exports = {
   IS_OWNER_HOST: function (req) {
     if (! req.session.email) throw httpErrors.UnauthorizedError();
 
-    return db.site.isOwner(req.session.email, req.dbQuery.hostname)
+    return db.site.isOwner(req.session.email, req.params.hostname)
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });

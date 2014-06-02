@@ -7,9 +7,13 @@
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/user';
-exports.verb = 'get';
+exports.method = 'get';
 exports.template = 'GET-user-index.html';
-exports['js-resources'] = clientResources('js/signin.min.js');
+
+exports.locals = {
+  resources: clientResources('js/signin.min.js')
+};
+
 exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.handler = function (req, res) {

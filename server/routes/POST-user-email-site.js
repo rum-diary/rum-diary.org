@@ -11,7 +11,7 @@ const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
 
 exports.path = '/user/:email/site';
-exports.verb = 'post';
+exports.method = 'post';
 exports.authorization = require('../lib/page-authorization').IS_USER;
 
 exports.validation = {

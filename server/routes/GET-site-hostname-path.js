@@ -5,7 +5,7 @@
 const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
-exports.verb = 'get';
+exports.method = 'get';
 exports.path = /\/site\/([\w\d][\w\d\-]*(?:\.[\w\d][\w\d\-]*)*)\/path\/(.*)?$/;
 
 // Convert from the above regexp to named params
@@ -19,7 +19,9 @@ exports.setParams = function (req) {
 };
 
 exports.template = 'GET-site-hostname-path.html';
-exports['js-resources'] = clientResources('js/rum-diary.min.js');
+exports.locals = {
+  resources: clientResources('js/rum-diary.min.js')
+};
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {

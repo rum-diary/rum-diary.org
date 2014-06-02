@@ -7,7 +7,7 @@ const siteCollection = db.site;
 const accessLevels = require('../lib/access-levels');
 
 exports.path = '/site/:hostname/admin';
-exports.verb = 'get';
+exports.method = 'get';
 exports.template = 'GET-site-hostname-admin.html';
 exports.authorization = require('../lib/page-authorization').CAN_ADMIN_HOST;
 

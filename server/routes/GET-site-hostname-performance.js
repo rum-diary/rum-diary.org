@@ -9,9 +9,11 @@ const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname/performance';
-exports.verb = 'get';
+exports.method = 'get';
 exports.template = 'GET-site-hostname-performance.html';
-exports['js-resources'] = clientResources('js/rum-diary.min.js');
+exports.locals = {
+  resources: clientResources('js/rum-diary.min.js')
+};
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {
@@ -34,7 +36,7 @@ exports.handler = function(req) {
   });
 
   return Promise.all([
-    siteCollection.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname),
+    siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
     db.pageView.pipe(req.dbQuery, null, reduceStream)
   ]).then(function(allResults) {
     reduceStream.end();

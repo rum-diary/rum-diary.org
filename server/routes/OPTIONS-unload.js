@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 exports.path = '/unload';
-exports.verb = 'options';
+exports.method = 'options';
 exports.enable_cors = true;
 exports.authorization = require('../lib/page-authorization').ANY;
 

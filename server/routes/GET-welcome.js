@@ -4,7 +4,7 @@
 
 // The welcome page shows the user how to add the JS snippet to their site.
 
-exports.verb = 'get';
+exports.method = 'get';
 exports.path = '/welcome';
 exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 exports.template = 'GET-welcome.html';

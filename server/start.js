@@ -21,12 +21,14 @@ const httpsServer = require('./lib/https-server');
 const csrf = require('./lib/middleware/csrf');
 const logging = require('./lib/middleware/logging');
 const session = require('./lib/middleware/session');
+const errorHandler = require('./lib/middleware/error');
+const siteQuery = require('./lib/middleware/site-query');
+
 
 const SessionStore = require('./lib/session-store');
 
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
-
 
 SessionStore.create().then(function (sessionStore) {
   const app = express();
@@ -66,6 +68,8 @@ SessionStore.create().then(function (sessionStore) {
     'default-src': ['\'self\'', 'https://login.persona.org']
   }));
 
+  app.use(siteQuery);
+
   // Get all of our routes.
   app.use(routes);
 
@@ -77,6 +81,8 @@ SessionStore.create().then(function (sessionStore) {
 
   // Static middleware is last.
   app.use(gzip_static(STATIC_ROOT, { force: true }));
+
+  app.use(errorHandler);
 
   httpsServer.start({ app: app });
   httpServer.start();
