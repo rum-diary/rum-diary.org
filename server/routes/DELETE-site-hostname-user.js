@@ -8,7 +8,7 @@ const inputValidation = require('../lib/input-validation');
 const accessLevels = require('../lib/access-levels');
 
 exports.path = '/site/:hostname/user';
-exports.verb = 'delete';
+exports.method = 'delete';
 exports.authorization = require('../lib/page-authorization').CAN_ADMIN_HOST;
 
 exports.validation = {

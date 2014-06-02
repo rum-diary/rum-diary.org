@@ -8,9 +8,11 @@ const userCollection = db.user;
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/user/:email';
-exports.verb = 'get';
+exports.method = 'get';
 exports.template = 'GET-user-email.html';
-exports['js-resources'] = clientResources('js/rum-diary.min.js');
+exports.locals = {
+  resources: clientResources('js/rum-diary.min.js')
+};
 exports.authorization = require('../lib/page-authorization').IS_USER;
 
 exports.handler = function (req, res, next) {

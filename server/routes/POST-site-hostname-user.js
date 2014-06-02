@@ -10,7 +10,7 @@ const logger = require('../lib/logger');
 const accessLevels = require('../lib/access-levels');
 
 exports.path = '/site/:hostname/user';
-exports.verb = 'post';
+exports.method = 'post';
 exports.authorization = require('../lib/page-authorization').CAN_ADMIN_HOST;
 
 exports.validation = {

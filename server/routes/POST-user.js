@@ -9,7 +9,7 @@ const siteCollection = db.site;
 const verifier = require('../lib/verifier');
 
 exports.path = '/user';
-exports.verb = 'post';
+exports.method = 'post';
 exports.authorization = require('../lib/page-authorization').NOT_AUTHENTICATED;
 
 exports.validation = {

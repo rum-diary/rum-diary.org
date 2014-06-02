@@ -10,9 +10,11 @@ const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname';
-exports.verb = 'get';
+exports.method = 'get';
 exports.template = 'GET-site-hostname.html';
-exports['js-resources'] = clientResources('js/rum-diary.min.js');
+exports.locals = {
+  resources: clientResources('js/rum-diary.min.js')
+};
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function (req, res) {
@@ -20,10 +22,10 @@ exports.handler = function (req, res) {
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
 
   return Promise.all([
-    siteCollection.isAuthorizedToAdministrate(req.session.email, req.dbQuery.hostname),
+    siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
     calculator.calculate({
       tags: {
-        filter: { hostname: req.dbQuery.hostname },
+        filter: { hostname: req.params.hostname },
         'tags-total-hits': {
           tags: queryTags
         },
@@ -44,7 +46,7 @@ exports.handler = function (req, res) {
         'returning': {}
       },
       site: {
-        filter: { hostname: req.dbQuery.hostname },
+        filter: { hostname: req.params.hostname },
         'sites-total-hits': {}
       }
     })
@@ -62,7 +64,7 @@ exports.handler = function (req, res) {
     if (queryTags.length) {
       totalHits = tagResults['tags-total-hits'];
     } else {
-      totalHits = siteResults['sites-total-hits'][req.dbQuery.hostname] || 0;
+      totalHits = siteResults['sites-total-hits'][req.params.hostname] || 0;
     }
 
     return {

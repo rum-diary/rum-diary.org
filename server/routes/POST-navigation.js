@@ -11,7 +11,7 @@ const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
 
 exports.path = '/navigation';
-exports.verb = 'post';
+exports.method = 'post';
 exports.enable_cors = true;
 exports.authorization = require('../lib/page-authorization').ANY;
 

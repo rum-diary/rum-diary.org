@@ -9,7 +9,7 @@ const inputValidation = require('../lib/input-validation');
 const userCollection = require('../lib/db').user;
 
 exports.path = '/user/:email';
-exports.verb = 'delete';
+exports.method = 'delete';
 exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 
 exports.validation = {

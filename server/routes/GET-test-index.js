@@ -3,21 +3,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const config = require('../lib/config');
-const logger = require('../lib/logger');
 const client_resources = require('../lib/client-resources');
 
-
-logger.info("env: %s", config.get('env'));
-if (config.get('env') !== 'test') return;
-
-logger.info('woohoo! we are testing!');
-
 exports.path = /tests\/(?:index\.html)?/;
-exports.verb = 'get';
+exports.method = 'get';
 exports.authorization = require('../lib/page-authorization').ANY;
+exports.locals = {
+  resources: client_resources.testing('js/rum-diary.min.js')
+};
 
-exports.handler = function(req, res) {
-  res.render('GET-test-index.html', {
-    resources: client_resources.testing('rum-diary.min.js')
-  });
+exports.template = 'GET-test-index.html';
+
+exports.handler = function(req, res, next) {
+  if (config.get('env') !== 'test') {
+    next();
+    return false;
+  }
 };

@@ -8,7 +8,7 @@ const logger = require('../lib/logger');
 const inputValidation = require('../lib/input-validation');
 
 exports.path = '/invitation/:token';
-exports.verb = 'post';
+exports.method = 'post';
 exports.template = 'GET-invitation-token.html';
 exports.authorization = require('../lib/page-authorization').ANY;
 

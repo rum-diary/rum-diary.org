@@ -10,7 +10,7 @@ const verifier = require('../lib/verifier');
 const httpErrors = require('../lib/http-errors');
 
 exports.path = '/session';
-exports.verb = 'post';
+exports.method = 'post';
 exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.validation = {

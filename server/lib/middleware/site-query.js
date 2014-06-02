@@ -5,10 +5,8 @@
 const moment = require('moment');
 
 // Create a database query object from the information in the request.
-module.exports = function(req) {
-  var query = {
-    hostname: req.params.hostname
-  };
+module.exports = function(req, res, next) {
+  var query = {};
 
   if (req.query.start) {
     query.start = moment(req.query.start).startOf('day');
@@ -31,7 +29,11 @@ module.exports = function(req) {
     query.referrer = req.query.referrer;
   }
 
-  return query;
+  req.dbQuery = query;
+  req.start = query.start;
+  req.end = query.end;
+
+  next();
 };
 
 function tagsToMongoSelector(tags) {

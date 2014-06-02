@@ -7,7 +7,7 @@ const httpErrors = require('../lib/http-errors');
 const logger = require('../lib/logger');
 
 exports.path = '/invitation/:token';
-exports.verb = 'get';
+exports.method = 'get';
 exports.template = 'GET-invitation-token.html';
 exports.authorization = require('../lib/page-authorization').ANY;
 
