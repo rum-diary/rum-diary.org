@@ -28,11 +28,13 @@ exports.handler = function(req) {
   var hostname = req.params.hostname;
   var path = req.params.path;
 
-  req.dbQuery.path = path;
+  var pageViewQuery = req.dbQuery;
+  pageViewQuery.hostname = hostname;
+  pageViewQuery.path = path;
 
   return calculator.calculate({
     pageView: {
-      filter: req.dbQuery,
+      filter: pageViewQuery,
       'hits_per_day': {
         start: req.start,
         end: req.end

@@ -20,6 +20,9 @@ exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 exports.handler = function (req, res) {
 
   var queryTags = req.query.tags && req.query.tags.split(',') || [];
+  var pageViewQuery = req.dbQuery;
+  pageViewQuery.hostname = req.params.hostname;
+
 
   return Promise.all([
     siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
@@ -32,7 +35,7 @@ exports.handler = function (req, res) {
         'tags-names': {}
       },
       pageView: {
-        filter: req.dbQuery,
+        filter: pageViewQuery,
         'hits_per_day': {
           start: req.start,
           end: req.end

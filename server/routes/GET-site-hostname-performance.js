@@ -20,6 +20,9 @@ exports.handler = function(req) {
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;
 
+  var pageViewQuery = req.dbQuery;
+  pageViewQuery.hostname = req.params.hostname;
+
   var reduceStream = new reduce.StreamReduce({
     which: ['navigation', 'navigation-histogram', 'navigation-cdf'],
     start: req.start,
@@ -37,7 +40,7 @@ exports.handler = function(req) {
 
   return Promise.all([
     siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
-    db.pageView.pipe(req.dbQuery, null, reduceStream)
+    db.pageView.pipe(pageViewQuery, null, reduceStream)
   ]).then(function(allResults) {
     reduceStream.end();
     reduceStream = null;
