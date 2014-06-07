@@ -9,7 +9,7 @@ const logger = require('../lib/logger');
 
 exports.path = '/unload';
 exports.method = 'post';
-exports.enable_cors = true;
+exports.cors = true;
 exports.authorization = require('../lib/page-authorization').ANY;
 
 exports.validation = {
