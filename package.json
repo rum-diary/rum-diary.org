@@ -41,7 +41,7 @@
     "nunjucks": "1.0.5",
     "spdy": "1.26.0",
     "think-stats": "0.0.21",
-    "triage": "0.0.1",
+    "triage": "0.0.2",
     "underscore": "1.6.0",
     "useragent": "2.0.8"
   },
