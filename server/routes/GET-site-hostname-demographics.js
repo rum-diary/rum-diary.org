@@ -17,6 +17,9 @@ exports.locals = {
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {
+  var pageViewQuery = req.dbQuery;
+  pageViewQuery.hostname = req.params.hostname;
+
   var reduceStream = new reduce.StreamReduce({
     which: [
       'browsers',
@@ -29,7 +32,7 @@ exports.handler = function(req) {
 
   return Promise.all([
     siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
-    db.pageView.pipe(req.dbQuery, null, reduceStream)
+    db.pageView.pipe(pageViewQuery, null, reduceStream)
   ]).then(function(allResults) {
     reduceStream.end();
     reduceStream = null;
