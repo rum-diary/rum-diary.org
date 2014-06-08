@@ -7,8 +7,8 @@ module.exports = function (grunt) {
 
   grunt.config('watch', {
     include_js: {
-      files: '<%= app.src %>/js-templates/*.js',
-      tasks: [ 'preprocess' ]
+      files: '<%= app.src %>/include.js',
+      tasks: [ 'string-replace' ]
     },
     scripts: {
       files: ['<%= app.src_js %>/**/*.js', '!<%= app.src_js %>/**/*bundle.js'],

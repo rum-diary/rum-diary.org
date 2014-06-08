@@ -10,8 +10,7 @@ module.exports = function (grunt) {
       jshintrc: '.jshintrc',
       reporter: require('jshint-stylish'),
       ignores: [
-        '<%= app.src %>/include.js',
-        '<%= app.src %>/js-templates/include.js'
+        '<%= app.src %>/include.js'
       ]
     },
     all: [
