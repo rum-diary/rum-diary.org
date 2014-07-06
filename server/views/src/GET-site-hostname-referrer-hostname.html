@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}{{ referrer }} &rarr; {{ hostname }} referrals{% endblock %}
+
+{% block navigation %}
+  {% include "partials/_hostname-nav.html" %}
+{% endblock %}
+
+{% block header %}
+  {{ referrer }} referrals - {{ startDate | dateFormat('MMM DD') }} to {{ endDate | dateFormat('MMM DD') }}
+{% endblock %}
+
+
+{% block body %}
+    <section class="row center">
+      {% if referrals %}
+        <nav class="vertical-nav">
+          <ul>
+            {% for referral in referrals %}
+              <li>
+                <a href="/site/{{ hostname }}/path{{ referral.path }}"><small>({{ referral.count }})</small> {{ referral.path }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      {% else %}
+        None
+      {% endif %}
+    </section>
+
+{% endblock %}
+
+

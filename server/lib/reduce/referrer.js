@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-// count referrers
+// count referrers for an individual host. The assumption is made that
+// all incoming chunks are for the same hostname.
 
 const util = require('util');
 const url = require('url');
@@ -13,7 +14,8 @@ util.inherits(Stream, ReduceStream);
 
 function Stream(options) {
   this._data = {
-    by_hostname: {}
+    by_hostname: {},
+    by_hostname_to_path: {}
   };
   ReduceStream.call(this, options);
 }
@@ -27,13 +29,10 @@ Stream.prototype._write = function(chunk, encoding, callback) {
   // Do not count internal referrers
   if (chunk.referrer_hostname === chunk.hostname) return;
 
-  var referrers = this._data.by_hostname;
   var referrerHostname = chunk.referrer_hostname;
-  if ( ! referrers[referrerHostname]) {
-    referrers[referrerHostname] = 0;
-  }
 
-  referrers[referrerHostname]++;
+  incrementReferrer.call(this, referrerHostname);
+  incrementReferrerToPath.call(this, referrerHostname, chunk.path);
 
   callback(null);
 };
@@ -42,6 +41,28 @@ Stream.prototype.result = function () {
   this._data.by_count = sortHostnamesByCount(this._data.by_hostname);
   return this._data;
 };
+
+function incrementReferrer(referrerHostname) {
+  var referrers = this._data.by_hostname;
+  if ( ! referrers[referrerHostname]) {
+    referrers[referrerHostname] = 0;
+  }
+
+  referrers[referrerHostname]++;
+}
+
+function incrementReferrerToPath(referrerHostname, targetPath) {
+  var referrers = this._data.by_hostname_to_path;
+  if ( ! referrers[referrerHostname]) {
+    referrers[referrerHostname] = {};
+  }
+
+  if ( ! referrers[referrerHostname][targetPath]) {
+    referrers[referrerHostname][targetPath] = 0;
+  }
+
+  referrers[referrerHostname][targetPath]++;
+}
 
 function sortHostnamesByCount(countByHostname) {
   var sortedByCount = new ThinkStats({
