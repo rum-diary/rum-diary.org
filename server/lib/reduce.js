@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const path = require('path');
-const fs = require('fs');
-const Promise = require('bluebird');
+const Promises = require('bluebird');
+const globRequire = require('glob-require');
 const logger = require('./logger');
 
 const WATCH_FOR_MEMORY_LEAKS = false;
@@ -42,14 +42,13 @@ var allFilters = [];
 loadDirectory(FILTER_PATH, allFilters);
 
 function loadDirectory(pathToLoad, modules) {
-  fs.readdirSync(pathToLoad).forEach(function (fileName) {
-    // skip files that don't have a .js suffix or start with a dot
-    if (path.extname(fileName) !== '.js' || /^\./.test(fileName)) return;
-    var module = require(path.join(pathToLoad, fileName));
-    modules.push(module);
+  globRequire('**/*.js', {
+    cwd: pathToLoad
+  }, function (err, includes) {
+    includes.forEach(function(include) {
+      modules.push(include.exports);
+    });
   });
-
-  return modules;
 }
 
 
@@ -83,7 +82,7 @@ function shouldAddStream(name, fields) {
  */
 exports.mapReduce = function (hits, fields, options) {
   var startTime = new Date();
-  return Promise.attempt(function () {
+  return Promises.attempt(function () {
     if (! options) options = {};
     options.which = fields;
 
