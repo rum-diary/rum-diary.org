@@ -30,62 +30,72 @@ MetricsCollector.prototype = {
   },
 
   write: function (data) {
-    var location = data.location;
-    logger.info('saving navigation data for: %s', location);
+    if (! data.length) {
+      data = [ data ];
+    }
 
-    // TODO - check site exists before continuing.
-    return db.pageView.getOne({
-      uuid: data.uuid
-    })
-    .then(function(pageView) {
-      if (pageView) {
-        // update existing page view
-
-        // TODO add events/timers
-        pageView.duration = data.duration;
-        return db.pageView.update(pageView);
-      }
-
-      // new page
-
-      parseLocation(data);
-
-      return db.site.hit(data.hostname)
-          .then(function (site) {
-            // site isn't yet registered, do NOT collect data.
-            if (! site) {
-              throw new MetricsCollector.NonExistentSiteError(data.hostname);
-            }
-
-            try {
-              parseReferrer(data);
-            } catch(e) {
-              // swallow, not fatal.
-            }
-
-            parseUserAgent(data);
-            cleanTags(data);
-
-            data.is_counted = true;
-
-            return Promises.all([
-              db.pageView.create(data),
-              // Note, this is not correct if the puuid or tags is sent
-              // with the second call to /metrics for the page.
-              updatePreviousPage(data),
-              updateTags(data)
-            ]);
-          });
-    })
-    .then(function () {
-      logger.info('data saved');
-    });
+    return Promises.all(data.map(function (item) {
+      return saveItem(item);
+    }));
   },
 
   flush: function () {
     // nothing to do here.
   }
 };
+
+function saveItem(data) {
+  var location = data.location;
+  logger.info('saving navigation data for: %s', location);
+
+  // TODO - check site exists before continuing.
+  return db.pageView.getOne({
+    uuid: data.uuid
+  })
+  .then(function(pageView) {
+    if (pageView) {
+      // update existing page view
+
+      // TODO add events/timers
+      pageView.duration = data.duration;
+      return db.pageView.update(pageView);
+    }
+
+    // new page
+
+    parseLocation(data);
+
+    return db.site.hit(data.hostname)
+        .then(function (site) {
+          // site isn't yet registered, do NOT collect data.
+          if (! site) {
+            throw new MetricsCollector.NonExistentSiteError(data.hostname);
+          }
+
+          try {
+            parseReferrer(data);
+          } catch(e) {
+            // swallow, not fatal.
+          }
+
+          parseUserAgent(data);
+          cleanTags(data);
+
+          data.is_counted = true;
+
+          return Promises.all([
+            db.pageView.create(data),
+            // Note, this is not correct if the puuid or tags is sent
+            // with the second call to /metrics for the page.
+            updatePreviousPage(data),
+            updateTags(data)
+          ]);
+        });
+  })
+  .then(function () {
+    logger.info('data saved');
+  });
+}
 
 function parseLocation(data) {
   var parsedUrl = url.parse(data.location);
