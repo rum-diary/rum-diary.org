@@ -53,6 +53,37 @@ describe('lib/metrics-collector', function () {
       });
     });
 
+    describe('with a registered host and multiple page views', function () {
+      it('saves the data', function () {
+        return siteCollection.registerNewSite(
+                  'registered.com', 'testuser@testuser.com')
+            .then(function () {
+              return metricsCollector.write([{
+                  location: 'http://registered.com/page',
+                  uuid: 'this is the uuid',
+                  referrer: 'https://referrer.com/thepage',
+                  user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
+                }, {
+                  location: 'http://registered.com/page',
+                  uuid: 'this is the second uuid',
+                  referrer: 'https://referrer.com/thepage',
+                  user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
+                }]);
+            })
+            .then(function () {
+              return pageViewCollection.getOne({ uuid: 'this is the uuid' });
+            })
+            .then(function (pageView) {
+              assert.ok(pageView);
+
+              return pageViewCollection.getOne({ uuid: 'this is the second uuid' });
+            })
+            .then(function (pageView) {
+              assert.ok(pageView);
+            });
+      });
+    });
+
     describe('with a registered host and a new page view', function () {
       it('saves the data', function () {
         return siteCollection.registerNewSite(
