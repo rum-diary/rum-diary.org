@@ -62,12 +62,12 @@ describe('lib/metrics-collector', function () {
                   location: 'http://registered.com/page',
                   uuid: 'this is the uuid',
                   referrer: 'https://referrer.com/thepage',
-                  user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
+                  userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
                 }, {
                   location: 'http://registered.com/page',
                   uuid: 'this is the second uuid',
                   referrer: 'https://referrer.com/thepage',
-                  user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
+                  userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
                 }]);
             })
             .then(function () {
@@ -93,7 +93,7 @@ describe('lib/metrics-collector', function () {
                   location: 'http://registered.com/page',
                   uuid: 'this is the uuid',
                   referrer: 'https://referrer.com/thepage',
-                  user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
+                  userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:29.0) Gecko/20100101 Firefox/29.0'
                 });
             })
             .then(function () {
