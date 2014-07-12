@@ -34,9 +34,7 @@ MetricsCollector.prototype = {
       data = [ data ];
     }
 
-    return Promises.all(data.map(function (item) {
-      return saveItem(item);
-    }));
+    return Promises.all(data.map(saveItem));
   },
 
   flush: function () {
@@ -125,7 +123,7 @@ function parseReferrer(data) {
 }
 
 function parseUserAgent(data) {
-  var ua = useragent.parse(data.user_agent);
+  var ua = useragent.parse(data.userAgent);
   data.os = ua.os.toString();
   data.os_parsed = {
     family: ua.os.family,

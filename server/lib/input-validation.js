@@ -47,6 +47,12 @@ exports.referrer = function () {
   return joi.string().allow('');
 };
 
+// A location for navigation data.
+// TODO - fill this out. It should be a full URL.
+exports.location = function () {
+  return joi.string().allow('').optional();
+};
+
 // navigationTiming data.
 exports.navigationTiming = function () {
   // some fields are optional or are not sent depending on the circumstance.
@@ -118,4 +124,9 @@ exports.accessLevel = function () {
 // A user's real name.
 exports.userRealName = function () {
   return joi.string().min(3).max(50);
+};
+
+// The user-agent
+exports.userAgent = function () {
+  return joi.string().min(0).max(200).optional();
 };

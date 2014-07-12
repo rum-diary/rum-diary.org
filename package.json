@@ -63,7 +63,7 @@
     "morgan": "1.0.1",
     "nodemailer": "0.6.5",
     "nunjucks": "1.0.5",
-    "rum-diary-endpoint": "0.0.1",
+    "rum-diary-endpoint": "0.0.2",
     "spdy": "1.26.0",
     "think-stats": "0.0.21",
     "time-grunt": "0.3.1",
