@@ -1,6 +1,10 @@
-    <ul class="referrers">
-      {% for referrer in referrers %}
-        <li><small>({{ referrer.count }})</small> {{ referrer.hostname }}</li>
-      {% endfor %}
-    </ul>
+{% if referrers.length %}
+  <ul class="referrers vertical-nav">
+    {% for referrer in referrers %}
+      <li><a href="/site/{{ hostname }}/referrer/{{ referrer.hostname }}"><small>({{ referrer.count }})</small> {{ referrer.hostname }}</a></li>
+    {% endfor %}
+  </ul>
+{% else %}
+  None
+{% endif %}
 
