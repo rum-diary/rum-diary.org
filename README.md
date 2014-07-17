@@ -42,7 +42,7 @@ Real user metrics with ethics.
 
 ## Add rum-diary statistics to a site
 
-There are two ways to add rum-diary statistics to a site.
+There are several ways to add rum-diary statistics to a site.
 
 ### The simple way - let rum-diary.org handle everything.
 
