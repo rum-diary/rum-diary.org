@@ -37,6 +37,7 @@ exports.handler = function (req, res) {
       pageView: {
         filter: pageViewQuery,
         'hits_per_day': {
+          path: '__all',
           start: req.start,
           end: req.end
         },

@@ -27,7 +27,6 @@ describe('reduce/referrer', function () {
   describe('result', function () {
     it('returns by_hostname', function () {
       var result = stream.result();
-      console.log(result);
 
       // referrers that are the same as the hostname not counted.
       assert.isUndefined(result.by_hostname.localhost);

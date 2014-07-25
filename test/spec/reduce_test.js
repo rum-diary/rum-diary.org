@@ -88,7 +88,6 @@ describe('reduce', function () {
       'hits_per_page',
       'referrers',
       'navigation',
-      'hits_per_day',
       'internal-transfer-from'
     ], {
       hits_per_page: {
