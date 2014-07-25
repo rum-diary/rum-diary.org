@@ -14,15 +14,11 @@ util.inherits(HitsPerDayStream, ReduceStream);
 
 function HitsPerDayStream(options) {
   if (! options) options = {};
-  /*if (! options.start) options.start = earliestDate(hits, 'createdAt');*/
-  /*if (! options.end) options.end = latestDate(hits, 'createdAt');*/
 
   options.start = moment(options.start).startOf('day').toDate().getTime();
   options.end = moment(options.end).endOf('day').toDate().getTime();
 
   ReduceStream.call(this, options);
-
-  ensurePageInfo(this._data, '__all', options.start, options.end);
 }
 
 HitsPerDayStream.prototype.name = 'hits_per_day';
@@ -30,47 +26,33 @@ HitsPerDayStream.prototype.type = Object;
 
 HitsPerDayStream.prototype._write = function(chunk, encoding, callback) {
   var options = this.getOptions();
-  var date = new Date(chunk.createdAt).getTime();
+  var start = options.start;
+  var end = options.end;
+  var capturePath = options.path;
+  var date = new Date(chunk.createdAt || chunk.updatedAt).getTime();
 
-  if (chunk.path) {
-    ensurePageInfo(this._data, chunk.path, options.start, options.end);
-    incrementDailyPageHit(this._data, chunk.path, options.start, date);
+  if (! capturePath || capturePath === chunk.path) {
+    ensurePathInfo(this._data, chunk.path, start, end);
+    incrementDailyPathHit(this._data, chunk.path, start, date);
   }
 
-  incrementDailyPageHit(this._data, '__all', options.start, date);
+  if (! capturePath || capturePath === '__all') {
+    ensurePathInfo(this._data, '__all', start, end);
+    incrementDailyPathHit(this._data, '__all', start, date);
+  }
 
   callback(null);
 };
 
-/*
-function earliestDate(data, dateName) {
-  return data.reduce(function (prevStart, item) {
-            var currStart = new Date(item[dateName]);
-            if ( ! prevStart) return currStart;
-            if (currStart < prevStart) return currStart;
-            return prevStart;
-          }, null);
-}
-
-function latestDate(data, dateName) {
-  return data.reduce(function (prevEnd, item) {
-            var currEnd = new Date(item[dateName]);
-            if ( ! prevEnd) return currEnd;
-            if (currEnd > prevEnd) return currEnd;
-            return prevEnd;
-          }, null);
-}
-*/
-
-function ensurePageInfo(returnedData, page, startDate, endDate) {
-  if ( ! returnedData.hasOwnProperty(page)) {
+function ensurePathInfo(returnedData, path, startDate, endDate) {
+  if ( ! returnedData.hasOwnProperty(path)) {
     var numDays = diffDays(startDate, endDate);
-    returnedData[page] = new Array(numDays);
+    returnedData[path] = new Array(numDays);
     // <= to include both the start and end date
     for (var i = 0; i <= numDays; ++i) {
       var date = new Date();
       date.setTime(startDate + (i * MS_PER_DAY));
-      returnedData[page][i] = {
+      returnedData[path][i] = {
         hits: 0,
         date: moment(date).format('YYYY-MM-DD')
       };
@@ -86,15 +68,15 @@ function diffDays(startDate, date) {
   return ((date - startDate) / MS_PER_DAY) << 0;
 }
 
-function getPageInfoOnDate(pageInfo, page, startDate, date) {
+function getPathInfoForDate(pathInfo, path, startDate, date) {
   var index = diffDays(startDate, date);
-  return pageInfo[page][index];
+  return pathInfo[path][index];
 }
 
-function incrementDailyPageHit(returnedData, page, startDate, date) {
-  var pageInfoOnDate = getPageInfoOnDate(returnedData, page, startDate, date);
-  if ( ! pageInfoOnDate) return new Error('invalid date range');
-  pageInfoOnDate.hits++;
+function incrementDailyPathHit(returnedData, path, startDate, date) {
+  var pathInfoOnDate = getPathInfoForDate(returnedData, path, startDate, date);
+  if ( ! pathInfoOnDate) throw new Error('invalid date range');
+  pathInfoOnDate.hits++;
 }
 
 

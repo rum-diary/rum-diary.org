@@ -19,7 +19,7 @@ const WATCH_FOR_MEMORY_LEAKS = false;
  * 2) When a pageView becomes available, write it to the stream with `write`.
  * 3) The data will first go through filters declared in `filter`.
  * 4) The data will then go through each `reduce` stream.
- * 5) Results are fetches using `result`
+ * 5) Results are fetched using `result`
  * 6) Call `end` to free the stream's references.
  */
 
