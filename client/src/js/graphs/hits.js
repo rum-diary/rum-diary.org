@@ -53,12 +53,14 @@ var Module = {
         })
         .y(function(d) {
           return y(d.hits);
-        });
+        })
+        .interpolate('cardinal');
 
     var area = d3.svg.area()
         .x(function(d) { return x(d.date); })
         .y0(height)
-        .y1(function(d) { return y(d.hits); });
+        .y1(function(d) { return y(d.hits); })
+        .interpolate('cardinal');
 
 
     var svgEl = d3.select('#hits-graph').append('svg')
