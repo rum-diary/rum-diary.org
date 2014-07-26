@@ -27,8 +27,7 @@ var Module = {
         height = this.height - margin.top - margin.bottom;
 
     var x = d3.scale.linear()
-        .domain([d3.min(this.data, function(d) { return d }),
-                 d3.max(this.data, function(d) { return d })])
+        .domain([0, d3.max(this.data, function(d) { return d })])
         .range([0, width]);
 
     // Generate a histogram using uniformly-spaced bins.
