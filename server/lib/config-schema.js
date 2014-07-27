@@ -18,16 +18,7 @@ module.exports = {
     'default': 80,
     env: 'HTTP_PORT'
   },
-  https_port: {
-    format: 'port',
-    'default': 443,
-    env: 'HTTPS_PORT'
-  },
   ssl: {
-    format: Boolean,
-    'default': true
-  },
-  spdy: {
     format: Boolean,
     'default': true
   },
