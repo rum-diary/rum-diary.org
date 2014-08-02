@@ -50,10 +50,9 @@ function getPublicUrl() {
   var hostname = config.get('hostname');
   var useSSL = config.get('ssl');
   var httpPort = config.get('http_port');
-  var httpsPort = config.get('https_port');
 
   var protocol = useSSL ? 'https' : 'http';
-  var port = useSSL ? (httpsPort === 443 ? '' : ':' + httpsPort) :
+  var port = useSSL ? (httpPort === 443 ? '' : ':' + httpPort) :
                       (httpPort === 80 ? '' : ':' + httpPort);
 
   return protocol + '://' + hostname + port;

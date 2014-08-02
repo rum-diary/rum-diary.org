@@ -18,7 +18,7 @@ exports.start = function start(done) {
 
   proc.stdout.on('data', function (buf) {
     var str = buf.toString();
-    if (done && /https listening on port/.test(str)) {
+    if (done && /http listening on port/.test(str)) {
       done();
       done = null;
     }

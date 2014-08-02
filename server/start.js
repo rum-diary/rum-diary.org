@@ -5,7 +5,6 @@
 const express = require('express');
 const path = require('path');
 const gzip_static = require('connect-gzip-static');
-const helmet = require('helmet');
 const cachify = require('connect-cachify');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -16,7 +15,6 @@ const routes = require('./lib/routes.js');
 const templates = require('./lib/templates');
 
 const httpServer = require('./lib/http-server');
-const httpsServer = require('./lib/https-server');
 
 const csrf = require('./lib/middleware/csrf');
 const logging = require('./lib/middleware/logging');
@@ -53,20 +51,7 @@ SessionStore.create().then(function (sessionStore) {
   // requires both cookieParser and bodyParser.
   app.use(csrf());
 
-  app.use(helmet.xframe('deny'));
-
-  if (config.get('ssl')) {
-    app.use(helmet.hsts());
-  }
-
-  app.use(helmet.iexss());
-  app.use(helmet.contentTypeOptions());
-
   app.disable('x-powered-by');
-
-  app.use(helmet.csp({
-    'default-src': ['\'self\'', 'https://login.persona.org']
-  }));
 
   app.use(siteQuery);
 
@@ -84,6 +69,5 @@ SessionStore.create().then(function (sessionStore) {
 
   app.use(errorHandler);
 
-  httpsServer.start({ app: app });
-  httpServer.start();
+  httpServer.start({ app: app });
 });

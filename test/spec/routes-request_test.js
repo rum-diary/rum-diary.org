@@ -11,7 +11,7 @@ const assert = require('chai').assert;
 const request = require('request');
 
 const config = require('../../server/lib/config');
-const baseURL = 'http://localhost:' + config.get('https_port');
+const baseURL = 'http://localhost:' + config.get('http_port');
 const guid = require('../../server/lib/guid');
 
 
@@ -109,16 +109,6 @@ function respondsWith(key, expectedCode) {
 function testCommonResponseHeaders(response) {
   // Remove the x-powered-by
   assert.isUndefined(response.headers['x-powered-by']);
-
-  // ensure CSP headers
-  assert.equal(response.headers['x-content-security-policy'],
-            "default-src 'self' https://login.persona.org");
-
-  // DENY xframes
-  assert.equal(response.headers['x-frame-options'], 'DENY');
-
-  // disable mime type sniffing
-  assert.equal(response.headers['x-content-type-options'], 'nosniff');
 }
 
 
