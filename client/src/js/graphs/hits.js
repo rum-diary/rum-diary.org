@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-'use strict';
-
 var d3 = require('d3');
+
+'use strict';
 
 var Module = {
   create: function () {
@@ -15,6 +15,7 @@ var Module = {
     this.root = options.root || '#hits-graph';
     this.containerEl = $(this.root).get(0);
     this.data = options.data;
+    this.markers = options.markers;
     this.height = options.height || 200;
   },
 
@@ -23,6 +24,7 @@ var Module = {
     var containerWidth = containerEl.clientWidth;
 
     var data = convert_dates(this.data, 'date');
+    var markers = convert_dates(this.markers, 'date');
 
     data_graphic({
       top: 30,
@@ -31,6 +33,7 @@ var Module = {
       left: 0,
       target: this.root,
       data: data,
+      markers: markers,
       width: containerWidth,
       height: this.height,
       x_accessor: 'date',

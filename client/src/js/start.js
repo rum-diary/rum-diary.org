@@ -39,6 +39,21 @@
   }
 
   function hitsGraph() {
+    var data = getHits();
+    var markers = getAnnotations();
+
+    // Graph the data!
+    var graph = require('./graphs/hits.js').create();
+    graph.init({
+      data: data,
+      markers: markers
+    });
+    graph.render();
+
+    document.getElementById('hits-data').style.display = 'none';
+  }
+
+  function getHits() {
     // Get data from the HTML
     var dayEls = [].slice.call(document.querySelectorAll('.hits-data-day'), 0);
     if (! dayEls.length) return;
@@ -53,15 +68,24 @@
       };
     });
 
-    // Graph the data!
-    var Hits = require('./graphs/hits.js');
-    var graph = Hits.create();
-    graph.init({
-      data: data
-    });
-    graph.render();
+    return data;
+  }
 
-    document.getElementById('hits-data').style.display = 'none';
+  function getAnnotations() {
+    var annotationEls = [].slice.call(document.querySelectorAll('.annotation'), 0);
+    if (! annotationEls.length) return [];
+
+    var data = annotationEls.map(function(dayEl) {
+      var dateEl = dayEl.querySelector('.annotation-date');
+      var titleEl = dayEl.querySelector('.annotation-title');
+
+      return {
+        date: dateEl.textContent,
+        title: titleEl.textContent
+      };
+    });
+
+    return data;
   }
 
   function navigationTimingGraph() {

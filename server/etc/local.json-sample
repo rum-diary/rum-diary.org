@@ -2,6 +2,7 @@
   "env": "development",
   "hostname": "localhost",
   "http_port": 8000,
+  "ssl": false,
   "static_dir": "src",
   "data_collection_server": "http://localhost:8000",
   "use_concatenated_resources": false,

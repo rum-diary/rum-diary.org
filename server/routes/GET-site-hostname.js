@@ -28,7 +28,9 @@ exports.handler = function (req, res) {
     siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
     calculator.calculate({
       tags: {
-        filter: { hostname: req.params.hostname },
+        filter: {
+          hostname: req.params.hostname
+        },
         'tags-total-hits': {
           tags: queryTags
         },
@@ -50,8 +52,20 @@ exports.handler = function (req, res) {
         'returning': {}
       },
       site: {
-        filter: { hostname: req.params.hostname },
+        filter: {
+          hostname: req.params.hostname
+        },
         'sites-total-hits': {}
+      },
+      annotation: {
+        filter: {
+          '$and': [
+            { hostname: req.params.hostname },
+            { occurredAt: { '$gte': req.start.toDate() } },
+            { occurredAt: { '$lte': req.end.toDate() } },
+          ]
+        },
+        raw: {}
       }
     })
   ]).then(function (allResults) {
@@ -63,6 +77,8 @@ exports.handler = function (req, res) {
     var tagResults = calculatorResults.tags;
     var pageViewResults = calculatorResults.pageView;
     var siteResults = calculatorResults.site;
+    var annotations = calculatorResults.annotation;
+    logger.error('annotations', JSON.stringify(annotations));
 
     var totalHits = 0;
     if (queryTags.length) {
@@ -87,7 +103,8 @@ exports.handler = function (req, res) {
         unique: pageViewResults.unique,
         repeat: pageViewResults.returning
       },
-      tags: tagResults['tags-names']
+      tags: tagResults['tags-names'],
+      annotations: annotations.raw
     };
   });
 };

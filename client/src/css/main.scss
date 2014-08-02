@@ -620,6 +620,22 @@ circle,line_rollover_circle {
 
 }
 
+
+.markers {
+  line {
+    opacity: 0.2;
+    shape-rendering: crispedges;
+    stroke: $line-graph-marker-line-color;
+    stroke-width: 1;
+  }
+
+  text {
+    fill: $line-graph-marker-text-color;
+    font-size: 0.8em;
+  }
+}
+
+
 .date-range {
   margin: -1rem 0 1rem 0;
 

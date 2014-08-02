@@ -10,6 +10,7 @@ var Site = require('./mongo/site');
 var User = require('./mongo/user');
 var Tags = require('./mongo/tags');
 var Invite = require('./mongo/invite');
+var Annotation = require('./mongo/annotation');
 
 exports.clear = function(done) {
   logger.warn('clearing database');
@@ -18,7 +19,8 @@ exports.clear = function(done) {
     User.clear(),
     Site.clear(),
     Tags.clear(),
-    Invite.clear()
+    Invite.clear(),
+    Annotation.clear()
   ]).then(function() {
     if (done) done(null);
   });
@@ -34,3 +36,4 @@ exports.user = User;
 exports.site = Site;
 exports.tags = Tags;
 exports.invite = Invite;
+exports.annotation = Annotation
