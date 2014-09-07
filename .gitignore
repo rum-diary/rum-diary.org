@@ -30,5 +30,4 @@ server/views/dist/
 .tmp
 
 ### bower artifacts ###
-client/src/bower_components
-
+bower_components

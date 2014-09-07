@@ -67,6 +67,7 @@ function createBundleWithSourceMap(startPath, destPath, jsRoot, done) {
   console.error('Creating dev bundle: %s=>%s->%s', jsRoot, startPath, destPath);
 
   browserify()
+    .require(path.join(jsRoot, 'bower_components', 'd3', 'd3.js'), { expose: 'd3'})
     .require(startPath, { entry: true })
     .bundle({ debug: true })
 
@@ -88,6 +89,7 @@ function createBundle(startPath, destPath, jsRoot, done) {
   console.error('Creating dist bundle: %s=>%s->%s', jsRoot, startPath, destPath);
 
   browserify()
+    .require(path.join(jsRoot, 'bower_components', 'd3', 'd3.js'), { expose: 'd3'})
     .require(startPath, { entry: true })
     .bundle({ debug: false })
     .pipe(outputStream);
