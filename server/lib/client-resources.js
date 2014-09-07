@@ -16,7 +16,6 @@ const DEPENDENCIES = {
     'include.js'
   ],
   'js/rum-diary.min.js': [
-    '/js/bower_components/d3/d3.js',
     '/js/app.bundle.js'
   ],
   'js/signin.min.js': [

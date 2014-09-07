@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*global d3*/
-
 'use strict';
 
 var TOTAL_WIDTH = 650,
@@ -13,6 +11,7 @@ var TOTAL_WIDTH = 650,
     MARGIN_BOTTOM = 30,
     MARGIN_LEFT = 50;
 
+var d3 = require('d3');
 var strformat = require('../string').strformat;
 
 var NAVIGATION_TIMING_SECTIONS = [
