@@ -16,6 +16,7 @@
   ],
   "dependencies": {
     "d3": "3.4.11",
+    "metrics-graphics": "1.1.0",
     "pikaday": "1.2.0",
     "rum-diary-js-client": "0.0.2"
   }

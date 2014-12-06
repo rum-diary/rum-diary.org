@@ -1,23 +1,23 @@
-$font-family: "Bitstream Vera Sans", "sans-serif", "serif";
+$font-family: "Fira Sans", "sans-serif", "serif";
 
 // $body-background-color: #00c4ad; // A green color
-$body-background-color: #f1f1f1;
+$body-background-color: #fff;
 // $body-text-color: #fff;
-$body-text-color: #574243;
+$body-text-color: #6A7B86;
 
 // $header-background-color: #ffa200; // An orange color
-$header-text-color: #fff;
-$header-background-color: #604F4C;
-$footer-background-color: #5a4042;
-$footer-text-color: #fff;
+$header-text-color: #6A7B86;
+$header-background-color: #F5F5F5;
+$footer-background-color: #F5F5F5;
+$footer-text-color: #6A7B86;
 
 $navigation-text-color: $header-text-color;
 $navigation-text-focus-color: #ffa200;
 
 $nav-background-color: $body-background-color;
-$nav-focus-background-color: #fabd54;
-$nav-text-color: #42BDAB;
-$nav-text-focus-color: #2795B6;
+$nav-focus-background-color: $body-background-color;
+$nav-text-color: #0096DD;
+$nav-text-focus-color: #2A6496;
 
 $button-text-color: $body-background-color;
 $button-background-color: #42bdab;
@@ -26,7 +26,7 @@ $button-scary-background-color: #fc8901;
 $button-scary-focus-background-color: #fca601;
 
 // hits graph colors
-$line-graph-line-color: #ffa200;
+$line-graph-line-color: #f76b1c;
 $line-graph-text-color: #00c4ad;
 $line-graph-axis-color: $body-text-color;
-$line-graph-fill-color: rgba(66, 189, 171, 0.4);
+$line-graph-fill-color: #f76b1c;

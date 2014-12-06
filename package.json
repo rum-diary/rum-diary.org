@@ -68,7 +68,8 @@
     "triage": "0.0.2",
     "typederror": "git://github.com/shane-tomlinson/typederror.git#519897e527683a51762a2ab77bd72fb46b4c5c62",
     "underscore": "1.6.0",
-    "useragent": "2.0.8"
+    "useragent": "2.0.8",
+    "connect-fonts-firasans": "0.0.4"
   },
   "devDependencies": {
     "assert": "1.1.1",

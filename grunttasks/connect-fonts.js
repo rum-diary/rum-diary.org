@@ -11,11 +11,11 @@ module.exports = function (grunt) {
   'use strict';
 
   var fontPacks = [
-    'connect-fonts-bitstream-vera-sans'
+    'connect-fonts-firasans'
   ];
 
   var fontNamesNeeded = [
-    'vera-regular'
+    'firasans-regular'
   ];
 
   grunt.config('connect_fonts', {
