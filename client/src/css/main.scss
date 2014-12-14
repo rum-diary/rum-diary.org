@@ -549,13 +549,17 @@ svg {
   stroke-width: 1;
 }
 
-.x-axis line {
+.x-axis line, .x-axis path,
+.y-axis line, .y-axis path {
+  fill: none;
   opacity: 0.5;
+  shape-rendering: crispEdges;
   stroke: $line-graph-axis-color;
   stroke-width: 1;
 }
 
-.x-axis text {
+.x-axis text,
+.y-axis text {
   fill: $body-text-color;
   opacity: 1;
   font-size: 0.8rem;

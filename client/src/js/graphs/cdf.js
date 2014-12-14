@@ -61,23 +61,21 @@ var Module = {
 
      svg.append('path')
           .datum(this.data)
-          .attr('class', 'area')
+          .attr('class', 'main-area')
           .attr('d', area);
 
       svg.append('g')
-          .attr('class', 'x axis')
+          .attr('class', 'x-axis')
           .attr('transform', 'translate(0,' + height + ')')
           .call(xAxis);
 
       svg.append('g')
-          .attr('class', 'y axis')
+          .attr('class', 'y-axis')
           .call(yAxis)
         .append('text')
           .attr('transform', 'rotate(-90)')
           .attr('y', 6)
-          .attr('dy', '.71em')
-          .style('text-anchor', 'end')
-          .text('cdf');
+          .attr('dy', '.71em');
 
     var tooltip = createTooltip();
 
