@@ -6,12 +6,16 @@
 {% endblock %}
 
 {% block header %}
-  {{ hostname }} - {{ startDate | dateFormat('MMM DD') }} to {{ endDate | dateFormat('MMM DD') }}
+  {{ hostname }} - past 30 days
 {% endblock %}
 
+{% block headerjs %}
+<script src="/js/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/js/bower_components/metrics-graphics/js/metricsgraphics.min.js"></script>
+{% endblock %}
 
 {% block body %}
-  <form method="get" action="{{ root_url }}" class="date-range">
+  <!--form method="get" action="{{ root_url }}" class="date-range">
     <div class="form-row">
       <label for="start">Start date</label>
       <input type="datepicker" name="start" value="{{ startDate | dateFormat('YYYY-MM-DD') }}" />
@@ -24,38 +28,36 @@
       <button>Update</button>
       <a href="/site/{{ hostname }}/" class="button">Reset</a>
     </p>
-  </form>
-<section class="row narrow-left">
-  <article id="overview" class="row-left">
-    <h2>Overview</h2>
+  </form-->
+<section class="row">
+  <article id="daily-hits" style="margin-bottom: 50px;">
+    {% include "partials/_hits-graph.html" %}
+  </article>
+
+  <article id="overview">
     <ul class="overview">
       <li>
-        <dt class="overview-name deemphasize">Total</dt>
+        <dt class="overview-name">Total</dt>
         <dd class="overview-stat">{{ hits.total }}</dd>
       </li>
       <li>
-        <dt class="overview-name deemphasize">Today</dt>
+        <dt class="overview-name">Today</dt>
         <dd class="overview-stat">{{ hits.today }}</dd>
       </li>
       <li>
-        <dt class="overview-name deemphasize">Period</dt>
+        <dt class="overview-name">Period</dt>
         <dd class="overview-stat">{{ hits.period }}</dd>
       </li>
       <li>
-        <dt class="overview-name deemphasize">Unique</dt>
+        <dt class="overview-name">Unique</dt>
         <dd class="overview-stat">{{ hits.unique }}</dd>
       </li>
       <li>
-        <dt class="overview-name deemphasize">Repeat</dt>
+        <dt class="overview-name">Repeat</dt>
         <dd class="overview-stat">{{ hits.repeat }}</dd>
       </li>
     </ul>
 
-  </article>
-
-  <article id="daily-hits" class="row-right">
-    <h2>Daily hits</h2>
-    {% include "partials/_hits-graph.html" %}
   </article>
 </section>
 

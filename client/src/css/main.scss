@@ -49,8 +49,8 @@ ul.disc {
   }
 }
 
-/* 
- * wrapper is set to min-height: 100% to allow the footer 
+/*
+ * wrapper is set to min-height: 100% to allow the footer
  * to be placed at the bottom of the page.
  */
 #wrapper {
@@ -85,10 +85,16 @@ header, footer {
 
 header {
   background-color: $header-background-color;
+  border-bottom: 1px solid #dcdcdc;
   color: $header-text-color;
   margin-bottom: 1rem;
 
+  h1 {
+    text-transform: uppercase;
+  }
+
   nav {
+    float: right;
     font-size: 0.8rem;
 
     .session {
@@ -173,7 +179,7 @@ header {
 
 footer {
   background-color: $footer-background-color;
-  bottom: 0; 
+  bottom: 0;
   color: $footer-text-color;
   font-size: 0.8rem;
   left: 0;
@@ -241,7 +247,7 @@ footer {
   }
 }
 
-.vertical-nav, 
+.vertical-nav,
 .multi-column-nav {
   margin-left: -1rem;
   li {
@@ -312,6 +318,7 @@ main {
 
   h1 {
     margin-bottom: 2rem;
+    font-size: 0.90rem;
   }
 
   h2 {
@@ -407,14 +414,30 @@ main {
 }
 
 .overview {
+  display: flex;
+  flex-direction: row;
+
   > li {
+    border-left: 3px solid #e6e6e6;
+    flex: auto;
+    padding: 0 15px;
+
+    > .overview-name {
+      text-transform: uppercase;
+    }
+
     > .overview-stat {
-      font-size: 3.15rem;
+      font-size: 2.15rem;
+      margin-left: 0;
     }
 
     > .overview-stat.small {
       font-size: 1.7rem;
     }
+  }
+
+  > li:first-child {
+    border-left: none;
   }
 }
 
@@ -520,33 +543,47 @@ svg {
   font: 10px sans-serif;
 }
 
-path {
-    stroke: $line-graph-line-color;
-    stroke-width: 1;      /* the line width for paths is 2 pixels */
-    fill: none;         /* don't fill the area bounded by any path elements */
-}
-
-.axis-label {
-  fill: $line-graph-text-color;
-  font-size: 0.8em;
-}
-
-.axis-label-x {
-  -webkit-transform: rotate(70deg) translateX(2.75em) translateY(-1em);
-          transform: rotate(70deg) translateX(2.75em) translateY(-1em);
-}
-
-.axis path, 
-.axis line {
+.main-line {
   fill: none;
+  stroke: $line-graph-line-color;
+  stroke-width: 1;
+}
+
+.x-axis line, .x-axis path,
+.y-axis line, .y-axis path {
+  fill: none;
+  opacity: 0.5;
   shape-rendering: crispEdges;
   stroke: $line-graph-axis-color;
   stroke-width: 1;
 }
 
-.area {
-  fill: $line-graph-fill-color;
+.x-axis text,
+.y-axis text {
+  fill: $body-text-color;
+  opacity: 1;
+  font-size: 0.8rem;
 }
+
+circle,line_rollover_circle {
+  fill: $line-graph-line-color;
+}
+
+.main-area {
+  fill: $line-graph-fill-color;
+  fill-opacity: 0.7;
+}
+
+.active_datapoint {
+  fill: $line-graph-axis-color;
+  font-size: 0.8rem;
+  opacity: 1;
+}
+
+.year-marker {
+  display: none;
+}
+
 
 .bar rect {
   fill: steelblue;

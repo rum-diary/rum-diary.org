@@ -159,7 +159,7 @@ function createYAxis(svg, width, height, chartData) {
       .orient('left');
 
   svg.append('g')
-          .attr('class', 'y axis')
+          .attr('class', 'y-axis')
           .call(yAxis)
           .selectAll('text')
             .attr('class', 'axis-label axis-label-y');

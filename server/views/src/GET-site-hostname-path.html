@@ -12,9 +12,18 @@
   {{ hostname }}{{ path }} - {{ startDate | dateFormat('MMM DD') }} to {{ endDate | dateFormat('MMM DD') }}
 {% endblock %}
 
+{% block headerjs %}
+<script src="/js/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="/js/bower_components/metrics-graphics/js/metricsgraphics.min.js"></script>
+{% endblock %}
+
 {% block body %}
-<section class="row narrow-left">
-  <article id="overview" class="row-left">
+<section class="row">
+  <article id="daily-hits" style="margin-bottom: 50px;">
+    {% include "partials/_hits-graph.html" %}
+  </article>
+
+  <article id="overview">
     <h2>Overview</h2>
     <ul class="overview">
       <li>
@@ -51,11 +60,6 @@
       </li>
     </ul>
 
-  </article>
-
-  <article class="row-right">
-    <h2>Daily hits</h2>
-    {% include "partials/_hits-graph.html" %}
   </article>
 </section>
 
