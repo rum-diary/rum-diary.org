@@ -543,14 +543,17 @@ svg {
   font: 10px sans-serif;
 }
 
-.main-line {
+.main-line,
+.mg-main-line {
   fill: none;
   stroke: $line-graph-line-color;
   stroke-width: 1;
 }
 
 .x-axis line, .x-axis path,
-.y-axis line, .y-axis path {
+.y-axis line, .y-axis path,
+.mg-x-axis line, .mg-x-axis path,
+.mg-y-axis line, .mg-y-axis path {
   fill: none;
   opacity: 0.5;
   shape-rendering: crispEdges;
@@ -559,28 +562,34 @@ svg {
 }
 
 .x-axis text,
-.y-axis text {
+.y-axis text,
+.mg-x-axis text,
+.mg-y-axis text {
   fill: $body-text-color;
   opacity: 1;
   font-size: 0.8rem;
 }
 
-circle,line_rollover_circle {
+circle,line_rollover_circle,
+circle,mg-line-rollover-circle {
   fill: $line-graph-line-color;
 }
 
-.main-area {
+.main-area,
+.mg-main-area {
   fill: $line-graph-fill-color;
   fill-opacity: 0.7;
 }
 
-.active_datapoint {
+.active_datapoint,
+.mg-active-datapoint {
   fill: $line-graph-axis-color;
   font-size: 0.8rem;
   opacity: 1;
 }
 
-.year-marker {
+.year-marker,
+.mg-year-marker {
   display: none;
 }
 
@@ -621,7 +630,8 @@ circle,line_rollover_circle {
 }
 
 
-.markers {
+.markers,
+.mg-markers {
   line {
     opacity: 0.2;
     shape-rendering: crispedges;

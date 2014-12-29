@@ -23,10 +23,13 @@ var Module = {
     var containerEl = this.containerEl;
     var containerWidth = containerEl.clientWidth;
 
-    var data = convert_dates(this.data, 'date');
-    var markers = convert_dates(this.markers, 'date');
+    var data = MG.convert.date(this.data, 'date');
+    var markers = MG.convert.date(this.markers, 'date').map(function (item) {
+      item.label = item.title;
+      return item;
+    });
 
-    data_graphic({
+    MG.data_graphic({
       top: 30,
       right: 0,
       bottom: 30,
