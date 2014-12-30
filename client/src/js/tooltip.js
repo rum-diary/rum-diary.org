@@ -29,12 +29,30 @@ module.exports = {
     if (this.id) this.tooltip.attr('id', this.id);
   },
 
+  root: function() {
+    return this.tooltip;
+  },
+
   html: function(html) {
     this.tooltip.inner(html);
   },
 
   show: function() {
     this.tooltip.show();
+    var self = this;
+    // the setTimeout is used to prevent the tooltip from immediately
+    // being hidden if the tooltip is shown on a click.
+    setTimeout(function () {
+      function stopPropagation(event) {
+        event.stopPropagation();
+      }
+      DOM(self.tooltip).bindEvent('click', stopPropagation);
+
+      DOM('body').once('click', function hide() {
+        DOM(self.tooltip).unbindEvent('click', stopPropagation);
+        self.hide();
+      });
+    }, 10);
   },
 
   hide: function() {

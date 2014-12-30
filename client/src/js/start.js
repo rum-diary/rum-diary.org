@@ -9,6 +9,7 @@
   window.addEventListener('load', function() {
 
     hitsGraph();
+    createEnterAnnotationWidget();
     navigationTimingGraph();
     histogramGraph();
     cdfGraph();
@@ -17,6 +18,12 @@
     deviceTypeGraph();
     datePicker();
   }, false);
+
+  function createEnterAnnotationWidget() {
+    var enterAnnotationWidget = require('./enter-annotation.js').create();
+    enterAnnotationWidget.init();
+    /*enterAnnotationWidget.render();*/
+  }
 
   function datePicker() {
     var startEl = DOMinator('[name=start]').nth(0);

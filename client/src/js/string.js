@@ -11,6 +11,27 @@ module.exports = {
     });
 
     return output;
+  },
+
+  fillLeft: function (input, width, fillWith) {
+    return fill(input, width, fillWith, function (output, fillWith) {
+      return fillWith + output;
+    });
+  },
+
+  fillRight: function (input, width, fillWith) {
+    return fill(input, width, fillWith, function (output, fillWith) {
+      return output + fillWith;
+    });
   }
 };
+
+function fill(input, width, fillWith, filler) {
+  var output = '' + input;
+  fillWith = ('' + fillWith) || ' ';
+  while (output.length < width) {
+    output = filler(output, fillWith);
+  }
+  return output;
+}
 

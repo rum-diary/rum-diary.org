@@ -116,6 +116,15 @@ module.exports = (function() {
       });
     },
 
+    once: function (eventName, callback, bubble) {
+      return this.forEach(function (element) {
+        element.addEventListener(eventName, function handler(event) {
+          element.removeEventListener(eventName, handler, bubble);
+          callback(event);
+        }, bubble);
+      });
+    },
+
     /**
      * Remove a DOM event handler from the set of elements
      */
@@ -363,7 +372,7 @@ module.exports = (function() {
 
     if (isString(selector)) {
       selector = selector.trim();
-      if (selector[0] === "<") {
+      if (selector.charAt(0) === "<") {
         // HTML was specified! Create the elements
         var element = document.createElement('div');
         element.innerHTML = selector;
