@@ -5,7 +5,7 @@
 'use strict';
 
 var d3 = require('d3');
-var DOMinator = require('../lib/dominator');
+var DOM = require('dominator');
 var margin = {top: 30, right: 10, bottom: 0, left: 100};
 
 var Module = {
@@ -16,7 +16,7 @@ var Module = {
   init: function(options) {
     this.root = options.root;
     this.data = options.data;
-    this.width = options.width || DOMinator(this.root).nth(0).clientWidth;
+    this.width = options.width || DOM(this.root).nth(0).clientWidth;
     this.height = options.height || (30 * this.data.length + margin.top);
   },
 

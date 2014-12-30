@@ -4,7 +4,7 @@
 
 'use strict';
 
-var DOM = require('./lib/dominator');
+var DOM = require('dominator');
 var Tooltip = require('./tooltip');
 var Events = require('./events');
 var string = require('./string');
@@ -23,7 +23,7 @@ var EnterAnnotation = {
   },
 
   render: function () {
-    var html = DOM(this.root).inner();
+    var html = DOM(this.root).html();
     DOM(this.root).remove();
 
     var tooltip = this._tooltip = Tooltip.create();

@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function() {
-  var DOMinator = require('./lib/dominator');
-  var Pikaday = require('./bower_components/pikaday/pikaday');
+  var DOMinator = require('dominator');
+  var Pikaday = require('pikaday');
 
   window.addEventListener('load', function() {
 
@@ -140,7 +140,7 @@
     var min, max;
 
     histogramDataEls.forEach(function(el) {
-      var text = DOMinator(el).inner().trim();
+      var text = DOMinator(el).html().trim();
       if (! text.length) return;
       if (isNaN(text)) return;
 
@@ -174,11 +174,11 @@
     var cdfData = [];
 
     cdfDataEls.forEach(function(rowEl) {
-      var x = DOMinator(rowEl).find('.elapsed-time').inner().trim();
+      var x = DOMinator(rowEl).find('.elapsed-time').html().trim();
       if (! x.length) return;
       if (isNaN(x)) return;
 
-      var y = DOMinator(rowEl).find('.cdf').inner().trim();
+      var y = DOMinator(rowEl).find('.cdf').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -211,10 +211,10 @@
     var browsersData = [];
 
     browsersDataEls.forEach(function(rowEl) {
-      var x = DOMinator(rowEl).find('.browsers-data-browser').inner().trim();
+      var x = DOMinator(rowEl).find('.browsers-data-browser').html().trim();
       if (! x.length) return;
 
-      var y = DOMinator(rowEl).find('.browsers-data-count').inner().trim();
+      var y = DOMinator(rowEl).find('.browsers-data-count').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -240,10 +240,10 @@
     var osData = [];
 
     osDataEls.forEach(function(rowEl) {
-      var x = DOMinator(rowEl).find('.os-data-name').inner().trim();
+      var x = DOMinator(rowEl).find('.os-data-name').html().trim();
       if (! x.length) return;
 
-      var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+      var y = DOMinator(rowEl).find('.os-data-count').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -297,7 +297,7 @@
       if (! osDataEls.length) return;
 
       osDataEls.forEach(function(rowEl) {
-        var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+        var y = DOMinator(rowEl).find('.os-data-count').html().trim();
         if (! y.length) return;
         if (isNaN(y)) return;
 

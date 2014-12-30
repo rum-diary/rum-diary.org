@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 var d3 = require('d3');
+var DOM = require('dominator');
 var events = require('../events.js');
-var DOM = require('../lib/dominator.js');
 
 'use strict';
 
@@ -33,7 +33,7 @@ var Module = {
 
     var lastIndex;
 
-    DOM(this.root).bindEvent('click', function (event) {
+    DOM(this.root).on('click', function (event) {
       if (typeof lastIndex !== 'undefined') {
         events.fire('point-click', data[lastIndex]);
       }

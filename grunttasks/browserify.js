@@ -68,6 +68,8 @@ function createBundleWithSourceMap(startPath, destPath, jsRoot, done) {
 
   browserify()
     .require(path.join(jsRoot, 'bower_components', 'd3', 'd3.js'), { expose: 'd3'})
+    .require(path.join(jsRoot, 'bower_components', 'dominator', 'build', 'umd.js'), { expose: 'dominator'})
+    .require(path.join(jsRoot, 'bower_components', 'pikaday', 'pikaday.js'), { expose: 'pikaday'})
     .require(startPath, { entry: true })
     .bundle({ debug: true })
 
@@ -90,6 +92,8 @@ function createBundle(startPath, destPath, jsRoot, done) {
 
   browserify()
     .require(path.join(jsRoot, 'bower_components', 'd3', 'd3.js'), { expose: 'd3'})
+    .require(path.join(jsRoot, 'bower_components', 'dominator', 'build', 'umd.js'), { expose: 'dominator'})
+    .require(path.join(jsRoot, 'bower_components', 'pikaday', 'pikaday.js'), { expose: 'pikaday'})
     .require(startPath, { entry: true })
     .bundle({ debug: false })
     .pipe(outputStream);

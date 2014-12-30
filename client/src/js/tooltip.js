@@ -4,7 +4,7 @@
 
 'use strict';
 
-var DOM = require('./lib/dominator');
+var DOM = require('dominator');
 
 module.exports = {
   create: function() {
@@ -34,7 +34,7 @@ module.exports = {
   },
 
   html: function(html) {
-    this.tooltip.inner(html);
+    this.tooltip.html(html);
   },
 
   show: function() {
@@ -46,10 +46,10 @@ module.exports = {
       function stopPropagation(event) {
         event.stopPropagation();
       }
-      DOM(self.tooltip).bindEvent('click', stopPropagation);
+      DOM(self.tooltip).on('click', stopPropagation);
 
       DOM('body').once('click', function hide() {
-        DOM(self.tooltip).unbindEvent('click', stopPropagation);
+        DOM(self.tooltip).off('click', stopPropagation);
         self.hide();
       });
     }, 10);
