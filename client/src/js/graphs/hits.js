@@ -4,7 +4,7 @@
 
 var d3 = require('d3');
 var DOM = require('dominator');
-var events = require('../events.js');
+var Events = require('events');
 
 'use strict';
 
@@ -35,7 +35,7 @@ var Module = {
 
     DOM(this.root).on('click', function (event) {
       if (typeof lastIndex !== 'undefined') {
-        events.fire('point-click', data[lastIndex]);
+        Events.trigger('point-click', data[lastIndex]);
       }
     });
 

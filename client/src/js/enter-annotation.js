@@ -6,7 +6,7 @@
 
 var DOM = require('dominator');
 var Tooltip = require('./tooltip');
-var Events = require('./events');
+var Events = require('events');
 var string = require('./string');
 
 var EnterAnnotation = {
