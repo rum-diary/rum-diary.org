@@ -17,7 +17,8 @@
   "dependencies": {
     "d3": "3.4.11",
     "dominator": "0.0.3",
-    "events": "https://github.com/shane-tomlinson/events.git#release",
+    "events": "https://github.com/shane-tomlinson/events.git#0.0.0",
+    "string-utils": "https://github.com/shane-tomlinson/string-utils.git#0.0.0",
     "metrics-graphics": "2.0.0",
     "pikaday": "1.2.0",
     "rum-diary-js-client": "0.0.2"

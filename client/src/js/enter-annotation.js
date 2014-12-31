@@ -7,7 +7,7 @@
 var DOM = require('dominator');
 var Tooltip = require('./tooltip');
 var Events = require('events');
-var string = require('./string');
+var StringUtils = require('string-utils');
 
 var EnterAnnotation = {
   create: function () {
@@ -43,10 +43,10 @@ var EnterAnnotation = {
     tooltip.move('100px', '150px');
 
     var occurredAt = data.date;
-    var occurredAtStr = string.strformat('%s-%s-%s',
+    var occurredAtStr = StringUtils.format('%s-%s-%s',
       occurredAt.getFullYear(),
       occurredAt.getMonth() + 1,
-      string.fillLeft(occurredAt.getDate(), 2, 0));
+      StringUtils.padLeft(occurredAt.getDate(), 2, 0));
     DOM(this._tooltip.root()).find('[name="occurredAt"]').attr('value', occurredAtStr);
     DOM('#occurredAtContainer').hide();
   }

@@ -12,7 +12,7 @@ var TOTAL_WIDTH = 650,
     MARGIN_LEFT = 50;
 
 var d3 = require('d3');
-var strformat = require('../string').strformat;
+var strformat = require('string-utils').format;
 
 var NAVIGATION_TIMING_SECTIONS = [
   {
