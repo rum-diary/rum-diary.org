@@ -123,7 +123,7 @@ function parseReferrer(data) {
 }
 
 function parseUserAgent(data) {
-  var ua = useragent.parse(data.userAgent);
+  var ua = useragent.parse(data.userAgent || data.user_agent);
   data.os = ua.os.toString();
   data.os_parsed = {
     family: ua.os.family,
