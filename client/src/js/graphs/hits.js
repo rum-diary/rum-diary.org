@@ -15,7 +15,7 @@ var Module = {
 
   init: function(options) {
     this.root = options.root || '#hits-graph';
-    this.containerEl = $(this.root).get(0);
+    this.containerEl = DOM(this.root).nth(0);
     this.data = options.data;
     this.markers = options.markers;
     this.height = options.height || 200;
@@ -23,6 +23,9 @@ var Module = {
 
   render: function () {
     var containerEl = this.containerEl;
+    if (! containerEl) {
+      return;
+    }
     var containerWidth = containerEl.clientWidth;
 
     var data = MG.convert.date(this.data, 'date');
