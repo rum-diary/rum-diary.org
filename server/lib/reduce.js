@@ -129,7 +129,7 @@ StreamReduce.prototype.write = function(chunk/*, encoding, callback*/) {
     }
 
     if (! filteredChunk) {
-      return logger.debug('Hit has been filtered');
+      return logger.debug('Item has been filtered');
     }
 
     var filter = filters[filterIndex];

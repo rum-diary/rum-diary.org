@@ -3,12 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function() {
-  var DOMinator = require('./lib/dominator');
-  var Pikaday = require('./bower_components/pikaday/pikaday');
+  var DOM = require('dominator');
+  var Pikaday = require('pikaday');
 
   window.addEventListener('load', function() {
 
     hitsGraph();
+    createEnterAnnotationWidget();
     navigationTimingGraph();
     histogramGraph();
     cdfGraph();
@@ -18,8 +19,14 @@
     datePicker();
   }, false);
 
+  function createEnterAnnotationWidget() {
+    var enterAnnotationWidget = require('./enter-annotation.js').create();
+    enterAnnotationWidget.init();
+    /*enterAnnotationWidget.render();*/
+  }
+
   function datePicker() {
-    var startEl = DOMinator('[name=start]').nth(0);
+    var startEl = DOM('[name=start]').nth(0);
     var startPicker = new Pikaday({
       field: startEl,
       onSelect: function() {
@@ -28,7 +35,7 @@
       maxDate: new Date()
     });
 
-    var endEl = DOMinator('[name=end]').nth(0);
+    var endEl = DOM('[name=end]').nth(0);
     var endPicker = new Pikaday({
       field: endEl,
       onSelect: function() {
@@ -39,6 +46,21 @@
   }
 
   function hitsGraph() {
+    var data = getHits();
+    var markers = getAnnotations();
+
+    // Graph the data!
+    var graph = require('./graphs/hits.js').create();
+    graph.init({
+      data: data,
+      markers: markers
+    });
+    graph.render();
+
+    DOM('#hits-data').style('display', 'none');
+  }
+
+  function getHits() {
     // Get data from the HTML
     var dayEls = [].slice.call(document.querySelectorAll('.hits-data-day'), 0);
     if (! dayEls.length) return;
@@ -53,15 +75,24 @@
       };
     });
 
-    // Graph the data!
-    var Hits = require('./graphs/hits.js');
-    var graph = Hits.create();
-    graph.init({
-      data: data
-    });
-    graph.render();
+    return data;
+  }
 
-    document.getElementById('hits-data').style.display = 'none';
+  function getAnnotations() {
+    var annotationEls = [].slice.call(document.querySelectorAll('.annotation'), 0);
+    if (! annotationEls.length) return [];
+
+    var data = annotationEls.map(function(dayEl) {
+      var dateEl = dayEl.querySelector('.annotation-date');
+      var titleEl = dayEl.querySelector('.annotation-title');
+
+      return {
+        date: dateEl.textContent,
+        label: titleEl.textContent
+      };
+    });
+
+    return data;
   }
 
   function navigationTimingGraph() {
@@ -92,24 +123,24 @@
         navigationTiming2QData,
         navigationTiming3QData
       ],
-      width: DOMinator('#navigation-timing-graph').nth(0).clientWidth,
+      width: DOM('#navigation-timing-graph').nth(0).clientWidth,
       height: '250'
     });
     graph.render();
 
 
-    document.getElementById('medians').style.display = 'none';
+    DOM('#medians').style('display', 'none');
   }
 
   function histogramGraph() {
-    var histogramDataEls = DOMinator('#histogram-data li');
+    var histogramDataEls = DOM('#histogram-data li');
     if (! histogramDataEls.length) return;
     var histogramData = [];
 
     var min, max;
 
     histogramDataEls.forEach(function(el) {
-      var text = DOMinator(el).inner().trim();
+      var text = DOM(el).html().trim();
       if (! text.length) return;
       if (isNaN(text)) return;
 
@@ -128,26 +159,26 @@
       root: '#histogram-graph',
       data: histogramData,
       ticks: Math.min(histogramData.length, 75),
-      width: DOMinator('#histogram-graph').nth(0).clientWidth,
+      width: DOM('#histogram-graph').nth(0).clientWidth,
       height: '350'
     });
     histogram.render();
 
-    DOMinator('#histogram-data').hide();
+    DOM('#histogram-data').hide();
   }
 
 
   function cdfGraph() {
-    var cdfDataEls = DOMinator('#cdf-data tr');
+    var cdfDataEls = DOM('#cdf-data tr');
     if (! cdfDataEls.length) return;
     var cdfData = [];
 
     cdfDataEls.forEach(function(rowEl) {
-      var x = DOMinator(rowEl).find('.elapsed-time').inner().trim();
+      var x = DOM(rowEl).find('.elapsed-time').html().trim();
       if (! x.length) return;
       if (isNaN(x)) return;
 
-      var y = DOMinator(rowEl).find('.cdf').inner().trim();
+      var y = DOM(rowEl).find('.cdf').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -166,24 +197,24 @@
     cdf.init({
       root: '#cdf-graph',
       data: cdfData,
-      width: DOMinator('#cdf-graph').nth(0).clientWidth,
+      width: DOM('#cdf-graph').nth(0).clientWidth,
       height: '350'
     });
     cdf.render();
 
-    DOMinator('#cdf-data').hide();
+    DOM('#cdf-data').hide();
   }
 
   function browsersGraph() {
-    var browsersDataEls = DOMinator('.browsers-data-item');
+    var browsersDataEls = DOM('.browsers-data-item');
     if (! browsersDataEls.length) return;
     var browsersData = [];
 
     browsersDataEls.forEach(function(rowEl) {
-      var x = DOMinator(rowEl).find('.browsers-data-browser').inner().trim();
+      var x = DOM(rowEl).find('.browsers-data-browser').html().trim();
       if (! x.length) return;
 
-      var y = DOMinator(rowEl).find('.browsers-data-count').inner().trim();
+      var y = DOM(rowEl).find('.browsers-data-count').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -200,19 +231,19 @@
     });
     browsers.render();
 
-    DOMinator('#browsers-data').hide();
+    DOM('#browsers-data').hide();
   }
 
   function osGraph() {
-    var osDataEls = DOMinator('.os-data-item');
+    var osDataEls = DOM('.os-data-item');
     if (! osDataEls.length) return;
     var osData = [];
 
     osDataEls.forEach(function(rowEl) {
-      var x = DOMinator(rowEl).find('.os-data-name').inner().trim();
+      var x = DOM(rowEl).find('.os-data-name').html().trim();
       if (! x.length) return;
 
-      var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+      var y = DOM(rowEl).find('.os-data-count').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -229,11 +260,11 @@
     });
     os.render();
 
-    DOMinator('#os-data').hide();
+    DOM('#os-data').hide();
   }
 
   function deviceTypeGraph() {
-    var rootEl = DOMinator('#device-type-graph');
+    var rootEl = DOM('#device-type-graph');
     if (! rootEl.length) return;
 
     var deviceTypeData = {
@@ -258,15 +289,15 @@
     });
     deviceType.render();
 
-    DOMinator('#os-data-mobile').hide();
-    DOMinator('#os-data-desktop').hide();
+    DOM('#os-data-mobile').hide();
+    DOM('#os-data-desktop').hide();
 
     function countDeviceType(type) {
-      var osDataEls = DOMinator('.os-data-item-' + type);
+      var osDataEls = DOM('.os-data-item-' + type);
       if (! osDataEls.length) return;
 
       osDataEls.forEach(function(rowEl) {
-        var y = DOMinator(rowEl).find('.os-data-count').inner().trim();
+        var y = DOM(rowEl).find('.os-data-count').html().trim();
         if (! y.length) return;
         if (isNaN(y)) return;
 

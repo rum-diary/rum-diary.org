@@ -25,7 +25,11 @@ module.exports = function (options) {
     timers: inputValidation.timers(),
     events: inputValidation.events(),
     userAgent: inputValidation.userAgent(),
-    location: inputValidation.location()
+    location: inputValidation.location(),
+    screen: joi.object().keys({
+      width: joi.number(),
+      height: joi.number()
+    }).optional()
   };
 
   return {

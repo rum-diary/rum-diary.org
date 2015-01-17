@@ -68,6 +68,11 @@ function createBundleWithSourceMap(startPath, destPath, jsRoot, done) {
 
   browserify()
     .require(path.join(jsRoot, 'bower_components', 'd3', 'd3.js'), { expose: 'd3'})
+    .require(path.join(jsRoot, 'bower_components', 'dominator', 'dominator.js'), { expose: 'dominator'})
+    .require(path.join(jsRoot, 'bower_components', 'pikaday', 'pikaday.js'), { expose: 'pikaday'})
+    .require(path.join(jsRoot, 'bower_components', 'events', 'events.js'), { expose: 'events'})
+    .require(path.join(jsRoot, 'bower_components', 'string-utils', 'string.js'), { expose: 'string-utils'})
+    .require(path.join(jsRoot, 'bower_components', 'function-utils', 'function.js'), { expose: 'function-utils'})
     .require(startPath, { entry: true })
     .bundle({ debug: true })
 
@@ -90,6 +95,11 @@ function createBundle(startPath, destPath, jsRoot, done) {
 
   browserify()
     .require(path.join(jsRoot, 'bower_components', 'd3', 'd3.js'), { expose: 'd3'})
+    .require(path.join(jsRoot, 'bower_components', 'dominator', 'dominator.js'), { expose: 'dominator'})
+    .require(path.join(jsRoot, 'bower_components', 'pikaday', 'pikaday.js'), { expose: 'pikaday'})
+    .require(path.join(jsRoot, 'bower_components', 'events', 'events.js'), { expose: 'events'})
+    .require(path.join(jsRoot, 'bower_components', 'string-utils', 'string.js'), { expose: 'string-utils'})
+    .require(path.join(jsRoot, 'bower_components', 'function-utils', 'function.js'), { expose: 'function-utils'})
     .require(startPath, { entry: true })
     .bundle({ debug: false })
     .pipe(outputStream);

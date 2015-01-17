@@ -2,9 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-'use strict';
-
 var d3 = require('d3');
+var DOM = require('dominator');
+var Events = require('events');
+
+'use strict';
 
 var Module = {
   create: function () {
@@ -13,31 +15,57 @@ var Module = {
 
   init: function(options) {
     this.root = options.root || '#hits-graph';
-    this.containerEl = $(this.root).get(0);
+    this.containerEl = DOM(this.root).nth(0);
     this.data = options.data;
+    this.markers = options.markers;
     this.height = options.height || 200;
   },
 
   render: function () {
     var containerEl = this.containerEl;
+    if (! containerEl) {
+      return;
+    }
     var containerWidth = containerEl.clientWidth;
 
-    var data = convert_dates(this.data, 'date');
+    var data = MG.convert.date(this.data, 'date');
+    var markers = MG.convert.date(this.markers, 'date');
 
-    data_graphic({
+    var lastIndex;
+
+    DOM(this.root).on('click', function (event) {
+      if (typeof lastIndex !== 'undefined') {
+        var eventData = {
+          data: data[lastIndex],
+          x: event.screenX + 'px',
+          y: event.screenY + 'px'
+        };
+        Events.trigger('day-click', eventData);
+      }
+    });
+
+    MG.data_graphic({
       top: 30,
       right: 0,
       bottom: 30,
       left: 0,
       target: this.root,
       data: data,
+      markers: markers,
       width: containerWidth,
       height: this.height,
       x_accessor: 'date',
       x_extend_ticks: true,
       y_accessor: 'hits',
       y_axis: false,
-      interpolate: 'line'
+      interpolate: 'line',
+      show_rollover_text: true,
+      mouseover: function (data, i) {
+        lastIndex = i;
+      },
+      mouseout: function (data, i) {
+        lastIndex = void 0;
+      }
     });
   }
 };

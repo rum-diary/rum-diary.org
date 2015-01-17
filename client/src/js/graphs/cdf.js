@@ -5,7 +5,7 @@
 'use strict';
 
 var d3 = require('d3');
-var strformat = require('../string').strformat;
+var strformat = require('string-utils').format;
 
 var Module = {
   create: function() {

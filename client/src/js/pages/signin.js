@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function () {
-  var DOMinator = require('../lib/dominator');
+  var DOM = require('dominator');
 
   // no caching the assertion.
-  DOMinator('[name=assertion]').inner('');
+  DOM('[name=assertion]').val('');
 
   // Flow:
   // 1) When user submits the form, prevent form submission and
@@ -15,7 +15,7 @@
   //    the assertion into the form.
   // 3) Sign the user out of Persona, then submit the form to the server.
 
-  DOMinator('#signin').bindEvent('submit', onSignInSubmit);
+  DOM('#signin').on('submit', onSignInSubmit);
 
   function onSignInSubmit(event) {
     // no assertion available, request one then re-submit the form.
@@ -26,14 +26,14 @@
     navigator.id.watch({
       onlogout: function () {
         if (isSignInFormValid()) {
-          DOMinator('#signin').nth(0).submit();
+          DOM('#signin').nth(0).submit();
         }
       },
       onlogin: function (assertion) {
         if (! assertion) return;
 
-        DOMinator('#signin').unbindEvent('submit', onSignInSubmit);
-        DOMinator('#signin [name=assertion]').inner(assertion);
+        DOM('#signin').off('submit', onSignInSubmit);
+        DOM('#signin [name=assertion]').val(assertion);
         navigator.id.logout();
       }
     });
@@ -45,10 +45,10 @@
   }
 
   function isSignInFormValid() {
-    return !!DOMinator('#signin [name=assertion]').inner();
+    return !!DOM('#signin [name=assertion]').val();
   }
 
-  DOMinator('#signup').bindEvent('submit', onSignUpSubmit);
+  DOM('#signup').on('submit', onSignUpSubmit);
 
   function onSignUpSubmit(event) {
     // no assertion available, request one then re-submit the form.
@@ -59,14 +59,14 @@
     navigator.id.watch({
       onlogout: function () {
         if (isSignUpFormValid()) {
-          DOMinator('#signup').nth(0).submit();
+          DOM('#signup').nth(0).submit();
         }
       },
       onlogin: function (assertion) {
         if (! assertion) return;
 
-        DOMinator('#signup').unbindEvent('submit', onSignUpSubmit);
-        DOMinator('#signup [name=assertion]').inner(assertion);
+        DOM('#signup').off('submit', onSignUpSubmit);
+        DOM('#signup [name=assertion]').val(assertion);
         navigator.id.logout();
       }
     });
@@ -78,8 +78,8 @@
   }
 
   function isSignUpFormValid() {
-    return !!(DOMinator('#signup [name=name]').inner() &&
-              DOMinator('#signup [name=assertion]').inner());
+    return !!(DOM('#signup [name=name]').val() &&
+              DOM('#signup [name=assertion]').val());
   }
 }());
 

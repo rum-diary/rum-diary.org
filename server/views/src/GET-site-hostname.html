@@ -11,7 +11,7 @@
 
 {% block headerjs %}
 <script src="/js/bower_components/jquery/dist/jquery.min.js"></script>
-<script src="/js/bower_components/metrics-graphics/js/metricsgraphics.min.js"></script>
+<script src="/js/bower_components/metrics-graphics/dist/metricsgraphics.min.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -57,6 +57,42 @@
         <dd class="overview-stat">{{ hits.repeat }}</dd>
       </li>
     </ul>
+
+  </article>
+
+  <article id="annotations">
+    <h2>Important Events</h2>
+    <ol>
+      {% for annotation in annotations %}
+      <li class="annotation" title="{{ annotation.title }}">
+        <span class="annotation-date">{{ annotation.occurredAt | dateFormat('YYYY-MM-DD')}}</span> -
+        {% if annotation.url %}
+          <a href="{{ annotation.url }}" target="_blank">
+        {% endif %}
+        <span class="annotation-title">{{ annotation.title }}</span>: {{ annotation.description }}
+        {% if annotation.url %}
+          </a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+
+    <div id="enter-annotation-container">
+      <form id="enter-annotation" method="post" action="/site/{{ hostname }}/annotation">
+        <div id='occurredAtContainer'>
+          <label for="occurredAt">Date/Time</label>
+          <input type="datepicker" name="occurredAt"/>
+        </div>
+        <div>
+          <label for="title">Event</label>
+          <input type="string" name="title" />
+        </div>
+        <div>
+          <input type="hidden" name="_csrf" value="{{ csrftoken }}" />
+          <button type="submit">Add event</button>
+        </div>
+      </form>
+    </div>
 
   </article>
 </section>
