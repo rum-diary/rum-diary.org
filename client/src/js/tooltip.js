@@ -6,6 +6,10 @@
 
 var DOM = require('dominator');
 
+function stopPropagation(event) {
+  event.stopPropagation();
+}
+
 module.exports = {
   create: function() {
     return Object.create(this);
@@ -40,19 +44,12 @@ module.exports = {
   show: function() {
     this.tooltip.show();
     var self = this;
-    // the setTimeout is used to prevent the tooltip from immediately
-    // being hidden if the tooltip is shown on a click.
-    setTimeout(function () {
-      function stopPropagation(event) {
-        event.stopPropagation();
-      }
-      DOM(self.tooltip).on('click', stopPropagation);
+    DOM(self.tooltip).on('click', stopPropagation);
 
-      DOM('body').once('click', function hide() {
-        DOM(self.tooltip).off('click', stopPropagation);
-        self.hide();
-      });
-    }, 10);
+    DOM('body').once('click', function hide() {
+      DOM(self.tooltip).off('click', stopPropagation);
+      self.hide();
+    });
   },
 
   hide: function() {

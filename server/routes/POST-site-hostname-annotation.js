@@ -17,7 +17,7 @@ exports.validation = {
   _csrf: inputValidation.csrf(),
   occurredAt: inputValidation.date('YYYY-MM-DD'),
   title: inputValidation.string(),
-  description: inputValidation.string().allow('')
+  description: inputValidation.string().allow('').optional()
 };
 
 

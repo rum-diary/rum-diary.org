@@ -29,16 +29,13 @@ var Module = {
     var containerWidth = containerEl.clientWidth;
 
     var data = MG.convert.date(this.data, 'date');
-    var markers = MG.convert.date(this.markers, 'date').map(function (item) {
-      item.label = item.title;
-      return item;
-    });
+    var markers = MG.convert.date(this.markers, 'date');
 
     var lastIndex;
 
     DOM(this.root).on('click', function (event) {
       if (typeof lastIndex !== 'undefined') {
-        Events.trigger('point-click', data[lastIndex]);
+        Events.trigger('day-click', data[lastIndex]);
       }
     });
 

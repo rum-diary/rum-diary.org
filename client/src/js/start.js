@@ -88,7 +88,7 @@
 
       return {
         date: dateEl.textContent,
-        title: titleEl.textContent
+        label: titleEl.textContent
       };
     });
 

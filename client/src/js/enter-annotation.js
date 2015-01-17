@@ -8,6 +8,7 @@ var DOM = require('dominator');
 var Tooltip = require('./tooltip');
 var Events = require('events');
 var StringUtils = require('string-utils');
+var delay = require('function-utils').delay;
 
 var EnterAnnotation = {
   create: function () {
@@ -19,7 +20,9 @@ var EnterAnnotation = {
     this.root = options.root || '#enter-annotation-container';
     DOM('#annotations').hide();
 
-    Events.on('point-click', this.show.bind(this));
+    // the delay is used to prevent the tooltip from immediately
+    // being hidden if the tooltip is shown on a click.
+    Events.on('day-click', delay(this.show.bind(this)));
   },
 
   render: function () {
