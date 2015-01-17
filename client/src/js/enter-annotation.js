@@ -22,7 +22,9 @@ var EnterAnnotation = {
 
     // the delay is used to prevent the tooltip from immediately
     // being hidden if the tooltip is shown on a click.
-    Events.on('day-click', delay(this.show.bind(this)));
+    Events.on('day-click', delay(function (eventData) {
+      this.show(eventData.data, eventData.x, eventData.y);
+    }.bind(this)));
   },
 
   render: function () {
@@ -36,14 +38,14 @@ var EnterAnnotation = {
 
   },
 
-  show: function (data) {
+  show: function (data, x, y) {
     if (! this._tooltip) {
       this.render();
     }
 
     var tooltip = this._tooltip;
     tooltip.show();
-    tooltip.move('100px', '150px');
+    tooltip.move(x, y);
 
     var occurredAt = data.date;
     var occurredAtStr = StringUtils.format('%s-%s-%s',

@@ -35,7 +35,12 @@ var Module = {
 
     DOM(this.root).on('click', function (event) {
       if (typeof lastIndex !== 'undefined') {
-        Events.trigger('day-click', data[lastIndex]);
+        var eventData = {
+          data: data[lastIndex],
+          x: event.screenX + 'px',
+          y: event.screenY + 'px'
+        };
+        Events.trigger('day-click', eventData);
       }
     });
 
