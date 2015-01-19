@@ -7,6 +7,7 @@ const db = require('../lib/db');
 const siteCollection = db.site;
 const reduce = require('../lib/reduce');
 const clientResources = require('../lib/client-resources');
+const navigationTimingFields = require('../lib/navigation-timing');
 
 exports.path = '/site/:hostname/performance';
 exports.method = 'get';
@@ -42,11 +43,12 @@ exports.handler = function(req) {
     siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
     db.pageView.pipe(pageViewQuery, null, reduceStream)
   ]).then(function(allResults) {
-    reduceStream.end();
-    reduceStream = null;
 
     var isAdmin = allResults[0];
-    var performanceResults = allResults[1];
+    var performanceResults = reduceStream.result();
+
+    reduceStream.end();
+    reduceStream = null;
 
     return {
       baseURL: req.url.replace(/\?.*/, ''),
@@ -56,7 +58,7 @@ exports.handler = function(req) {
       hostname: req.params.hostname,
       startDate: req.start.format('MMM DD'),
       endDate: req.end.format('MMM DD'),
-      navigationTimingFields: getNavigationTimingFields(),
+      navigationTimingFields: navigationTimingFields,
       first_q: performanceResults.navigation['25'],
       second_q: performanceResults.navigation['50'],
       third_q: performanceResults.navigation['75'],
@@ -64,30 +66,4 @@ exports.handler = function(req) {
     };
   });
 };
-
-function getNavigationTimingFields() {
-  return Object.keys({
-    'navigationStart': Number,
-    'unloadEventStart': Number,
-    'unloadEventEnd': Number,
-    'redirectStart': Number,
-    'redirectEnd': Number,
-    'fetchStart': Number,
-    'domainLookupStart': Number,
-    'domainLookupEnd': Number,
-    'connectStart': Number,
-    'connectEnd': Number,
-    'secureConnectionStart': Number,
-    'requestStart': Number,
-    'responseStart': Number,
-    'responseEnd': Number,
-    'domLoading': Number,
-    'domInteractive': Number,
-    'domContentLoadedEventStart': Number,
-    'domContentLoadedEventEnd': Number,
-    'domComplete': Number,
-    'loadEventStart': Number,
-    'loadEventEnd': Number
-  });
-}
 

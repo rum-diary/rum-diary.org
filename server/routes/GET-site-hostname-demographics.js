@@ -34,11 +34,12 @@ exports.handler = function(req) {
     siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
     db.pageView.pipe(pageViewQuery, null, reduceStream)
   ]).then(function(allResults) {
+    var isAdmin = allResults[0];
+    var demographicsResults = reduceStream.result();
+
     reduceStream.end();
     reduceStream = null;
 
-    var isAdmin = allResults[0];
-    var demographicsResults = allResults[1];
 
     return {
       hostname: req.params.hostname,

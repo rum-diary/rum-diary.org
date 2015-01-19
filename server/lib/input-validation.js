@@ -59,29 +59,12 @@ exports.navigationTiming = function () {
   // unload events are not sent if the previous page is on a different domain.
   // redirect events are not sent if there is no redirect.
   // secureConnectionStart is not sent if using only an HTTP connection.
-  return joi.object({
-    navigationStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    unloadEventStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    unloadEventEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    redirectStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    redirectEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    fetchStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    domainLookupStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    domainLookupEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    connectStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    connectEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    secureConnectionStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    requestStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    responseStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    responseEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    domLoading: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    domInteractive: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    domContentLoadedEventStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    domContentLoadedEventEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    domComplete: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    loadEventStart: joi.alternatives(joi.number().integer(), joi.any().allow(null)),
-    loadEventEnd: joi.alternatives(joi.number().integer(), joi.any().allow(null))
+  var fields = require('./navigation-timing');
+  var validationConfig = {};
+  fields.forEach(function (field) {
+    validationConfig[field] = joi.alternatives(joi.number().integer(), joi.any().allow(null));
   });
+  return joi.object(validationConfig);
 };
 
 // guids used in reporting session information.
