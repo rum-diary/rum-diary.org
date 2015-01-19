@@ -6,14 +6,20 @@
 
 /*global describe, beforeEach, afterEach, it*/
 
+const Promises = require('bluebird');
 const mocha = require('mocha');
 const assert = require('chai').assert;
+const sinon = require('sinon');
 
 const Calculator = require('../../server/lib/calculator');
 const DbMock = {
   table_name: {
-    calculate: function(config) {
-      return config.value_to_return;
+    calculate: function(outputStream, config) {
+      // monkey patch the output stream
+      sinon.stub(outputStream, 'result', function () {
+        return config.value_to_return;
+      });
+      return Promises.resolve()
     }
   }
 };
