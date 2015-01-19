@@ -10,7 +10,7 @@
 const Promise = require('bluebird');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
-const dbConnection = require('./db').connection;
+const db = require('./db');
 
 var resolver;
 exports.create = function () {
@@ -19,7 +19,7 @@ exports.create = function () {
   resolver = Promise.defer();
 
   // use the existing mongoose connection.
-  dbConnection.connect().then(function (connection) {
+  return db.connect().then(function (connection) {
     var sessionStore = new MongoStore({
       mongoose_connection: connection,
       collection: 'sessions'
@@ -31,5 +31,4 @@ exports.create = function () {
   });
 
   return resolver.promise;
-
 };

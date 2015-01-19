@@ -6,6 +6,7 @@
 
 const Promise = require('bluebird');
 const db = require('./db');
+const Reduce = require('./reduce');
 
 'use strict';
 
@@ -25,20 +26,44 @@ module.exports = {
     var start = new Date();
     var queries = [];
 
+    function getWhich(options) {
+      options = options || {};
+      return Object.keys(options).filter(function (name) {
+        return name !== 'filter';
+      });
+    }
+
+    function getQuery(modelConfig) {
+      modelConfig.which = getWhich(modelConfig);
+      var targetStream = new Reduce.StreamReduce(modelConfig);
+
+      return this.db[key].calculate(targetStream, modelConfig)
+        .then(function () {
+          var result = targetStream.result();
+          targetStream.end();
+          targetStream = null;
+          return result;
+        }, function (err) {
+          targetStream.end();
+          targetStream = null;
+          throw err;
+        });
+    }
+
     for (var key in config) {
-      var query = this.db[key].calculate(config[key]);
-      queries.push(query);
+      var modelConfig = config[key];
+      queries.push(getQuery.call(this, modelConfig));
     }
 
     return Promise.all(queries)
-                    .then(function(_results) {
-                      var results = promiseArrayToObject(_results, Object.keys(config));
+      .then(function(_results) {
+        var results = promiseArrayToObject(_results, Object.keys(config));
 
-                      var end = new Date();
-                      results.duration = end.getTime() - start.getTime();
+        var end = new Date();
+        results.duration = end.getTime() - start.getTime();
 
-                      return results;
-                    });
+        return results;
+      });
   }
 };
 
