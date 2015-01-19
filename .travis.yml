@@ -1,0 +1,27 @@
+language: node_js
+cache: node_modules
+
+sudo: false
+
+notifications:
+  email:
+    recipients:
+      - shane@shanetomlinson.com
+    on_success: change
+    on_failure: always
+
+node_js:
+  - 0.10.25
+
+services:
+  - mongodb
+
+before_script:
+  - cp server/etc/local.json-sample server/etc/local.json
+
+install:
+  - travis_retry npm install --silent
+
+script:
+  - npm test
+
