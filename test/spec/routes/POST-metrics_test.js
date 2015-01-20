@@ -31,7 +31,7 @@ describe('routes/POST-metrics', function () {
     resMock = new ResponseMock();
   });
 
-  it('returns 200, always', function () {
+  it('returns 200, always, sets CORS headers', function () {
     route.handler(reqMock, resMock);
     assert.equal(resMock.status, 200);
   });

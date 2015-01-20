@@ -26,7 +26,9 @@ function createSessionMiddleware(options) {
     },
     name: config.get('session_cookie_name'),
     secret: config.get('session_cookie_secret'),
-    store: options.sessionStore
+    store: options.sessionStore,
+    resave: false,
+    saveUninitialized: true
   });
 }
 

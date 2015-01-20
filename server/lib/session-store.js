@@ -21,7 +21,7 @@ exports.create = function () {
   // use the existing mongoose connection.
   return db.connect().then(function (connection) {
     var sessionStore = new MongoStore({
-      mongoose_connection: connection,
+      mongooseConnection: connection,
       collection: 'sessions'
     });
 

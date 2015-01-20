@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 // set up a middleware to add & check CSRF tokens on all POST requests
-// except POST /navigation. POST /navigation is the only API call available
+// except POST /metrics. POST /metrics is the only API call available
 // to RP users, and adding a CSRF token would give us the ability to track
 // their users, something to avoid.
 //
@@ -15,8 +15,7 @@ module.exports = function () {
   return function (req, res, next) {
     // These two do not require CSRF tokens.
     if (req.url === '/include.js') return next();
-    if (req.url === '/navigation') return next();
-    if (req.url === '/unload') return next();
+    if (req.url === '/metrics') return next();
 
     csrfMiddleware(req, res, function () {
       // All other requests get a csrf token, the logout button is a form POST.
