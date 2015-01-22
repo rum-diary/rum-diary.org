@@ -26,7 +26,7 @@ exports.handler = function(req, res) {
     email: req.session.email,
     name: name,
     hostname: hostname,
-    rum_diary_hostname: req.host,
+    rum_diary_hostname: req.hostname,
     is_new_site: isNewSite,
     has_access: canViewExistingSite,
   };

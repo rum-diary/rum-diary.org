@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
   if (req.query.start) {
     query.start = moment(req.query.start).startOf('day');
   } else {
-    query.start = moment().subtract('days', 30).startOf('day');
+    query.start = moment().subtract(30, 'days').startOf('day');
   }
 
   if (req.query.end) {

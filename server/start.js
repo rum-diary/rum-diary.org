@@ -35,7 +35,8 @@ SessionStore.create().then(function (sessionStore) {
 
   app.use(logging({ app: app }));
 
-  app.use(bodyParser());
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
 
   // allow PUT/DELETE methods via POST in HTML forms.
   // requires bodyParser.

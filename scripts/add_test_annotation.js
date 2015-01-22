@@ -18,21 +18,21 @@ Annotation.clear()
         title: 'annotation 1',
         description: 'test description',
         url: 'https://shanetomlinson.com',
-        occurredAt: moment().subtract('days', 10).toDate()
+        occurredAt: moment().subtract(10,'days').toDate()
       }),
       Annotation.create({
         hostname: 'localhost',
         title: 'annotation 2',
         description: 'test description',
         url: 'https://shanetomlinson.com',
-        occurredAt: moment().subtract('days', 5).toDate()
+        occurredAt: moment().subtract(5, 'days').toDate()
       }),
       Annotation.create({
         hostname: 'localhost',
         title: 'annotation 3',
         description: 'test description',
         url: 'https://shanetomlinson.com',
-        occurredAt: moment().subtract('days', 2).toDate()
+        occurredAt: moment().subtract(2, 'days').toDate()
       })
     ]);
   }).then(function () {

@@ -5,7 +5,7 @@
 const Promise = require('bluebird');
 const db = require('../lib/db');
 const siteCollection = db.site;
-const reduce = require('../lib/reduce');
+const ReducingStream = require('rum-diary-queries');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname/demographics';
@@ -20,7 +20,7 @@ exports.handler = function(req) {
   var pageViewQuery = req.dbQuery;
   pageViewQuery.hostname = req.params.hostname;
 
-  var reduceStream = new reduce.StreamReduce({
+  var reduceStream = new ReducingStream({
     which: [
       'browsers',
       'os',

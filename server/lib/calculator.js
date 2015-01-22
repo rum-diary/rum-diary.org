@@ -6,7 +6,7 @@
 
 const Promise = require('bluebird');
 const db = require('./db');
-const Reduce = require('./reduce');
+const ReducingStream = require('rum-diary-queries');
 
 'use strict';
 
@@ -35,7 +35,7 @@ module.exports = {
 
     function getQuery(modelConfig) {
       modelConfig.which = getWhich(modelConfig);
-      var targetStream = new Reduce.StreamReduce(modelConfig);
+      var targetStream = new ReducingStream(modelConfig);
 
       return this.db[key].calculate(targetStream, modelConfig)
         .then(function () {

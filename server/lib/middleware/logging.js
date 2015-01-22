@@ -8,8 +8,7 @@ const morgan = require('morgan');
 const logger = require('../logger');
 
 module.exports = function () {
-  return morgan({
-    format: 'tiny',
+  return morgan('tiny', {
     stream: {
       write: function(x) {
         logger.info(typeof x === 'string' ? x.trim() : x);
