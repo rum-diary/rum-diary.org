@@ -50,7 +50,7 @@
     "rum-diary-queries": "0.0.1",
     "think-stats": "0.0.21",
     "time-grunt": "1.0.0",
-    "triage": "0.0.2",
+    "triage": "0.0.3",
     "typederror": "git://github.com/shane-tomlinson/typederror.git#519897e527683a51762a2ab77bd72fb46b4c5c62",
     "underscore": "1.7.0",
     "useragent": "2.1.3"
