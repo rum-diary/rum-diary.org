@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const express = require('express');
 const path = require('path');
 const gzip_static = require('connect-gzip-static');
 const cachify = require('connect-cachify');
@@ -12,7 +11,6 @@ const methodOverride = require('method-override');
 const common = require('rum-diary-server-common');
 
 const config = require('./lib/config');
-const routes = require('./lib/routes.js');
 const templates = require('./lib/templates');
 
 const httpServer = common.httpServer;
@@ -29,6 +27,7 @@ const SessionStore = require('./lib/session-store');
 
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
+const ROUTES_ROOT = path.join(__dirname, 'routes');
 
 SessionStore.create().then(function (sessionStore) {
   const app = common.app();
@@ -59,7 +58,9 @@ SessionStore.create().then(function (sessionStore) {
   app.use(siteQuery);
 
   // Get all of our routes.
-  app.use(routes);
+  app.use(common.router({
+    cwd: ROUTES_ROOT
+  }));
 
   // set up cachify before the static middleware to strip off any md5's then
   // serve up the correct gzipped item.
