@@ -12,11 +12,12 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const db = require('./db');
 
-var resolver;
+var promise;
 exports.create = function () {
-  if (resolver) return resolver.promise;
+  if (promise) return promise;
 
-  resolver = Promise.defer();
+  var resolver = Promise.defer();
+  promise = resolver.promise;
 
   // use the existing mongoose connection.
   return db.connect().then(function (connection) {
@@ -30,5 +31,5 @@ exports.create = function () {
     resolver.reject(err);
   });
 
-  return resolver.promise;
+  return promise;
 };

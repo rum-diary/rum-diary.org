@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const path = require('path');
+const procname = require('rum-diary-server-common').procname;
 
 module.exports = {
   hostname: {
@@ -38,10 +39,22 @@ module.exports = {
   config_dir: path.join(__dirname, '..', 'etc'),
   var_dir: path.join(__dirname, '..', 'var'),
   ssl_cert_dir: path.join(__dirname, '..', '..', '..', 'ssl'),
-  logging_dir: {
-    doc: 'Where log files should be stored',
-    format: String,
-    'default': path.join(__dirname, '..', 'var', 'log')
+  logging: {
+    file: {
+      doc: 'Where log files should be stored',
+      format: String,
+      'default': path.join(__dirname, '..', 'var', 'log', procname)
+    },
+    level: {
+      doc: 'Minimum level to log',
+      format: ['TRACE', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'],
+      'default': 'DEBUG'
+    },
+    handlers: {
+      doc: 'Handlers to user',
+      format: Array,
+      'default': ['console', 'file']
+    }
   },
   data_collection_server: {
     doc: 'Server where clients should send performance data',
@@ -115,19 +128,6 @@ module.exports = {
     },
   },
 
-  logging: {
-    level: {
-      doc: 'Minimum level to log',
-      format: ['TRACE', 'VERBOSE', 'DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'],
-      'default': 'DEBUG'
-    },
-    handlers: {
-      doc: 'Handlers to user',
-      format: Array,
-      'default': ['console', 'file']
-    }
-  },
-
   mongo: {
     databaseURI: {
       doc: 'Mongo database URI',
@@ -149,11 +149,8 @@ module.exports = {
     }
   },
 
-  proc_name: getProcName()
+  proc_name: procname
 };
 
-function getProcName() {
-  return path.basename(process.argv[1], '.js');
-}
 
 

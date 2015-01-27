@@ -3,17 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const path = require('path');
-const Triage = require('triage');
-
-const Router = require('express').Router;
-const router = new Router();
 
 const ROUTES_DIR = path.join(__dirname, '..', 'routes');
 
-var triage = new Triage();
-triage.init({
-  cwd: ROUTES_DIR,
-  router: router
+module.exports = require('rum-diary-server-common').router({
+  cwd: ROUTES_DIR
 });
-
-module.exports = router;
