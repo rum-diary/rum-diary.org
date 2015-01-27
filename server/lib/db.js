@@ -8,16 +8,6 @@
  * @Class DB
  */
 const config = require('./config');
+const common = require('rum-diary-server-common');
+module.exports = common.db(common.configAdapter(config, 'mongo'));
 
-const dbConfig = {
-  get: function (name) {
-    return config.get('mongo.' + name);
-  }
-};
-
-const MongoAdapter = require('rum-diary-db-mongo');
-
-const db = Object.create(MongoAdapter);
-db.init(dbConfig);
-
-module.exports = db;

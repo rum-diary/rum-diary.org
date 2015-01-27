@@ -7,7 +7,7 @@ const siteCollection = db.site;
 const inviteCollection = db.invite;
 const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
-const accessLevels = require('../lib/access-levels');
+const accessLevels = require('rum-diary-access-levels');
 
 exports.path = '/site/:hostname/user';
 exports.method = 'post';

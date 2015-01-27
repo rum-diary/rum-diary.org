@@ -5,7 +5,7 @@
 // A simple wrapper around joi with some helper functions.
 
 const joi = require('joi');
-const accessLevels = Object.keys(require('./access-levels'));
+const accessLevels = Object.keys(require('rum-diary-access-levels'));
 
 'use strict';
 
@@ -51,20 +51,6 @@ exports.referrer = function () {
 // TODO - fill this out. It should be a full URL.
 exports.location = function () {
   return joi.string().allow('').optional();
-};
-
-// navigationTiming data.
-exports.navigationTiming = function () {
-  // some fields are optional or are not sent depending on the circumstance.
-  // unload events are not sent if the previous page is on a different domain.
-  // redirect events are not sent if there is no redirect.
-  // secureConnectionStart is not sent if using only an HTTP connection.
-  var fields = require('./navigation-timing');
-  var validationConfig = {};
-  fields.forEach(function (field) {
-    validationConfig[field] = joi.alternatives(joi.number().integer(), joi.any().allow(null));
-  });
-  return joi.object(validationConfig);
 };
 
 // guids used in reporting session information.

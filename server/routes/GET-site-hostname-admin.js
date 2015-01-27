@@ -4,7 +4,7 @@
 
 const db = require('../lib/db');
 const siteCollection = db.site;
-const accessLevels = require('../lib/access-levels');
+const accessLevels = require('rum-diary-access-levels');
 
 exports.path = '/site/:hostname/admin';
 exports.method = 'get';
