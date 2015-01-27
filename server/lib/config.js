@@ -49,7 +49,7 @@ function loadConfigFiles() {
 function getPublicUrl() {
   var hostname = config.get('hostname');
   var useSSL = config.get('ssl');
-  var httpPort = config.get('http_port');
+  var httpPort = config.get('server.port');
 
   var protocol = useSSL ? 'https' : 'http';
   var port = useSSL ? (httpPort === 443 ? '' : ':' + httpPort) :

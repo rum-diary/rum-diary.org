@@ -10,14 +10,17 @@ module.exports = {
     format: String,
     'default': undefined
   },
+  server: {
+    port: {
+      format: 'port',
+      'default': 80,
+      env: 'HTTP_PORT'
+    }
+  },
+
   public_url: {
     format: String,
     'default': undefined
-  },
-  http_port: {
-    format: 'port',
-    'default': 80,
-    env: 'HTTP_PORT'
   },
   ssl: {
     format: Boolean,

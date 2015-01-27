@@ -15,7 +15,7 @@ const config = require('./lib/config');
 const routes = require('./lib/routes.js');
 const templates = require('./lib/templates');
 
-const httpServer = require('./lib/http-server');
+const httpServer = common.httpServer;
 
 const logger = common.logging(common.configAdapter(config, 'logging'));
 
@@ -72,5 +72,5 @@ SessionStore.create().then(function (sessionStore) {
 
   app.use(errorHandler);
 
-  httpServer.start({ app: app });
+  httpServer.start(app, logger, common.configAdapter(config, 'server'));
 });
