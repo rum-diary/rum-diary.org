@@ -17,7 +17,7 @@ const httpServer = common.httpServer;
 
 const logger = common.logging(common.configAdapter(config, 'logging'));
 
-const csrf = require('./lib/middleware/csrf');
+const csrf = common.middleware.csrf;
 const session = require('./lib/middleware/session');
 const errorHandler = require('./lib/middleware/error');
 const siteQuery = require('./lib/middleware/site-query');
@@ -51,7 +51,12 @@ SessionStore.create().then(function (sessionStore) {
   }));
 
   // requires both cookieParser and bodyParser.
-  app.use(csrf());
+  app.use(csrf({
+    noCsrfUrls: [
+      '/metrics',
+      '/include.js'
+    ]
+  }));
 
   app.disable('x-powered-by');
 
