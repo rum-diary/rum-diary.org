@@ -2,65 +2,50 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const session = require('express-session');
-const config = require('../config');
+const session = require('rum-diary-server-common').middleware.session;
 
-const userCollection = require('../db').user;
+const SESSIONLESS_URLS = [
+  '/include.js',
+  '/metrics'
+];
 
 module.exports = function (options) {
-  const sessionMiddleware = createSessionMiddleware(options);
+  var sessionStore = options.sessionStore;
+  var config = options.config;
+  var userCollection = options.userCollection;
 
-  return function middlewareProxy(req, res, next) {
-    if (isUrlSessionless(req.url)) return next();
+  return createSessionMiddleware(sessionStore, config, function (req, res, next) {
+    var email = req.session.email;
+    if (email) {
+      return checkUserExists(userCollection, email)
+        .then(function (userExists) {
+          if (! userExists) {
+            destroySessionAndRedirect(req, res);
+          } else {
+            next();
+          }
+        });
+    }
 
-    sessionMiddleware(req, res, validateSession.bind(null, req, res, next));
-  };
+    next();
+  });
 };
 
-function createSessionMiddleware(options) {
+function createSessionMiddleware(sessionStore, config, validateSession) {
   return session({
-    cookie: {
-      maxAge: config.get('session_duration_ms'),
-      httpOnly: true,
-      secure: config.get('ssl'),
-    },
-    name: config.get('session_cookie_name'),
-    secret: config.get('session_cookie_secret'),
-    store: options.sessionStore,
-    resave: false,
-    saveUninitialized: true
+    sessionStore: sessionStore,
+    config: config,
+    // These items do not receive cookies because they are part of
+    // the RP API. Eliminate the ability to track their users.
+    sessionlessUrls: SESSIONLESS_URLS,
+    validateSession: validateSession
   });
 }
 
-// These items do not receive cookies because they are part of
-// the RP API. Eliminate the ability to track their users.
-const SESSIONLESS_URLS = {
-  '/include.js': 1,
-  '/navigation': 1,
-  '/unload': 1
-};
-
-function isUrlSessionless(url) {
-  return SESSIONLESS_URLS[url];
-}
-
-function validateSession(req, res, next) {
-  var email = req.session.email;
-  if (email) {
-    return checkUserExists(email, req, res, next);
-  }
-
-  next();
-}
-
-function checkUserExists(email, req, res, next) {
-  userCollection.getOne({ email: email })
+function checkUserExists(userCollection, email) {
+  return userCollection.getOne({ email: email })
     .then(function (user) {
-      if (! user) {
-        return destroySessionAndRedirect(req, res);
-      }
-
-      next();
+      return !! user;
     });
 }
 

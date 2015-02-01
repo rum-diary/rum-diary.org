@@ -12,9 +12,11 @@ const config = require('./config');
  *   value: array of resources to include.
  */
 const DEPENDENCIES = {
+  /*
   'include.js': [
     'include.js'
   ],
+  */
   'js/rum-diary.min.js': [
     '/js/app.bundle.js'
   ],

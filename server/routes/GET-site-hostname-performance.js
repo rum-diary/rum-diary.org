@@ -5,9 +5,9 @@
 const Promise = require('bluebird');
 const db = require('../lib/db');
 const siteCollection = db.site;
-const ReducingStream = require('rum-diary-queries');
 const clientResources = require('../lib/client-resources');
 const navigationTimingFields = require('../lib/navigation-timing');
+const calculator = require('rum-diary-calculator')({ db: db });
 
 exports.path = '/site/:hostname/performance';
 exports.method = 'get';
@@ -21,47 +21,23 @@ exports.handler = function(req) {
   var statName = 'domContentLoadedEventEnd';
   if (req.query.plot) statName = req.query.plot;
 
-  var pageViewQuery = req.dbQuery;
-  pageViewQuery.hostname = req.params.hostname;
-
-  var reduceStream = new ReducingStream({
-    which: ['navigation', 'navigation-histogram', 'navigation-cdf'],
-    start: req.start,
-    end: req.end,
-    navigation: {
-      calculate: ['25', '50', '75']
-    },
-    'navigation-histogram': {
-      statName: statName
-    },
-    'navigation-cdf': {
-      statName: statName
-    }
-  });
-
   return Promise.all([
     siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
-    db.pageView.pipe(pageViewQuery, null, reduceStream)
-  ]).then(function(allResults) {
-
-    var isAdmin = allResults[0];
-    var performanceResults = reduceStream.result();
-
-    reduceStream.end();
-    reduceStream = null;
+    calculator.sitePerformance(req.params.hostname, statName, req.start, req.end)
+  ]).spread(function(isAdmin, performanceResults) {
 
     return {
       baseURL: req.url.replace(/\?.*/, ''),
-      histogram: performanceResults['navigation-histogram'],
-      cdf: performanceResults['navigation-cdf'],
       statName: statName,
       hostname: req.params.hostname,
       startDate: req.start.format('MMM DD'),
       endDate: req.end.format('MMM DD'),
       navigationTimingFields: navigationTimingFields,
-      first_q: performanceResults.navigation['25'],
-      second_q: performanceResults.navigation['50'],
-      third_q: performanceResults.navigation['75'],
+      histogram: performanceResults.histogram,
+      cdf: performanceResults.cdf,
+      first_q: performanceResults.first_q,
+      second_q: performanceResults.second_q,
+      third_q: performanceResults.third_q,
       isAdmin: isAdmin
     };
   });

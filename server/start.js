@@ -24,6 +24,7 @@ const siteQuery = require('./lib/middleware/site-query');
 
 
 const SessionStore = require('./lib/session-store');
+const db = require('./lib/db');
 
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
@@ -47,7 +48,9 @@ SessionStore.create().then(function (sessionStore) {
 
   // requires cookieParser.
   app.use(session({
-    sessionStore: sessionStore
+    userCollection: db.user,
+    sessionStore: sessionStore,
+    config: config
   }));
 
   // requires both cookieParser and bodyParser.

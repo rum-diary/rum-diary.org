@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Promise = require('bluebird');
+const p = require('bluebird');
 const db = require('../lib/db');
 const siteCollection = db.site;
-const ReducingStream = require('rum-diary-queries');
+const calculator = require('rum-diary-calculator')({ db: db });
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname/demographics';
@@ -17,38 +17,24 @@ exports.locals = {
 exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
 exports.handler = function(req) {
-  var pageViewQuery = req.dbQuery;
-  pageViewQuery.hostname = req.params.hostname;
+  var email = req.session.email;
+  var hostname = req.params.hostname;
+  var startDate = req.start;
+  var endDate = req.end;
 
-  var reduceStream = new ReducingStream({
-    which: [
-      'browsers',
-      'os',
-      'os:form'
-    ],
-    start: req.start,
-    end: req.end
-  });
-
-  return Promise.all([
-    siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
-    db.pageView.pipe(pageViewQuery, null, reduceStream)
-  ]).then(function(allResults) {
-    var isAdmin = allResults[0];
-    var demographicsResults = reduceStream.result();
-
-    reduceStream.end();
-    reduceStream = null;
-
+  return p.all([
+    siteCollection.isAuthorizedToAdministrate(email, hostname),
+    calculator.siteDemographics(hostname, startDate, endDate)
+  ]).spread(function(isAdmin, demographicsResults) {
 
     return {
-      hostname: req.params.hostname,
-      startDate: req.start.format('MMM DD'),
-      endDate: req.end.format('MMM DD'),
+      isAdmin: isAdmin,
+      hostname: hostname,
+      startDate: startDate.format('MMM DD'),
+      endDate: endDate.format('MMM DD'),
       browsers: demographicsResults.browsers,
       os: demographicsResults.os,
-      os_form: demographicsResults['os:form'],
-      isAdmin: isAdmin
+      os_form: demographicsResults.os_form
     };
   });
 };

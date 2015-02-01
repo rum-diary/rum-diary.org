@@ -48,7 +48,7 @@
       {% endblock %}
     </main>
   </div>
-  <script defer src="/include.js"></script>
+  <script defer src="/include.js" data-load_url="http://localhost:8001/metrics" data-unload_url="http://localhost:8001/metrics"></script>
   {% block footerjs %}
     {% for resource in resources %}<script src="{{ resource | cachify }}"></script>
     {% endfor %}
