@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const calculator = require('../lib/calculator');
+var db = require('../lib/db');
+const calculator = require('rum-diary-calculator')({ db: db });
 const clientResources = require('../lib/client-resources');
 
 exports.method = 'get';
@@ -27,103 +28,33 @@ exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 exports.handler = function(req) {
   var hostname = req.params.hostname;
   var path = req.params.path;
+  var startDate = req.start;
+  var endDate = req.end;
 
-  var pageViewQuery = req.dbQuery;
-  pageViewQuery.hostname = hostname;
-  pageViewQuery.path = path;
-
-  return calculator.calculate({
-    pageView: {
-      filter: pageViewQuery,
-      'hits_per_day': {
-        path: '__all',
-        start: req.start,
-        end: req.end
-      },
-      'hits_per_page': {
-        sort: 'desc',
-        limit: 20
-      },
-      'referrers': {},
-      'unique': {},
-      'returning': {},
-      'read-time': {},
-      'internal-transfer-from': {},
-      'exit': {},
-      'bounce': {}
-    }
-  }).then(function (allResults) {
-    var results = allResults.pageView;
-
-    var pageHitsInPeriod = results.hits_per_page[0].hits;
-
-    var exitRate = calculateExitRate(results, path);
-    var bounceRate = calculateBounceRate(results, path);
-
+  return calculator.pageTraffic(hostname, path, startDate, endDate)
+    .then(function (results) {
     return {
       root_url: req.url.replace(/\?.*/, ''),
       hostname: hostname,
       path: path,
-      pageHitsPerPage: results.hits_per_page,
-      pageHitsPerDay: results.hits_per_day.__all,
-      referrers: results.referrers.by_count.slice(0, 20),
-      startDate: req.start,
-      endDate: req.end,
+      startDate: startDate,
+      endDate: endDate,
+      pageHitsPerPage: results.pageHitsPerPage,
+      pageHitsPerDay: results.pageHitsPerDay,
+      referrers: results.referrers,
       hits: {
-        total: 'N/A',//totalHits,
-        period: pageHitsInPeriod,
-        today: results.hits_per_day.__all[results.hits_per_day.__all.length - 1].hits,
-        unique: results.unique,
-        repeat: results.returning,
-        exitRate: exitRate,
-        bounceRate: bounceRate
+        total: results.hits.total,
+        period: results.hits.period,
+        today: results.hits.today,
+        unique: results.hits.unique,
+        repeat: results.hits.repeat,
+        exitRate: results.hits.exitRate,
+        bounceRate: results.hits.bounceRate
       },
-      medianReadTime: msToHoursMinsSeconds(results['read-time']),
+      medianReadTime: results.medianReadTime,
       internalTransfer: {
-        from: results['internal-transfer-from']['by_dest'][path]
+        from: results.internalTransfer.from
       }
     };
   });
 };
-
-
-function msToHoursMinsSeconds(ms) {
-  var seconds = ((ms || 0) / 1000) << 0;
-
-  var hours = (seconds / 3600) << 0;
-  var minutes = ((seconds - hours * 3600) / 60) << 0;
-  seconds = (seconds % 60);
-
-  return {
-    hours: padLeft(hours, 0, 2),
-    minutes: padLeft(minutes, 0, 2),
-    seconds: padLeft(seconds, 0, 2)
-  };
-}
-
-function padLeft(numToPad, padWith, length) {
-  var padded = '' + numToPad;
-
-  while(padded.length < length) {
-    padded = padWith + padded;
-  }
-
-  return padded;
-}
-
-function calculateBounceRate(results, path) {
-  var pageHitsInPeriod = results.hits_per_page[0].hits;
-  if (! pageHitsInPeriod) return 0;
-
-  var bouncesInPeriod = results.bounce[path];
-  return (100 * bouncesInPeriod / pageHitsInPeriod) << 0;
-}
-
-function calculateExitRate(results, path) {
-  var pageHitsInPeriod = results.hits_per_page[0].hits;
-  if (! pageHitsInPeriod) return 0;
-
-  var exitsInPeriod = results.exit[path];
-  return (100 * exitsInPeriod / pageHitsInPeriod) << 0;
-}
-

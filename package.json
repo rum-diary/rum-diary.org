@@ -45,6 +45,7 @@
     "morgan": "1.5.1",
     "nodemailer": "0.6.5",
     "nunjucks": "1.1.0",
+    "rum-diary-calculator": "git://github.com/rum-diary/rum-diary-calculator.git#master",
     "rum-diary-db-mongo": "0.0.1",
     "rum-diary-endpoint": "0.0.3",
     "rum-diary-queries": "0.0.1",
