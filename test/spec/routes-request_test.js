@@ -58,26 +58,6 @@ describe('routes module', function () {
     }
   });
 
-  describe('POST /metrics', function () {
-    it('should have CORS `access-control-allow-origin: *` header', function (done) {
-      request.post(baseURL + '/metrics', {
-        data: {
-          hostname: 'unknown.com',
-          uuid: 'fake uuid'
-        }
-      }, function (err, response) {
-        assert.equal(response.statusCode, 200, baseURL);
-
-        // CORS is allowed for POST /metrics
-        assert.equal(response.headers['access-control-allow-origin'], '*');
-
-        testCommonResponseHeaders(response);
-
-        done();
-      });
-    });
-  });
-
   describe('stop', function () {
     it('stops', function (done) {
       startStop.stop(function () {
