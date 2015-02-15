@@ -2,9 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const db = require('../lib/db');
 const sites = require('../lib/site');
-const inviteCollection = db.invite;
+const invitations = require('../lib/invite');
 const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
 const accessLevels = require('rum-diary-access-levels');
@@ -32,7 +31,7 @@ exports.handler = function (req, res) {
   logger.info('setting access level: %s, %s, %s', email, hostname, accessLevel);
   return sites.setUserAccessLevel(hostname, email, accessLevel)
     .then(function () {
-      return inviteCollection.createAndSendIfNotAlreadyInvited({
+      return invitations.createAndSendIfNotAlreadyInvited({
         from_email: req.session.email,
         to_email: email,
         hostname: hostname,

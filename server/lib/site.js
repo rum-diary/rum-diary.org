@@ -28,6 +28,10 @@ exports.canView = function (hostname, email) {
   return db.site.isAuthorizedToView(email, hostname);
 };
 
+exports.isOwner = function (hostname, email) {
+  return db.site.isOwner(email, hostname);
+};
+
 exports.setUserAccessLevel = function (hostname, email, accessLevel) {
   return db.site.setUserAccessLevel(email, hostname, accessLevel);
 };

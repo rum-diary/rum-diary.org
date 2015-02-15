@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const db = require('./db');
+const sites = require('./site');
 const httpErrors = require('./http-errors');
 
 module.exports = {
@@ -41,7 +41,7 @@ module.exports = {
   CAN_READ_HOST: function (req) {
     if (! req.session.email) throw httpErrors.UnauthorizedError();
 
-    return db.site.isAuthorizedToView(req.session.email, req.params.hostname)
+    return sites.canView(req.params.hostname, req.session.email)
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });
@@ -53,7 +53,7 @@ module.exports = {
   CAN_ADMIN_HOST: function (req) {
     if (! req.session.email) throw httpErrors.UnauthorizedError();
 
-    return db.site.isAuthorizedToAdministrate(req.session.email, req.params.hostname)
+    return sites.canAdminister(req.params.hostname, req.session.email)
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });
@@ -62,7 +62,7 @@ module.exports = {
   IS_OWNER_HOST: function (req) {
     if (! req.session.email) throw httpErrors.UnauthorizedError();
 
-    return db.site.isOwner(req.session.email, req.params.hostname)
+    return sites.isOwner(req.params.hostname, req.session.email)
       .then(function (isAuthorized) {
         if (! isAuthorized) throw httpErrors.ForbiddenError();
       });

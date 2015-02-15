@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const inviteCollection = require('../lib/db').invite;
+const invitations = require('../lib/invite');
 const httpErrors = require('../lib/http-errors');
 const logger = require('../lib/logger');
 const inputValidation = require('../lib/input-validation');
@@ -21,7 +21,7 @@ exports.handler = function (req, res) {
   var token = req.params.token;
   var name = req.body.name;
 
-  return inviteCollection.tokenInfo(token)
+  return invitations.tokenInfo(token)
       .then(function (tokenInfo) {
         if (! tokenInfo.isValid) {
           logger.warn('invalid token: %s', token);
@@ -38,7 +38,7 @@ exports.handler = function (req, res) {
 };
 
 function verifyNewUserThenRedirect(req, res, tokenInfo, name) {
-  return inviteCollection.verifyNewUser(tokenInfo.token, name)
+  return invitations.verifyNewUser(tokenInfo.token, name)
     .then(function () {
       req.session.email = tokenInfo.to_email;
 
