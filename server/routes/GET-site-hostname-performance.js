@@ -3,11 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Promise = require('bluebird');
-const db = require('../lib/db');
-const siteCollection = db.site;
+const siteInfo = require('../lib/site');
 const clientResources = require('../lib/client-resources');
 const navigationTimingFields = require('../lib/navigation-timing');
-const calculator = require('../lib/calculator');
 
 exports.path = '/site/:hostname/performance';
 exports.method = 'get';
@@ -22,8 +20,8 @@ exports.handler = function(req) {
   if (req.query.plot) statName = req.query.plot;
 
   return Promise.all([
-    siteCollection.isAuthorizedToAdministrate(req.session.email, req.params.hostname),
-    calculator.sitePerformance(req.params.hostname, statName, req.start, req.end)
+    siteInfo.canAdminister(req.params.hostname, req.session.email),
+    siteInfo.performance(req.params.hostname, statName, req.start, req.end)
   ]).spread(function(isAdmin, performanceResults) {
 
     return {

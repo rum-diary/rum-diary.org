@@ -3,9 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const p = require('bluebird');
-const db = require('../lib/db');
-const siteCollection = db.site;
-const calculator = require('../lib/calculator');
+const siteInfo = require('../lib/site');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname/demographics';
@@ -23,8 +21,8 @@ exports.handler = function(req) {
   var endDate = req.end;
 
   return p.all([
-    siteCollection.isAuthorizedToAdministrate(email, hostname),
-    calculator.siteDemographics(hostname, startDate, endDate)
+    siteInfo.canAdminister(hostname, email),
+    siteInfo.demographics(hostname, startDate, endDate)
   ]).spread(function(isAdmin, demographicsResults) {
 
     return {

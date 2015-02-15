@@ -4,9 +4,7 @@
 
 const p = require('bluebird');
 const logger = require('../lib/logger');
-const db = require('../lib/db');
-const siteCollection = db.site;
-const calculator = require('../lib/calculator');
+const siteInfo = require('../lib/site');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname';
@@ -24,8 +22,8 @@ exports.handler = function (req) {
   var endDate = req.end;
 
   return p.all([
-    siteCollection.isAuthorizedToAdministrate(email, hostname),
-    calculator.siteTraffic(hostname, startDate, endDate)
+    siteInfo.canAdminister(hostname, email),
+    siteInfo.traffic(hostname, startDate, endDate)
   ]).spread(function (isAdmin, results) {
     logger.info('%s: elapsed time: %s ms', req.url, results.duration);
 
