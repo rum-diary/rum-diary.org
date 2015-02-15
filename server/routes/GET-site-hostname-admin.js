@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const calculator = require('../lib/calculator');
+const site = require('../lib/site');
 
 exports.path = '/site/:hostname/admin';
 exports.method = 'get';
@@ -13,7 +13,7 @@ exports.handler = function(req) {
   var hostname = req.params.hostname;
   var email = req.session.email;
 
-  return calculator.siteAdmin(hostname)
+  return site.adminInfo(hostname)
     .then(function (adminInfo) {
       var adminUsers = adminInfo.admin;
       var readonlyUsers = adminInfo.readonly;

@@ -6,7 +6,7 @@
 
 const moment = require('moment');
 const inputValidation = require('../lib/input-validation');
-const Annotation = require('../lib/db').annotation;
+const Annotation = require('../lib/annotation');
 const logger = require('../lib/logger');
 
 exports.path = '/site/:hostname/annotation';

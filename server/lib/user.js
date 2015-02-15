@@ -12,6 +12,10 @@ exports.exists = function (email) {
     });
 };
 
+exports.get = function (email) {
+  return db.user.getOne({ email: email });
+};
+
 exports.create = function (name, email) {
   return db.user.create({
     name: name,
@@ -19,4 +23,10 @@ exports.create = function (name, email) {
   });
 };
 
+exports.remove = function (email) {
+  return db.user.deleteUser(email);
+};
 
+exports.sites = function (email) {
+  return calculator.usersSites(email);
+};

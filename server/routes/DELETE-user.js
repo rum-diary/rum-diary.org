@@ -6,7 +6,7 @@
 
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
-const userCollection = require('../lib/db').user;
+const users = require('../lib/user');
 
 exports.path = '/user/:email';
 exports.method = 'delete';
@@ -23,7 +23,7 @@ exports.handler = function (req, res) {
 
   if (sessionEmail !== specifiedEmail) throw httpErrors.ForbiddenError();
 
-  return userCollection.deleteUser(sessionEmail)
+  return users.remove(sessionEmail)
     .then(function () {
       req.session.destroy();
       res.redirect('/user');

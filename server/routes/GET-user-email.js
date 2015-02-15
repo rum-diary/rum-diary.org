@@ -3,8 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const httpErrors = require('../lib/http-errors');
-const db = require('../lib/db');
-const userCollection = db.user;
+const users = require('../lib/user');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/user/:email';
@@ -17,17 +16,14 @@ exports.authorization = require('../lib/page-authorization').IS_USER;
 
 exports.handler = function (req, res, next) {
   var email = decodeURIComponent(req.params.email);
-  var user;
 
   if (email === 'new') return next();
 
-  return userCollection.getOne({
-    email: email
-  })
-  .then(function (user) {
-    if (! user) {
-      throw httpErrors.NotFoundError();
-    }
-    return user;
-  });
+  return users.get(email)
+    .then(function (user) {
+      if (! user) {
+        throw httpErrors.NotFoundError();
+      }
+      return user;
+    });
 };

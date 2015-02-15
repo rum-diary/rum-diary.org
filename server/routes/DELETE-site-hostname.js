@@ -4,8 +4,7 @@
 
 // Delete a site.
 
-const db = require('../lib/db');
-const siteCollection = db.site;
+const sites = require('../lib/site');
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 
@@ -28,7 +27,7 @@ exports.handler = function (req, res) {
     throw new httpErrors.ForbiddenError();
   }
 
-  return siteCollection.findOneAndDelete({ hostname: hostname })
+  return sites.remove(hostname)
     .then(function () {
       res.redirect('/site');
     });

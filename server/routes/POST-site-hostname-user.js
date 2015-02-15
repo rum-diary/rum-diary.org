@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const db = require('../lib/db');
-const siteCollection = db.site;
+const sites = require('../lib/site');
 const inviteCollection = db.invite;
 const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
@@ -30,7 +30,7 @@ exports.handler = function (req, res) {
 
   // Adds a user to the site whether they exist or not.
   logger.info('setting access level: %s, %s, %s', email, hostname, accessLevel);
-  return siteCollection.setUserAccessLevel(email, hostname, accessLevel)
+  return sites.setUserAccessLevel(hostname, email, accessLevel)
     .then(function () {
       return inviteCollection.createAndSendIfNotAlreadyInvited({
         from_email: req.session.email,

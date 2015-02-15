@@ -16,6 +16,10 @@ exports.create = function (hostname, email) {
   return db.site.registerNewSite(hostname, email);
 };
 
+exports.remove = function (hostname) {
+  return db.site.findOneAndDelete({ hostname: hostname });
+};
+
 exports.canAdminister = function (hostname, email) {
   return db.site.isAuthorizedToAdministrate(email, hostname);
 };
@@ -24,7 +28,12 @@ exports.canView = function (hostname, email) {
   return db.site.isAuthorizedToView(email, hostname);
 };
 
+exports.setUserAccessLevel = function (hostname, email, accessLevel) {
+  return db.site.setUserAccessLevel(email, hostname, accessLevel);
+};
+
 exports.traffic = calculator.siteTraffic;
 exports.demographics = calculator.siteDemographics;
 exports.performance = calculator.sitePerformance;
 exports.referrals = calculator.siteReferrer;
+exports.adminInfo = calculator.siteAdmin;

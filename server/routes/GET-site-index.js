@@ -4,7 +4,7 @@
 
 // Show a list of hostnames.
 
-const calculator = require('../lib/calculator');
+const user = require('../lib/user');
 
 exports.path = '/site';
 exports.method = 'get';
@@ -14,7 +14,7 @@ exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 exports.handler = function (req) {
   var email = req.session.email;
 
-  return calculator.usersSites(email)
+  return user.sites(email)
     .then(function (sites) {
       return {
         sites: sites,

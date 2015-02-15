@@ -5,7 +5,7 @@
 // Sign in an existing user.
 
 const inputValidation = require('../lib/input-validation');
-const db = require('../lib/db');
+const user = require('../lib/user');
 const verifier = require('../lib/verifier');
 const httpErrors = require('../lib/http-errors');
 
@@ -25,20 +25,22 @@ exports.handler = function (req, res) {
 
   delete req.session.redirectTo;
 
+  var email;
+
   return verifier.verify(assertion)
-     .then(function (email) {
-        // Check if user already exists.
-        return db.user.getOne({
-          email: email
-        });
-      })
-     .then(function (existingUser) {
-        // uh oh, user does not exist.
-        if (! existingUser) return httpErrors.ForbiddenError();
+    .then(function (_email) {
+      email = _email;
+       // Check if user already exists.
+       return user.exists(email);
+    })
+    .then(function (exists) {
+      // uh oh, user does not exist.
+      if (! exists) {
+        throw httpErrors.ForbiddenError();
+      }
 
-        // sign the user in, visit their list of sites.
-        req.session.email = existingUser.email;
-
-        res.redirect(redirectTo);
-      });
+      // sign the user in, visit their list of sites.
+      req.session.email = email;
+      res.redirect(redirectTo);
+    });
 };
