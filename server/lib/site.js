@@ -5,8 +5,23 @@
 const calculator = require('./calculator');
 const db = require('./db');
 
+exports.exists = function (hostname) {
+  return db.site.getOne({ hostname: hostname })
+    .then(function (site) {
+      return !! site;
+    });
+};
+
+exports.create = function (hostname, email) {
+  return db.site.registerNewSite(hostname, email);
+};
+
 exports.canAdminister = function (hostname, email) {
   return db.site.isAuthorizedToAdministrate(email, hostname);
+};
+
+exports.canView = function (hostname, email) {
+  return db.site.isAuthorizedToView(email, hostname);
 };
 
 exports.traffic = calculator.siteTraffic;

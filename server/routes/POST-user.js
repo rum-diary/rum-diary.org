@@ -3,9 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const inputValidation = require('../lib/input-validation');
-const db = require('../lib/db');
-const userCollection = db.user;
-const siteCollection = db.site;
+const users = require('../lib/user');
+const sites = require('../lib/site');
 const verifier = require('../lib/verifier');
 
 exports.path = '/user';
@@ -32,34 +31,25 @@ exports.handler = function (req, res) {
      .then(function (_email) {
         email = _email;
 
-        // Check if user already exists.
-        return userCollection.getOne({
-          email: email
-        });
+        return users.exists(email);
       })
-     .then(function (existingUser) {
-        // just sign the user in.
-        if (existingUser) return;
-
-        return userCollection.create({
-          name: name,
-          email: email
-        });
+     .then(function (userExists) {
+        if (! userExists) {
+          return users.create(name, email);
+        }
       })
      .then(function () {
-        return siteCollection.getOne({ hostname: hostname });
+        return sites.exists(hostname)
       })
-     .then(function (site) {
-        if (! site) {
+     .then(function (exists) {
+        if (! exists) {
           // non-existent site - create it.
-          return siteCollection.registerNewSite(hostname, email)
-             .then(function () {
-                isNewSite = true;
-              });
+          isNewSite = true;
+          return sites.create(hostname, email);
         }
 
         // site already exists, see if user is authorized.
-        return siteCollection.isAuthorizedToView(email, hostname)
+        return sites.canView(hostname, email)
           .then(function (isAuthorized) {
             canViewExistingSite = isAuthorized;
           });
