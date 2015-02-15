@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var db = require('../lib/db');
-const calculator = require('rum-diary-calculator')({ db: db });
+const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
 exports.method = 'get';

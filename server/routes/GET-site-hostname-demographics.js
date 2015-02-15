@@ -5,7 +5,7 @@
 const p = require('bluebird');
 const db = require('../lib/db');
 const siteCollection = db.site;
-const calculator = require('rum-diary-calculator')({ db: db });
+const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname/demographics';

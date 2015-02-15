@@ -7,7 +7,7 @@ const db = require('../lib/db');
 const siteCollection = db.site;
 const clientResources = require('../lib/client-resources');
 const navigationTimingFields = require('../lib/navigation-timing');
-const calculator = require('rum-diary-calculator')({ db: db });
+const calculator = require('../lib/calculator');
 
 exports.path = '/site/:hostname/performance';
 exports.method = 'get';

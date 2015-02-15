@@ -6,7 +6,7 @@ const p = require('bluebird');
 const logger = require('../lib/logger');
 const db = require('../lib/db');
 const siteCollection = db.site;
-const calculator = require('rum-diary-calculator')({ db: db });
+const calculator = require('../lib/calculator');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname';
@@ -43,7 +43,7 @@ exports.handler = function (req) {
         period: results.hits.period,
         today: results.hits.today,
         unique: results.hits.unique,
-        repeat: results.hits.repeate
+        repeat: results.hits.repeat
       },
       annotations: results.annotations
     };

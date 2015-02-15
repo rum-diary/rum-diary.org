@@ -4,8 +4,7 @@
 
 // Show a list of hostnames.
 
-const db = require('../lib/db');
-const calculator = require('rum-diary-calculator')({ db: db });
+const calculator = require('../lib/calculator');
 
 exports.path = '/site';
 exports.method = 'get';
