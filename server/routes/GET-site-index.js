@@ -4,34 +4,22 @@
 
 // Show a list of hostnames.
 
-const logger = require('../lib/logger');
-calculator = require('../lib/calculator');
+const db = require('../lib/db');
+const calculator = require('rum-diary-calculator')({ db: db });
 
 exports.path = '/site';
 exports.method = 'get';
 exports.template = 'GET-site-index.html';
 exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 
-exports.handler = function (req, res) {
+exports.handler = function (req) {
   var email = req.session.email;
 
-  return calculator.calculate({
-    site: {
-      filter: {
-        $or: [
-          { owner: email },
-          { 'users.email': email }
-        ]
-      },
-      'site:hostname': {
-        sort: 'asc'
-      }
-    }
-  }).then(function (allResults) {
-    var sites = allResults ? allResults.site['site:hostname'] : []
-    return {
-      sites: sites,
-      email: email
-    };
-  });
+  return calculator.usersSites(email)
+    .then(function (sites) {
+      return {
+        sites: sites,
+        email: email
+      };
+    });
 };
