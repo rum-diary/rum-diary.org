@@ -4,31 +4,35 @@
 
 // Delete a site.
 
-const sites = require('../lib/data-layer/site');
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 
-exports.path = '/site/:hostname';
-exports.method = 'delete';
-exports.authorization = require('../lib/page-authorization').IS_OWNER_HOST;
+module.exports = function (config) {
+  const sites = config.sites;
 
-exports.validation = {
-  _csrf: inputValidation.csrf(),
-  hostname: inputValidation.hostname()
-};
+  return {
+    path: '/site/:hostname',
+    method: 'delete',
+    authorization: require('../lib/page-authorization').IS_OWNER_HOST,
 
+    validation: {
+      _csrf: inputValidation.csrf(),
+      hostname: inputValidation.hostname()
+    },
 
-exports.handler = function (req, res) {
-  var hostname = req.params.hostname;
-  var verificationHostname = req.body.hostname;
+    handler: function (req, res) {
+      var hostname = req.params.hostname;
+      var verificationHostname = req.body.hostname;
 
-  // uh oh, verification hostname is not the same as the real hostname.
-  if (hostname !== verificationHostname) {
-    throw new httpErrors.ForbiddenError();
-  }
+      // uh oh, verification hostname is not the same as the real hostname.
+      if (hostname !== verificationHostname) {
+        throw new httpErrors.ForbiddenError();
+      }
 
-  return sites.remove(hostname)
-    .then(function () {
-      res.redirect('/site');
-    });
+      return sites.remove(hostname)
+        .then(function () {
+          res.redirect('/site');
+        });
+    }
+  };
 };

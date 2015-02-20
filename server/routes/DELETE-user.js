@@ -6,26 +6,30 @@
 
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
-const users = require('../lib/data-layer/user');
 
-exports.path = '/user/:email';
-exports.method = 'delete';
-exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
+module.exports = function (config) {
+  const users = config.users;
 
-exports.validation = {
-  _csrf: inputValidation.csrf()
-};
+  return {
+    path: '/user/:email',
+    method: 'delete',
+    authorization: require('../lib/page-authorization').AUTHENTICATED,
 
+    validation: {
+      _csrf: inputValidation.csrf()
+    },
 
-exports.handler = function (req, res) {
-  var sessionEmail = req.session.email;
-  var specifiedEmail = req.params.email;
+    handler: function (req, res) {
+      var sessionEmail = req.session.email;
+      var specifiedEmail = req.params.email;
 
-  if (sessionEmail !== specifiedEmail) throw httpErrors.ForbiddenError();
+      if (sessionEmail !== specifiedEmail) throw httpErrors.ForbiddenError();
 
-  return users.remove(sessionEmail)
-    .then(function () {
-      req.session.destroy();
-      res.redirect('/user');
-    });
+      return users.remove(sessionEmail)
+        .then(function () {
+          req.session.destroy();
+          res.redirect('/user');
+        });
+    }
+  };
 };

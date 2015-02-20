@@ -4,21 +4,25 @@
 
 // Show a list of hostnames.
 
-const users = require('../lib/data-layer/user');
+module.exports = function (config) {
+  const users = config.users;
 
-exports.path = '/site';
-exports.method = 'get';
-exports.template = 'GET-site-index.html';
-exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
+  return {
+    path: '/site',
+    method: 'get',
+    template: 'GET-site-index.html',
+    authorization: require('../lib/page-authorization').AUTHENTICATED,
 
-exports.handler = function (req) {
-  var email = req.session.email;
+    handler: function (req) {
+      var email = req.session.email;
 
-  return users.sites(email)
-    .then(function (sites) {
-      return {
-        sites: sites,
-        email: email
-      };
-    });
+      return users.sites(email)
+        .then(function (sites) {
+          return {
+            sites: sites,
+            email: email
+          };
+        });
+    }
+  };
 };

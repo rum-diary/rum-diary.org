@@ -27,6 +27,8 @@ const SessionStore = require('./lib/session-store');
 const db = require('./lib/db');
 const sites = require('./lib/data-layer/site');
 const users = require('./lib/data-layer/user');
+const annotations = require('./lib/data-layer/annotation');
+const invites = require('./lib/data-layer/invite');
 
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
@@ -70,10 +72,12 @@ SessionStore.create().then(function (sessionStore) {
   // Get all of our routes.
   app.use(common.router({
     cwd: ROUTES_ROOT,
-    routes_config: {
+    route_config: {
       '*': {
         sites: sites,
         users: users,
+        invites: invites,
+        annotations: annotations,
         logger: logger,
         verifier: require('./lib/verifier')
       }

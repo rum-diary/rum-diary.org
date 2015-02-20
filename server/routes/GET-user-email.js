@@ -3,27 +3,32 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const httpErrors = require('../lib/http-errors');
-const users = require('../lib/data-layer/user');
 const clientResources = require('../lib/client-resources');
 
-exports.path = '/user/:email';
-exports.method = 'get';
-exports.template = 'GET-user-email.html';
-exports.locals = {
-  resources: clientResources('js/rum-diary.min.js')
-};
-exports.authorization = require('../lib/page-authorization').IS_USER;
+module.exports = function (config) {
+  const users = config.users;
 
-exports.handler = function (req, res, next) {
-  var email = decodeURIComponent(req.params.email);
+  return {
+    path: '/user/:email',
+    method: 'get',
+    template: 'GET-user-email.html',
+    locals: {
+      resources: clientResources('js/rum-diary.min.js')
+    },
+    authorization: require('../lib/page-authorization').IS_USER,
 
-  if (email === 'new') return next();
+    handler: function (req, res, next) {
+      var email = decodeURIComponent(req.params.email);
 
-  return users.get(email)
-    .then(function (user) {
-      if (! user) {
-        throw httpErrors.NotFoundError();
-      }
-      return user;
-    });
+      if (email === 'new') return next();
+
+      return users.get(email)
+        .then(function (user) {
+          if (! user) {
+            throw httpErrors.NotFoundError();
+          }
+          return user;
+        });
+    }
+  };
 };

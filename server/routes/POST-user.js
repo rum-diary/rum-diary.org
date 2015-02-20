@@ -3,65 +3,70 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const inputValidation = require('../lib/input-validation');
-const users = require('../lib/data-layer/user');
-const sites = require('../lib/data-layer/site');
 const verifier = require('../lib/verifier');
 
-exports.path = '/user';
-exports.method = 'post';
-exports.authorization = require('../lib/page-authorization').NOT_AUTHENTICATED;
+module.exports = function (config) {
+  const users = config.users;
+  const sites = config.sites;
 
-exports.validation = {
-  _csrf: inputValidation.csrf(),
-  name: inputValidation.userRealName().required(),
-  hostname: inputValidation.hostname().required(),
-  assertion: inputValidation.assertion().required()
-};
+  return {
+    path: '/user',
+    method: 'post',
+    authorization: require('../lib/page-authorization').NOT_AUTHENTICATED,
 
-exports.handler = function (req, res) {
-  const name = req.body.name;
-  const hostname = req.body.hostname.replace(/^https?:\/\//, '');
-  const assertion = req.body.assertion;
+    validation: {
+      _csrf: inputValidation.csrf(),
+      name: inputValidation.userRealName().required(),
+      hostname: inputValidation.hostname().required(),
+      assertion: inputValidation.assertion().required()
+    },
 
-  var email;
-  var isNewSite = false;
-  var canViewExistingSite = false;
+    handler: function (req, res) {
+      const name = req.body.name;
+      const hostname = req.body.hostname.replace(/^https?:\/\//, '');
+      const assertion = req.body.assertion;
 
-  return verifier.verify(assertion)
-     .then(function (_email) {
-        email = _email;
+      var email;
+      var isNewSite = false;
+      var canViewExistingSite = false;
 
-        return users.exists(email);
-      })
-     .then(function (userExists) {
-        if (! userExists) {
-          return users.create(name, email);
-        }
-      })
-     .then(function () {
-        return sites.exists(hostname)
-      })
-     .then(function (exists) {
-        if (! exists) {
-          // non-existent site - create it.
-          isNewSite = true;
-          return sites.create(hostname, email);
-        }
+      return verifier.verify(assertion)
+        .then(function (_email) {
+           email = _email;
 
-        // site already exists, see if user is authorized.
-        return sites.canView(hostname, email)
-          .then(function (isAuthorized) {
-            canViewExistingSite = isAuthorized;
-          });
-      })
-     .then(function () {
-        // sign the user in, visit their page.
-        req.session.email = email;
-        req.session.name = name;
-        req.session.hostname = hostname;
-        req.session.isNewSite = isNewSite;
-        req.session.canViewExistingSite = canViewExistingSite;
+           return users.exists(email);
+        })
+        .then(function (userExists) {
+          if (! userExists) {
+            return users.create(name, email);
+          }
+        })
+        .then(function () {
+           return sites.exists(hostname);
+        })
+        .then(function (exists) {
+          if (! exists) {
+            // non-existent site - create it.
+            isNewSite = true;
+            return sites.create(hostname, email);
+          }
 
-        res.redirect('/welcome');
-      });
+          // site already exists, see if user is authorized.
+          return sites.canView(hostname, email)
+            .then(function (isAuthorized) {
+              canViewExistingSite = isAuthorized;
+            });
+        })
+        .then(function () {
+          // sign the user in, visit their page.
+          req.session.email = email;
+          req.session.name = name;
+          req.session.hostname = hostname;
+          req.session.isNewSite = isNewSite;
+          req.session.canViewExistingSite = canViewExistingSite;
+
+          res.redirect('/welcome');
+        });
+    }
+  };
 };

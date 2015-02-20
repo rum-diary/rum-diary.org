@@ -6,32 +6,36 @@
 
 const moment = require('moment');
 const inputValidation = require('../lib/input-validation');
-const annotations = require('../lib/data-layer/annotation');
-const logger = require('../lib/logger');
 
-exports.path = '/site/:hostname/annotation';
-exports.method = 'post';
-exports.authorization = require('../lib/page-authorization').CAN_ADMIN_HOST;
+module.exports = function (config) {
+  const annotations = config.annotations;
+  const logger = config.logger;
 
-exports.validation = {
-  _csrf: inputValidation.csrf(),
-  occurredAt: inputValidation.date('YYYY-MM-DD'),
-  title: inputValidation.string(),
-  description: inputValidation.string().allow('').optional()
-};
+  return {
+    path: '/site/:hostname/annotation',
+    method: 'post',
+    authorization: require('../lib/page-authorization').CAN_ADMIN_HOST,
 
+    validation: {
+      _csrf: inputValidation.csrf(),
+      occurredAt: inputValidation.date('YYYY-MM-DD'),
+      title: inputValidation.string(),
+      description: inputValidation.string().allow('').optional()
+    },
 
-exports.handler = function (req, res) {
-  var annotation = {
-    hostname: req.params.hostname,
-    title: req.body.title,
-    description: req.body.description,
-    occurredAt: moment(req.body.occurredAt, 'YYYY-MM-DD').toDate()
+    handler: function (req, res) {
+      var annotation = {
+        hostname: req.params.hostname,
+        title: req.body.title,
+        description: req.body.description,
+        occurredAt: moment(req.body.occurredAt, 'YYYY-MM-DD').toDate()
+      };
+
+      logger.info('annotation: %s', JSON.stringify(annotation));
+      return annotations.create(annotation)
+        .then(function () {
+          res.redirect(req.get('referrer'));
+        });
+    }
   };
-
-  logger.info('annotation: %s', JSON.stringify(annotation));
-  return annotations.create(annotation)
-    .then(function () {
-      res.redirect(req.get('referrer'));
-    });
 };

@@ -3,41 +3,46 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Promise = require('bluebird');
-const sites = require('../lib/data-layer/site');
 const clientResources = require('../lib/client-resources');
 const navigationTimingFields = require('../lib/navigation-timing');
 
-exports.path = '/site/:hostname/performance';
-exports.method = 'get';
-exports.template = 'GET-site-hostname-performance.html';
-exports.locals = {
-  resources: clientResources('js/rum-diary.min.js')
-};
-exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
+module.exports = function (config) {
+  const sites = config.sites;
 
-exports.handler = function(req) {
-  var statName = 'domContentLoadedEventEnd';
-  if (req.query.plot) statName = req.query.plot;
+  return {
+    path: '/site/:hostname/performance',
+    method: 'get',
+    template: 'GET-site-hostname-performance.html',
+    locals: {
+      resources: clientResources('js/rum-diary.min.js')
+    },
+    authorization: require('../lib/page-authorization').CAN_READ_HOST,
 
-  return Promise.all([
-    sites.canAdminister(req.params.hostname, req.session.email),
-    sites.performance(req.params.hostname, statName, req.start, req.end)
-  ]).spread(function(isAdmin, performanceResults) {
+    handler: function(req) {
+      var statName = 'domContentLoadedEventEnd';
+      if (req.query.plot) statName = req.query.plot;
 
-    return {
-      baseURL: req.url.replace(/\?.*/, ''),
-      statName: statName,
-      hostname: req.params.hostname,
-      startDate: req.start.format('MMM DD'),
-      endDate: req.end.format('MMM DD'),
-      navigationTimingFields: navigationTimingFields,
-      histogram: performanceResults.histogram,
-      cdf: performanceResults.cdf,
-      first_q: performanceResults.first_q,
-      second_q: performanceResults.second_q,
-      third_q: performanceResults.third_q,
-      isAdmin: isAdmin
-    };
-  });
+      return Promise.all([
+        sites.canAdminister(req.params.hostname, req.session.email),
+        sites.performance(req.params.hostname, statName, req.start, req.end)
+      ]).spread(function(isAdmin, performanceResults) {
+
+        return {
+          baseURL: req.url.replace(/\?.*/, ''),
+          statName: statName,
+          hostname: req.params.hostname,
+          startDate: req.start.format('MMM DD'),
+          endDate: req.end.format('MMM DD'),
+          navigationTimingFields: navigationTimingFields,
+          histogram: performanceResults.histogram,
+          cdf: performanceResults.cdf,
+          first_q: performanceResults.first_q,
+          second_q: performanceResults.second_q,
+          third_q: performanceResults.third_q,
+          isAdmin: isAdmin
+        };
+      });
+    }
+  };
 };
 

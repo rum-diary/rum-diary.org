@@ -2,40 +2,44 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const invitations = require('../lib/data-layer/invite');
 const httpErrors = require('../lib/http-errors');
-const logger = require('../lib/logger');
 
-exports.path = '/invitation/:token';
-exports.method = 'get';
-exports.template = 'GET-invitation-token.html';
-exports.authorization = require('../lib/page-authorization').ANY;
+module.exports = function (config) {
+  const invitations = config.invitations;
+  const logger = config.logger;
 
+  function verifyExistingUserThenRedirect(req, res, tokenInfo) {
+    return invitations.verifyExistingUser(tokenInfo.token)
+      .then(function () {
+        req.session.email = tokenInfo.to_email;
 
-exports.handler = function(req, res) {
-  var token = req.params.token;
-
-  return invitations.tokenInfo(token)
-      .then(function(tokenInfo) {
-        if (! tokenInfo.isValid) {
-          logger.warn('invalid token: %s', token);
-          throw new httpErrors.GoneError();
-        }
-
-        if (tokenInfo.doesInviteeExist) {
-          return verifyExistingUserThenRedirect(req, res, tokenInfo);
-        }
-
-        // user has to give us their real name.
-        return tokenInfo;
+        res.redirect('/site/' + tokenInfo.hostname);
       });
+  }
+
+  return {
+    path: '/invitation/:token',
+    method: 'get',
+    template: 'GET-invitation-token.html',
+    authorization: require('../lib/page-authorization').ANY,
+
+    handler: function (req, res) {
+      var token = req.params.token;
+
+      return invitations.tokenInfo(token)
+          .then(function (tokenInfo) {
+            if (! tokenInfo.isValid) {
+              logger.warn('invalid token: %s', token);
+              throw new httpErrors.GoneError();
+            }
+
+            if (tokenInfo.doesInviteeExist) {
+              return verifyExistingUserThenRedirect(req, res, tokenInfo);
+            }
+
+            // user has to give us their real name.
+            return tokenInfo;
+          });
+    }
+  };
 };
-
-function verifyExistingUserThenRedirect(req, res, tokenInfo) {
-  return invitations.verifyExistingUser(tokenInfo.token)
-    .then(function () {
-      req.session.email = tokenInfo.to_email;
-
-      res.redirect('/site/' + tokenInfo.hostname);
-    });
-}

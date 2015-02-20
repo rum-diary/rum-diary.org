@@ -3,37 +3,43 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Promises = require('bluebird');
-const logger = require('../lib/logger');
-const sites = require('../lib/data-layer/site');
 const clientResources = require('../lib/client-resources');
 
-exports.path = '/site/:hostname/referrer/:referrer';
-exports.method = 'get';
-exports.template = 'GET-site-hostname-referrer-hostname.html';
-exports.locals = {
-  resources: clientResources('js/rum-diary.min.js')
+module.exports = function (config) {
+  const logger = config.logger;
+  const sites = config.sites;
+
+  return {
+    path: '/site/:hostname/referrer/:referrer',
+    method: 'get',
+    template: 'GET-site-hostname-referrer-hostname.html',
+    locals: {
+      resources: clientResources('js/rum-diary.min.js')
+    },
+    authorization: require('../lib/page-authorization').CAN_READ_HOST,
+
+    handler: function (req) {
+      var hostname = req.params.hostname;
+      var referrerHostname = req.params.referrer;
+      var startDate = req.start;
+      var endDate = req.end;
+
+      return Promises.all([
+        sites.canAdminister(req.params.hostname, req.session.email),
+        sites.referrals(hostname, referrerHostname, startDate, endDate)
+      ]).spread(function (isAdmin, results) {
+        logger.info('%s: elapsed time: %s ms', req.url, results.duration);
+
+        return {
+          isAdmin: isAdmin,
+          hostname: req.params.hostname,
+          referrer: req.params.referrer,
+          referrals: results.referrals,
+          startDate: req.start,
+          endDate: req.end
+        };
+      });
+    }
+  };
 };
-exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
 
-exports.handler = function (req) {
-  var hostname = req.params.hostname;
-  var referrerHostname = req.params.referrer;
-  var startDate = req.start;
-  var endDate = req.end;
-
-  return Promises.all([
-    sites.canAdminister(req.params.hostname, req.session.email),
-    sites.referrals(hostname, referrerHostname, startDate, endDate)
-  ]).spread(function (isAdmin, results) {
-    logger.info('%s: elapsed time: %s ms', req.url, results.duration);
-
-    return {
-      isAdmin: isAdmin,
-      hostname: req.params.hostname,
-      referrer: req.params.referrer,
-      referrals: results.referrals,
-      startDate: req.start,
-      endDate: req.end
-    };
-  });
-};

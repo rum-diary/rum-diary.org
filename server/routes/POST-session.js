@@ -21,7 +21,6 @@ module.exports = function (config) {
       assertion: inputValidation.assertion()
     },
 
-
     handler: function (req, res) {
       const assertion = req.body.assertion;
       const redirectTo = decodeURIComponent(req.session.redirectTo || '/site');

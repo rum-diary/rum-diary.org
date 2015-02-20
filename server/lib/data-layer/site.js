@@ -41,3 +41,8 @@ exports.demographics = calculator.siteDemographics;
 exports.performance = calculator.sitePerformance;
 exports.referrals = calculator.siteReferrer;
 exports.adminInfo = calculator.siteAdmin;
+
+exports.pages = {
+  traffic: calculator.pageTraffic
+};
+
