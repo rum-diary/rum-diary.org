@@ -18,7 +18,7 @@ module.exports = function (config) {
     authorization: require('../lib/page-authorization').IS_USER,
 
     handler: function (req, res, next) {
-      var email = decodeURIComponent(req.params.email);
+      const email = decodeURIComponent(req.params.email);
 
       if (email === 'new') return next();
 

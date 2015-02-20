@@ -22,9 +22,9 @@ module.exports = function (config) {
     },
 
     handler: function (req, res) {
-      var hostname = req.params.hostname;
-      var email = req.body.email;
-      var accessLevel = accessLevels[req.body.access_level];
+      const hostname = req.params.hostname;
+      const email = req.body.email;
+      const accessLevel = accessLevels[req.body.access_level];
 
       if (accessLevel === accessLevels.OWNER) {
         throw new Error('Cannot set the owner');

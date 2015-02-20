@@ -17,9 +17,11 @@ exports.validation = {
 
 
 exports.handler = function (req, res) {
-  var email = req.session.email;
+  const email = req.session.email;
 
-  if (! email) return httpErrors.BadRequestError();
+  if (! email) {
+    return httpErrors.BadRequestError();
+  }
 
   req.session.destroy();
 

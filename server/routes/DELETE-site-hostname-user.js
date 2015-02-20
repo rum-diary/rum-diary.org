@@ -19,8 +19,8 @@ module.exports = function (config) {
     },
 
     handler: function (req, res) {
-      var hostname = req.params.hostname;
-      var email = req.body.email;
+      const hostname = req.params.hostname;
+      const email = req.body.email;
 
       return sites.setUserAccessLevel(hostname, email, accessLevels.NONE)
         .then(function () {

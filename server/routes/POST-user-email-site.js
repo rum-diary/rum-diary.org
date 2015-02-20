@@ -20,8 +20,8 @@ module.exports = function (config) {
     },
 
     handler: function (req, res) {
-      var email = req.params.email;
-      var hostname = req.body.hostname;
+      const email = req.params.email;
+      const hostname = req.body.hostname;
 
       return users.exists(email)
         .then(function (exists) {
@@ -34,7 +34,9 @@ module.exports = function (config) {
               return true;
             }, function (err) {
               // if the site already exists, inform the user, but do not fail.
-              if (err.message === 'already exists') return false;
+              if (err.message === 'already exists') {
+                return false;
+              }
 
               // all other errors fail.
               throw err;

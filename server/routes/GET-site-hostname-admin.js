@@ -12,13 +12,13 @@ module.exports = function (config) {
     authorization: require('../lib/page-authorization').CAN_ADMIN_HOST,
 
     handler: function(req) {
-      var hostname = req.params.hostname;
-      var email = req.session.email;
+      const hostname = req.params.hostname;
+      const email = req.session.email;
 
       return sites.adminInfo(hostname)
         .then(function (adminInfo) {
-          var adminUsers = adminInfo.admin;
-          var readonlyUsers = adminInfo.readonly;
+          const adminUsers = adminInfo.admin;
+          const readonlyUsers = adminInfo.readonly;
 
           return {
             root_url: req.url.replace(/\?.*/, ''),

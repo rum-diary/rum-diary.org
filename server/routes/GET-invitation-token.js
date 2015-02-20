@@ -24,22 +24,22 @@ module.exports = function (config) {
     authorization: require('../lib/page-authorization').ANY,
 
     handler: function (req, res) {
-      var token = req.params.token;
+      const token = req.params.token;
 
       return invitations.tokenInfo(token)
-          .then(function (tokenInfo) {
-            if (! tokenInfo.isValid) {
-              logger.warn('invalid token: %s', token);
-              throw new httpErrors.GoneError();
-            }
+        .then(function (tokenInfo) {
+          if (! tokenInfo.isValid) {
+            logger.warn('invalid token: %s', token);
+            throw new httpErrors.GoneError();
+          }
 
-            if (tokenInfo.doesInviteeExist) {
-              return verifyExistingUserThenRedirect(req, res, tokenInfo);
-            }
+          if (tokenInfo.doesInviteeExist) {
+            return verifyExistingUserThenRedirect(req, res, tokenInfo);
+          }
 
-            // user has to give us their real name.
-            return tokenInfo;
-          });
+          // user has to give us their real name.
+          return tokenInfo;
+        });
     }
   };
 };

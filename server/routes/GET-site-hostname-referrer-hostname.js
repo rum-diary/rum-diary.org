@@ -19,10 +19,10 @@ module.exports = function (config) {
     authorization: require('../lib/page-authorization').CAN_READ_HOST,
 
     handler: function (req) {
-      var hostname = req.params.hostname;
-      var referrerHostname = req.params.referrer;
-      var startDate = req.start;
-      var endDate = req.end;
+      const hostname = req.params.hostname;
+      const referrerHostname = req.params.referrer;
+      const startDate = req.start;
+      const endDate = req.end;
 
       return Promises.all([
         sites.canAdminister(req.params.hostname, req.session.email),

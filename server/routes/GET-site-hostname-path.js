@@ -5,7 +5,7 @@
 const clientResources = require('../lib/client-resources');
 
 module.exports = function (config) {
-  var pages = config.sites.pages;
+  const pages = config.sites.pages;
 
   return {
     method: 'get',
@@ -28,10 +28,10 @@ module.exports = function (config) {
     authorization: require('../lib/page-authorization').CAN_READ_HOST,
 
     handler: function(req) {
-      var hostname = req.params.hostname;
-      var path = req.params.path;
-      var startDate = req.start;
-      var endDate = req.end;
+      const hostname = req.params.hostname;
+      const path = req.params.path;
+      const startDate = req.start;
+      const endDate = req.end;
 
       return pages.traffic(hostname, path, startDate, endDate)
         .then(function (results) {

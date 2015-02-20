@@ -21,8 +21,8 @@ module.exports = function (config) {
     },
 
     handler: function (req, res) {
-      var hostname = req.params.hostname;
-      var verificationHostname = req.body.hostname;
+      const hostname = req.params.hostname;
+      const verificationHostname = req.body.hostname;
 
       // uh oh, verification hostname is not the same as the real hostname.
       if (hostname !== verificationHostname) {

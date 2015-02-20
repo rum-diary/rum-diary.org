@@ -24,7 +24,7 @@ module.exports = function (config) {
     },
 
     handler: function (req, res) {
-      var annotation = {
+      const annotation = {
         hostname: req.params.hostname,
         title: req.body.title,
         description: req.body.description,

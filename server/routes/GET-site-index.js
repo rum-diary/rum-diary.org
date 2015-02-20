@@ -14,7 +14,7 @@ module.exports = function (config) {
     authorization: require('../lib/page-authorization').AUTHENTICATED,
 
     handler: function (req) {
-      var email = req.session.email;
+      const email = req.session.email;
 
       return users.sites(email)
         .then(function (sites) {

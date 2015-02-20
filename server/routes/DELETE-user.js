@@ -20,10 +20,12 @@ module.exports = function (config) {
     },
 
     handler: function (req, res) {
-      var sessionEmail = req.session.email;
-      var specifiedEmail = req.params.email;
+      const sessionEmail = req.session.email;
+      const specifiedEmail = req.params.email;
 
-      if (sessionEmail !== specifiedEmail) throw httpErrors.ForbiddenError();
+      if (sessionEmail !== specifiedEmail) {
+        throw httpErrors.ForbiddenError();
+      }
 
       return users.remove(sessionEmail)
         .then(function () {

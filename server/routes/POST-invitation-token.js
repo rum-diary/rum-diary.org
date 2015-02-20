@@ -30,8 +30,8 @@ module.exports = function (config) {
     },
 
     handler: function (req, res) {
-      var token = req.params.token;
-      var name = req.body.name;
+      const token = req.params.token;
+      const name = req.body.name;
 
       return invitations.tokenInfo(token)
         .then(function (tokenInfo) {
