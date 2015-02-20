@@ -2,11 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-exports.method = 'get';
-exports.path = '/';
-exports.authorization = require('../lib/page-authorization').ANY;
-exports.template = 'GET-root.html';
+module.exports = function (config) {
+  const authorization = config.authorization;
 
-exports.handler = function(req, res) {
-  return {};
+  return {
+    method: 'get',
+    path: '/',
+    authorization: authorization.ANY,
+    template: 'GET-root.html',
+
+    handler: function(req, res) {
+      return {};
+    }
+  };
 };

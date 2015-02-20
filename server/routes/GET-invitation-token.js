@@ -7,6 +7,7 @@ const httpErrors = require('../lib/http-errors');
 module.exports = function (config) {
   const invitations = config.invitations;
   const logger = config.logger;
+  const authorization = config.authorization;
 
   function verifyExistingUserThenRedirect(req, res, tokenInfo) {
     return invitations.verifyExistingUser(tokenInfo.token)
@@ -21,7 +22,7 @@ module.exports = function (config) {
     path: '/invitation/:token',
     method: 'get',
     template: 'GET-invitation-token.html',
-    authorization: require('../lib/page-authorization').ANY,
+    authorization: authorization.ANY,
 
     handler: function (req, res) {
       const token = req.params.token;

@@ -4,12 +4,13 @@
 
 module.exports = function (config) {
   const sites = config.sites;
+  const authorization = config.authorization;
 
   return {
     path: '/site/:hostname/admin',
     method: 'get',
     template: 'GET-site-hostname-admin.html',
-    authorization: require('../lib/page-authorization').CAN_ADMIN_HOST,
+    authorization: authorization.CAN_ADMIN_HOST,
 
     handler: function(req) {
       const hostname = req.params.hostname;

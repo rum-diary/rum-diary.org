@@ -6,12 +6,13 @@
 
 module.exports = function (config) {
   const users = config.users;
+  const authorization = config.authorization;
 
   return {
     path: '/site',
     method: 'get',
     template: 'GET-site-index.html',
-    authorization: require('../lib/page-authorization').AUTHENTICATED,
+    authorization: authorization.AUTHENTICATED,
 
     handler: function (req) {
       const email = req.session.email;

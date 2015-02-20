@@ -7,23 +7,29 @@
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 
-exports.path = '/session';
-exports.method = 'delete';
-exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
+module.exports = function (config) {
+  const authorization = config.authorization;
 
-exports.validation = {
-  _csrf: inputValidation.csrf()
-};
+  return {
+    path: '/session',
+    method: 'delete',
+    authorization: authorization.AUTHENTICATED,
+
+    validation: {
+      _csrf: inputValidation.csrf()
+    },
 
 
-exports.handler = function (req, res) {
-  const email = req.session.email;
+    handler: function (req, res) {
+      const email = req.session.email;
 
-  if (! email) {
-    return httpErrors.BadRequestError();
-  }
+      if (! email) {
+        return httpErrors.BadRequestError();
+      }
 
-  req.session.destroy();
+      req.session.destroy();
 
-  res.redirect('/user');
+      res.redirect('/user');
+    }
+  };
 };

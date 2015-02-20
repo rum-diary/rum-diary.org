@@ -10,11 +10,12 @@ const inputValidation = require('../lib/input-validation');
 module.exports = function (config) {
   const annotations = config.annotations;
   const logger = config.logger;
+  const authorization = config.authorization;
 
   return {
     path: '/site/:hostname/annotation',
     method: 'post',
-    authorization: require('../lib/page-authorization').CAN_ADMIN_HOST,
+    authorization: authorization.CAN_ADMIN_HOST,
 
     validation: {
       _csrf: inputValidation.csrf(),

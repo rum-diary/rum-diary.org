@@ -7,11 +7,12 @@ const accessLevels = require('rum-diary-access-levels');
 
 module.exports = function (config) {
   const sites = config.sites;
+  const authorization = config.authorization;
 
   return {
     path: '/site/:hostname/user',
     method: 'delete',
-    authorization: require('../lib/page-authorization').CAN_ADMIN_HOST,
+    authorization: authorization.CAN_ADMIN_HOST,
 
     validation: {
       _csrf: inputValidation.csrf(),

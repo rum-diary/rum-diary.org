@@ -6,15 +6,16 @@
 
 const inputValidation = require('../lib/input-validation');
 const httpErrors = require('../lib/http-errors');
-const verifier = require('../lib/verifier');
 
 module.exports = function (config) {
   const users = config.users;
+  const verifier = config.verifier;
+  const authorization = config.authorization;
 
   return {
     path: '/session',
     method: 'post',
-    authorization: require('../lib/page-authorization').ANY,
+    authorization: authorization.ANY,
 
     validation: {
       _csrf: inputValidation.csrf(),

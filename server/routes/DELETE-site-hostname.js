@@ -9,11 +9,12 @@ const inputValidation = require('../lib/input-validation');
 
 module.exports = function (config) {
   const sites = config.sites;
+  const authorization = config.authorization;
 
   return {
     path: '/site/:hostname',
     method: 'delete',
-    authorization: require('../lib/page-authorization').IS_OWNER_HOST,
+    authorization: authorization.IS_OWNER_HOST,
 
     validation: {
       _csrf: inputValidation.csrf(),

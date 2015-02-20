@@ -25,10 +25,7 @@ const siteQuery = require('./lib/middleware/site-query');
 
 const SessionStore = require('./lib/session-store');
 const db = require('./lib/db');
-const sites = require('./lib/data-layer/site');
-const users = require('./lib/data-layer/user');
-const annotations = require('./lib/data-layer/annotation');
-const invites = require('./lib/data-layer/invite');
+const dataLayer = require('./lib/data-layer')(db);
 
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
@@ -74,12 +71,14 @@ SessionStore.create().then(function (sessionStore) {
     cwd: ROUTES_ROOT,
     route_config: {
       '*': {
-        sites: sites,
-        users: users,
-        invites: invites,
-        annotations: annotations,
+        config: config,
+        sites: dataLayer.site,
+        users: dataLayer.user,
+        annotations: dataLayer.annotation,
+        invites: dataLayer.invite,
         logger: logger,
-        verifier: require('./lib/verifier')
+        verifier: require('./lib/verifier')(config, logger),
+        authorization: require('./lib/page-authorization')(dataLayer.site)
       }
     }
   }));

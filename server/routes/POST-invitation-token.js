@@ -8,6 +8,7 @@ const inputValidation = require('../lib/input-validation');
 module.exports = function (config) {
   const logger = config.logger;
   const invitations = config.invitations;
+  const authorization = config.authorization;
 
   function verifyNewUserThenRedirect(req, res, tokenInfo, name) {
     return invitations.verifyNewUser(tokenInfo.token, name)
@@ -22,7 +23,7 @@ module.exports = function (config) {
     path: '/invitation/:token',
     method: 'post',
     template: 'GET-invitation-token.html',
-    authorization: require('../lib/page-authorization').ANY,
+    authorization: authorization.ANY,
 
     validation: {
       _csrf: inputValidation.csrf(),

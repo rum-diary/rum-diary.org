@@ -3,16 +3,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const inputValidation = require('../lib/input-validation');
-const verifier = require('../lib/verifier');
 
 module.exports = function (config) {
   const users = config.users;
   const sites = config.sites;
+  const verifier = config.verifier;
+  const authorization = config.authorization;
 
   return {
     path: '/user',
     method: 'post',
-    authorization: require('../lib/page-authorization').NOT_AUTHENTICATED,
+    authorization: authorization.NOT_AUTHENTICATED,
 
     validation: {
       _csrf: inputValidation.csrf(),

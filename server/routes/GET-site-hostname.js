@@ -8,6 +8,7 @@ const clientResources = require('../lib/client-resources');
 module.exports = function (config) {
   const sites = config.sites;
   const logger = config.logger;
+  const authorization = config.authorization;
 
   return {
     path: '/site/:hostname',
@@ -16,7 +17,7 @@ module.exports = function (config) {
     locals: {
       resources: clientResources('js/rum-diary.min.js')
     },
-    authorization: require('../lib/page-authorization').CAN_READ_HOST,
+    authorization: authorization.CAN_READ_HOST,
 
     handler: function (req) {
       const email = req.session.email;

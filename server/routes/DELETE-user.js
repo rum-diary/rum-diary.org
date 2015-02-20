@@ -9,11 +9,12 @@ const inputValidation = require('../lib/input-validation');
 
 module.exports = function (config) {
   const users = config.users;
+  const authorization = config.authorization;
 
   return {
     path: '/user/:email',
     method: 'delete',
-    authorization: require('../lib/page-authorization').AUTHENTICATED,
+    authorization: authorization.AUTHENTICATED,
 
     validation: {
       _csrf: inputValidation.csrf()

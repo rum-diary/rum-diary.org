@@ -3,5 +3,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 module.exports = function (db) {
-  return db.annotation;
+  const calculator = require('./calculator')(db);
+
+  return {
+    annotation: require('./annotation')(db),
+    invite: require('./invite')(db),
+    site: require('./site')(db, calculator),
+    user: require('./user')(db, calculator)
+  };
 };
+

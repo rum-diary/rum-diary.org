@@ -8,6 +8,7 @@ const clientResources = require('../lib/client-resources');
 module.exports = function (config) {
   const logger = config.logger;
   const sites = config.sites;
+  const authorization = config.authorization;
 
   return {
     path: '/site/:hostname/referrer/:referrer',
@@ -16,7 +17,7 @@ module.exports = function (config) {
     locals: {
       resources: clientResources('js/rum-diary.min.js')
     },
-    authorization: require('../lib/page-authorization').CAN_READ_HOST,
+    authorization: authorization.CAN_READ_HOST,
 
     handler: function (req) {
       const hostname = req.params.hostname;

@@ -7,6 +7,7 @@ const clientResources = require('../lib/client-resources');
 
 module.exports = function (config) {
   const users = config.users;
+  const authorization = config.authorization;
 
   return {
     path: '/user/:email',
@@ -15,7 +16,7 @@ module.exports = function (config) {
     locals: {
       resources: clientResources('js/rum-diary.min.js')
     },
-    authorization: require('../lib/page-authorization').IS_USER,
+    authorization: authorization.IS_USER,
 
     handler: function (req, res, next) {
       const email = decodeURIComponent(req.params.email);

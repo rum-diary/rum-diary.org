@@ -6,16 +6,22 @@
 
 const clientResources = require('../lib/client-resources');
 
-exports.path = '/user';
-exports.method = 'get';
-exports.template = 'GET-user-index.html';
+module.exports = function (config) {
+  const authorization = config.authorization;
 
-exports.locals = {
-  resources: clientResources('js/signin.min.js')
-};
+  return {
+    path: '/user',
+    method: 'get',
+    template: 'GET-user-index.html',
 
-exports.authorization = require('../lib/page-authorization').ANY;
+    locals: {
+      resources: clientResources('js/signin.min.js')
+    },
 
-exports.handler = function (req, res) {
-  return {};
+    authorization: authorization.ANY,
+
+    handler: function (req, res) {
+      return {};
+    }
+  };
 };
