@@ -3,48 +3,53 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const p = require('bluebird');
-const logger = require('../lib/logger');
-const siteInfo = require('../lib/site');
 const clientResources = require('../lib/client-resources');
 
-exports.path = '/site/:hostname';
-exports.method = 'get';
-exports.template = 'GET-site-hostname.html';
-exports.locals = {
-  resources: clientResources('js/rum-diary.min.js')
-};
-exports.authorization = require('../lib/page-authorization').CAN_READ_HOST;
+module.exports = function (config) {
+  const sites = config.sites;
+  const logger = config.logger;
 
-exports.handler = function (req) {
-  var email = req.session.email;
-  var hostname = req.params.hostname;
-  var startDate = req.start;
-  var endDate = req.end;
+  return {
+    path: '/site/:hostname',
+    method: 'get',
+    template: 'GET-site-hostname.html',
+    locals: {
+      resources: clientResources('js/rum-diary.min.js')
+    },
+    authorization: require('../lib/page-authorization').CAN_READ_HOST,
 
-  return p.all([
-    siteInfo.canAdminister(hostname, email),
-    siteInfo.traffic(hostname, startDate, endDate)
-  ]).spread(function (isAdmin, results) {
-    logger.info('%s: elapsed time: %s ms', req.url, results.duration);
+    handler: function (req) {
+      const email = req.session.email;
+      const hostname = req.params.hostname;
+      const startDate = req.start;
+      const endDate = req.end;
 
-    return {
-      root_url: req.url.replace(/\?.*/, ''),
-      isAdmin: isAdmin,
-      hostname: hostname,
-      startDate: startDate,
-      endDate: endDate,
-      pageHitsPerPage: results.pageHitsPerPage,
-      pageHitsPerDay: results.pageHitsPerDay,
-      referrers: results.referrers,
-      hits: {
-        total: results.hits.total,
-        period: results.hits.period,
-        today: results.hits.today,
-        unique: results.hits.unique,
-        repeat: results.hits.repeat
-      },
-      annotations: results.annotations
-    };
-  });
+      return p.all([
+        sites.canAdminister(hostname, email),
+        sites.traffic(hostname, startDate, endDate)
+      ]).spread(function (isAdmin, results) {
+        logger.info('%s: elapsed time: %s ms', req.url, results.duration);
+
+        return {
+          root_url: req.url.replace(/\?.*/, ''),
+          isAdmin: isAdmin,
+          hostname: hostname,
+          startDate: startDate,
+          endDate: endDate,
+          pageHitsPerPage: results.pageHitsPerPage,
+          pageHitsPerDay: results.pageHitsPerDay,
+          referrers: results.referrers,
+          hits: {
+            total: results.hits.total,
+            period: results.hits.period,
+            today: results.hits.today,
+            unique: results.hits.unique,
+            repeat: results.hits.repeat
+          },
+          annotations: results.annotations
+        };
+      });
+    }
+  };
 };
 

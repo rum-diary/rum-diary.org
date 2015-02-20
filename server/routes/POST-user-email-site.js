@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const clientResources = require('../lib/client-resources');
-const sites = require('../lib/site');
-const users = require('../lib/user');
+const sites = require('../lib/data-layer/site');
+const users = require('../lib/data-layer/user');
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');

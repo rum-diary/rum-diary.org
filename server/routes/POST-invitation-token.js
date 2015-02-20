@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const invitations = require('../lib/invite');
+const invitations = require('../lib/data-layer/invite');
 const httpErrors = require('../lib/http-errors');
 const logger = require('../lib/logger');
 const inputValidation = require('../lib/input-validation');

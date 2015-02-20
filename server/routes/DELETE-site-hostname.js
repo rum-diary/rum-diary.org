@@ -4,7 +4,7 @@
 
 // Delete a site.
 
-const sites = require('../lib/site');
+const sites = require('../lib/data-layer/site');
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 

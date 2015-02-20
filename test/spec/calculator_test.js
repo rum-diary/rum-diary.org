@@ -11,7 +11,7 @@ const mocha = require('mocha');
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
-const Calculator = require('../../server/lib/calculator');
+const Calculator = require('../../server/lib/data-layer/calculator');
 const DbMock = {
   table_name: {
     calculate: function(outputStream, config) {

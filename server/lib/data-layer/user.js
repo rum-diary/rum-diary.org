@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const calculator = require('./calculator');
-const db = require('./db');
+const db = require('../db');
 
 exports.exists = function (email) {
   return db.user.getOne({ email: email })

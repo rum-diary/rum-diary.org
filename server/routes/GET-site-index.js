@@ -4,7 +4,7 @@
 
 // Show a list of hostnames.
 
-const user = require('../lib/user');
+const users = require('../lib/data-layer/user');
 
 exports.path = '/site';
 exports.method = 'get';
@@ -14,7 +14,7 @@ exports.authorization = require('../lib/page-authorization').AUTHENTICATED;
 exports.handler = function (req) {
   var email = req.session.email;
 
-  return user.sites(email)
+  return users.sites(email)
     .then(function (sites) {
       return {
         sites: sites,

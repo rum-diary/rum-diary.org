@@ -6,7 +6,7 @@
 
 const moment = require('moment');
 const inputValidation = require('../lib/input-validation');
-const Annotation = require('../lib/annotation');
+const annotations = require('../lib/data-layer/annotation');
 const logger = require('../lib/logger');
 
 exports.path = '/site/:hostname/annotation';
@@ -30,7 +30,7 @@ exports.handler = function (req, res) {
   };
 
   logger.info('annotation: %s', JSON.stringify(annotation));
-  return Annotation.create(annotation)
+  return annotations.create(annotation)
     .then(function () {
       res.redirect(req.get('referrer'));
     });

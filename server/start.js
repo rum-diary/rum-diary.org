@@ -25,6 +25,8 @@ const siteQuery = require('./lib/middleware/site-query');
 
 const SessionStore = require('./lib/session-store');
 const db = require('./lib/db');
+const sites = require('./lib/data-layer/site');
+const users = require('./lib/data-layer/user');
 
 const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
@@ -67,7 +69,15 @@ SessionStore.create().then(function (sessionStore) {
 
   // Get all of our routes.
   app.use(common.router({
-    cwd: ROUTES_ROOT
+    cwd: ROUTES_ROOT,
+    routes_config: {
+      '*': {
+        sites: sites,
+        users: users,
+        logger: logger,
+        verifier: require('./lib/verifier')
+      }
+    }
   }));
 
   // set up cachify before the static middleware to strip off any md5's then

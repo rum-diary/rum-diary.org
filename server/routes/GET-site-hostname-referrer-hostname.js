@@ -4,7 +4,7 @@
 
 const Promises = require('bluebird');
 const logger = require('../lib/logger');
-const siteInfo = require('../lib/site');
+const sites = require('../lib/data-layer/site');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname/referrer/:referrer';
@@ -22,8 +22,8 @@ exports.handler = function (req) {
   var endDate = req.end;
 
   return Promises.all([
-    siteInfo.canAdminister(req.params.hostname, req.session.email),
-    siteInfo.referrals(hostname, referrerHostname, startDate, endDate)
+    sites.canAdminister(req.params.hostname, req.session.email),
+    sites.referrals(hostname, referrerHostname, startDate, endDate)
   ]).spread(function (isAdmin, results) {
     logger.info('%s: elapsed time: %s ms', req.url, results.duration);
 

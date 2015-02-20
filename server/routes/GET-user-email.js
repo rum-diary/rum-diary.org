@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const httpErrors = require('../lib/http-errors');
-const users = require('../lib/user');
+const users = require('../lib/data-layer/user');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/user/:email';

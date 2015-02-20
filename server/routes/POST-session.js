@@ -5,42 +5,47 @@
 // Sign in an existing user.
 
 const inputValidation = require('../lib/input-validation');
-const user = require('../lib/user');
-const verifier = require('../lib/verifier');
 const httpErrors = require('../lib/http-errors');
+const verifier = require('../lib/verifier');
 
-exports.path = '/session';
-exports.method = 'post';
-exports.authorization = require('../lib/page-authorization').ANY;
+module.exports = function (config) {
+  const users = config.users;
 
-exports.validation = {
-  _csrf: inputValidation.csrf(),
-  assertion: inputValidation.assertion()
-};
+  return {
+    path: '/session',
+    method: 'post',
+    authorization: require('../lib/page-authorization').ANY,
+
+    validation: {
+      _csrf: inputValidation.csrf(),
+      assertion: inputValidation.assertion()
+    },
 
 
-exports.handler = function (req, res) {
-  const assertion = req.body.assertion;
-  const redirectTo = decodeURIComponent(req.session.redirectTo || '/site');
+    handler: function (req, res) {
+      const assertion = req.body.assertion;
+      const redirectTo = decodeURIComponent(req.session.redirectTo || '/site');
 
-  delete req.session.redirectTo;
+      delete req.session.redirectTo;
 
-  var email;
+      var email;
 
-  return verifier.verify(assertion)
-    .then(function (_email) {
-      email = _email;
-       // Check if user already exists.
-       return user.exists(email);
-    })
-    .then(function (exists) {
-      // uh oh, user does not exist.
-      if (! exists) {
-        throw httpErrors.ForbiddenError();
-      }
+      return verifier.verify(assertion)
+        .then(function (_email) {
+          email = _email;
+           // Check if user already exists.
+           return users.exists(email);
+        })
+        .then(function (exists) {
+          // uh oh, user does not exist.
+          if (! exists) {
+            throw httpErrors.ForbiddenError();
+          }
 
-      // sign the user in, visit their list of sites.
-      req.session.email = email;
-      res.redirect(redirectTo);
-    });
+          // sign the user in, visit their list of sites.
+          req.session.email = email;
+          res.redirect(redirectTo);
+        });
+    }
+  };
 };

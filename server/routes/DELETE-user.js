@@ -6,7 +6,7 @@
 
 const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
-const users = require('../lib/user');
+const users = require('../lib/data-layer/user');
 
 exports.path = '/user/:email';
 exports.method = 'delete';

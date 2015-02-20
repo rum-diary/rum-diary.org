@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const sites = require('../lib/site');
-const invitations = require('../lib/invite');
+const sites = require('../lib/data-layer/site');
+const invitations = require('../lib/data-layer/invite');
 const inputValidation = require('../lib/input-validation');
 const logger = require('../lib/logger');
 const accessLevels = require('rum-diary-access-levels');

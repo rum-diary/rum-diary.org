@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const p = require('bluebird');
-const siteInfo = require('../lib/site');
+const sites = require('../lib/data-layer/site');
 const clientResources = require('../lib/client-resources');
 
 exports.path = '/site/:hostname/demographics';
@@ -21,8 +21,8 @@ exports.handler = function(req) {
   var endDate = req.end;
 
   return p.all([
-    siteInfo.canAdminister(hostname, email),
-    siteInfo.demographics(hostname, startDate, endDate)
+    sites.canAdminister(hostname, email),
+    sites.demographics(hostname, startDate, endDate)
   ]).spread(function(isAdmin, demographicsResults) {
 
     return {

@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Promise = require('bluebird');
-const siteInfo = require('../lib/site');
+const sites = require('../lib/data-layer/site');
 const clientResources = require('../lib/client-resources');
 const navigationTimingFields = require('../lib/navigation-timing');
 
@@ -20,8 +20,8 @@ exports.handler = function(req) {
   if (req.query.plot) statName = req.query.plot;
 
   return Promise.all([
-    siteInfo.canAdminister(req.params.hostname, req.session.email),
-    siteInfo.performance(req.params.hostname, statName, req.start, req.end)
+    sites.canAdminister(req.params.hostname, req.session.email),
+    sites.performance(req.params.hostname, statName, req.start, req.end)
   ]).spread(function(isAdmin, performanceResults) {
 
     return {

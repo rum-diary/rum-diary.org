@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const inputValidation = require('../lib/input-validation');
-const users = require('../lib/user');
-const sites = require('../lib/site');
+const users = require('../lib/data-layer/user');
+const sites = require('../lib/data-layer/site');
 const verifier = require('../lib/verifier');
 
 exports.path = '/user';
