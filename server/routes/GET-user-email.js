@@ -3,18 +3,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const httpErrors = require('../lib/http-errors');
-const clientResources = require('../lib/client-resources');
 
 module.exports = function (config) {
   const users = config.users;
   const authorization = config.authorization;
+  const clientResources = config.clientResources;
 
   return {
     path: '/user/:email',
     method: 'get',
     template: 'GET-user-email.html',
     locals: {
-      resources: clientResources('js/rum-diary.min.js')
+      resources: clientResources.get('js/rum-diary.min.js')
     },
     authorization: authorization.IS_USER,
 

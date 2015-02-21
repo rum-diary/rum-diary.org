@@ -4,10 +4,9 @@
 
 // Placeholder to sign a user in.
 
-const clientResources = require('../lib/client-resources');
-
 module.exports = function (config) {
   const authorization = config.authorization;
+  const clientResources = config.clientResources;
 
   return {
     path: '/user',
@@ -15,7 +14,7 @@ module.exports = function (config) {
     template: 'GET-user-index.html',
 
     locals: {
-      resources: clientResources('js/signin.min.js')
+      resources: clientResources.get('js/signin.min.js')
     },
 
     authorization: authorization.ANY,

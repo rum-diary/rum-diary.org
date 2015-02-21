@@ -11,7 +11,6 @@ const methodOverride = require('method-override');
 const common = require('rum-diary-server-common');
 
 const config = require('./lib/config');
-const templates = require('./lib/templates');
 
 const httpServer = common.httpServer;
 
@@ -23,7 +22,7 @@ const errorHandler = require('./lib/middleware/error')(logger);
 const siteQuery = require('./lib/middleware/site-query');
 
 
-const db = require('./lib/db');
+const db = require('./lib/db')(config);
 const dataLayer = require('./lib/data-layer')(db);
 
 const STATIC_ROOT = path.join(config.get('static_root'),
@@ -33,8 +32,7 @@ const ROUTES_ROOT = path.join(__dirname, 'routes');
 const SessionStore = require('./lib/session-store');
 SessionStore.create(db).then(function (sessionStore) {
   const app = common.app();
-
-  templates.setup(app);
+  const templates = require('./lib/templates')(config, app);
 
   app.use(common.middleware.logging(logger));
 
@@ -78,7 +76,8 @@ SessionStore.create(db).then(function (sessionStore) {
         invites: dataLayer.invite,
         logger: logger,
         verifier: require('./lib/verifier')(config, logger),
-        authorization: require('./lib/page-authorization')(dataLayer.site)
+        authorization: require('./lib/page-authorization')(dataLayer.site),
+        clientResources: require('./lib/client-resources')(config)
       }
     }
   }));

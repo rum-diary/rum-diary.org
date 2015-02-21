@@ -7,8 +7,6 @@ const moment = require('moment');
 const cachify = require('connect-cachify');
 const path = require('path');
 
-const config = require('./config');
-
 function getNunjucksConfig(app) {
   // Template setup.
   var nunjucksConfig = {
@@ -22,7 +20,7 @@ function getNunjucksConfig(app) {
   return nunjucksConfig;
 }
 
-exports.setup = function (app) {
+module.exports = function (config, app) {
   var nunjucksConfig = getNunjucksConfig(app);
   var templateRoot = path.join(config.get('views_root'), config.get('static_dir'));
   var env = nunjucks.configure(templateRoot, nunjucksConfig);
@@ -40,5 +38,3 @@ exports.setup = function (app) {
 
   return env;
 };
-
-

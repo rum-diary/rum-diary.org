@@ -7,7 +7,9 @@
  *
  * @Class DB
  */
-const config = require('./config');
 const common = require('rum-diary-server-common');
-module.exports = common.db(common.configAdapter(config, 'mongo'));
+
+module.exports = function (config) {
+  return common.db(common.configAdapter(config, 'mongo'));
+};
 

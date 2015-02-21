@@ -4,18 +4,18 @@
 
 
 const p = require('bluebird');
-const clientResources = require('../lib/client-resources');
 
 module.exports = function (config) {
   const sites = config.sites;
   const authorization = config.authorization;
+  const clientResources = config.clientResources;
 
   return {
     path: '/site/:hostname/demographics',
     method: 'get',
     template: 'GET-site-hostname-demographics.html',
     locals: {
-      resources: clientResources('js/rum-diary.min.js')
+      resources: clientResources.get('js/rum-diary.min.js')
     },
     authorization: authorization.CAN_READ_HOST,
 
