@@ -15,7 +15,7 @@ module.exports = function (grunt) {
 
     // The resources have to be included inside of this fake task so we do not
     // load up local config before the selectconfig task has been run.
-    var client_deps = require('../server/lib/client-resources');
+    var client_deps = require('../server/lib/client-resources')();
 
     var files = {};
     for (var key in client_deps.all) {
