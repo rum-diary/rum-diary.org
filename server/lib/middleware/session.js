@@ -16,18 +16,19 @@ module.exports = function (options) {
 
   return createSessionMiddleware(sessionStore, config, function (req, res, next) {
     var email = req.session.email;
-    if (email) {
-      return checkUserExists(userCollection, email)
-        .then(function (userExists) {
-          if (! userExists) {
-            destroySessionAndRedirect(req, res);
-          } else {
-            next();
-          }
-        });
+    if (! email) {
+      next();
+      return;
     }
 
-    next();
+    return checkUserExists(userCollection, email)
+      .then(function (userExists) {
+        if (! userExists) {
+          destroySessionAndRedirect(req, res);
+        } else {
+          next();
+        }
+      });
   });
 };
 
