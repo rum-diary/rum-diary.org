@@ -29,8 +29,7 @@ const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
 const ROUTES_ROOT = path.join(__dirname, 'routes');
 
-const SessionStore = require('./lib/session-store');
-SessionStore.create(db).then(function (sessionStore) {
+common.sessionStore(db).then(function (sessionStore) {
   const app = common.app();
   const templates = require('./lib/templates')(config, app);
 
