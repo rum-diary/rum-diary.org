@@ -3,8 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 module.exports = function (config) {
-  const sites = config.sites;
   const authorization = config.authorization;
+  const sites = config.sites;
 
   return {
     path: '/site/:hostname/admin',

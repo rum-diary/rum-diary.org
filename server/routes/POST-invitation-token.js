@@ -6,9 +6,9 @@ const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 
 module.exports = function (config) {
-  const logger = config.logger;
-  const invitations = config.invitations;
   const authorization = config.authorization;
+  const invitations = config.invitations;
+  const logger = config.logger;
 
   function verifyNewUserThenRedirect(req, res, tokenInfo, name) {
     return invitations.verifyNewUser(tokenInfo.token, name)

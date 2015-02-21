@@ -4,13 +4,13 @@
 
 // Sign in an existing user.
 
-const moment = require('moment');
 const inputValidation = require('../lib/input-validation');
+const moment = require('moment');
 
 module.exports = function (config) {
   const annotations = config.annotations;
-  const logger = config.logger;
   const authorization = config.authorization;
+  const logger = config.logger;
 
   return {
     path: '/site/:hostname/annotation',

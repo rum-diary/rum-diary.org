@@ -5,9 +5,9 @@
 const httpErrors = require('../lib/http-errors');
 
 module.exports = function (config) {
-  const users = config.users;
   const authorization = config.authorization;
   const clientResources = config.clientResources;
+  const users = config.users;
 
   return {
     path: '/user/:email',

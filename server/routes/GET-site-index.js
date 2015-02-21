@@ -5,8 +5,8 @@
 // Show a list of hostnames.
 
 module.exports = function (config) {
-  const users = config.users;
   const authorization = config.authorization;
+  const users = config.users;
 
   return {
     path: '/site',

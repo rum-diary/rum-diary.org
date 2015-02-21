@@ -5,9 +5,9 @@
 const httpErrors = require('../lib/http-errors');
 
 module.exports = function (config) {
+  const authorization = config.authorization;
   const invitations = config.invitations;
   const logger = config.logger;
-  const authorization = config.authorization;
 
   function verifyExistingUserThenRedirect(req, res, tokenInfo) {
     return invitations.verifyExistingUser(tokenInfo.token)

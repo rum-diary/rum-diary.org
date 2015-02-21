@@ -4,9 +4,9 @@
 
 
 module.exports = function (config) {
-  const pages = config.sites.pages;
   const authorization = config.authorization;
   const clientResources = config.clientResources;
+  const pages = config.sites.pages;
 
   return {
     method: 'get',

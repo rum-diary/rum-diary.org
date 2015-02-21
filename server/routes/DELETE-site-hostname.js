@@ -8,8 +8,8 @@ const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 
 module.exports = function (config) {
-  const sites = config.sites;
   const authorization = config.authorization;
+  const sites = config.sites;
 
   return {
     path: '/site/:hostname',

@@ -5,10 +5,10 @@
 const inputValidation = require('../lib/input-validation');
 
 module.exports = function (config) {
-  const users = config.users;
-  const sites = config.sites;
-  const verifier = config.verifier;
   const authorization = config.authorization;
+  const sites = config.sites;
+  const users = config.users;
+  const verifier = config.verifier;
 
   return {
     path: '/user',

@@ -4,13 +4,13 @@
 
 // Sign in an existing user.
 
-const inputValidation = require('../lib/input-validation');
 const httpErrors = require('../lib/http-errors');
+const inputValidation = require('../lib/input-validation');
 
 module.exports = function (config) {
+  const authorization = config.authorization;
   const users = config.users;
   const verifier = config.verifier;
-  const authorization = config.authorization;
 
   return {
     path: '/session',

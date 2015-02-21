@@ -5,10 +5,10 @@
 const p = require('bluebird');
 
 module.exports = function (config) {
-  const sites = config.sites;
-  const logger = config.logger;
   const authorization = config.authorization;
   const clientResources = config.clientResources;
+  const logger = config.logger;
+  const sites = config.sites;
 
   return {
     path: '/site/:hostname',

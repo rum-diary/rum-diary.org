@@ -3,9 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 module.exports = function (config) {
-  const env = config.config.get('env');
   const authorization = config.authorization;
   const clientResources = config.clientResources;
+  const env = config.config.get('env');
 
   return {
     path: /tests\/(?:index\.html)?/,

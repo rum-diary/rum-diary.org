@@ -6,9 +6,9 @@ const httpErrors = require('../lib/http-errors');
 const inputValidation = require('../lib/input-validation');
 
 module.exports = function (config) {
+  const authorization = config.authorization;
   const sites = config.sites;
   const users = config.users;
-  const authorization = config.authorization;
 
   return {
     path: '/user/:email/site',

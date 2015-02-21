@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const Promise = require('bluebird');
 const navigationTimingFields = require('../lib/navigation-timing');
+const Promise = require('bluebird');
 
 module.exports = function (config) {
-  const sites = config.sites;
   const authorization = config.authorization;
   const clientResources = config.clientResources;
+  const sites = config.sites;
 
   return {
     path: '/site/:hostname/performance',

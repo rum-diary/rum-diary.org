@@ -6,9 +6,9 @@
 const p = require('bluebird');
 
 module.exports = function (config) {
-  const sites = config.sites;
   const authorization = config.authorization;
   const clientResources = config.clientResources;
+  const sites = config.sites;
 
   return {
     path: '/site/:hostname/demographics',
