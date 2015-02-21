@@ -23,7 +23,6 @@ const errorHandler = require('./lib/middleware/error');
 const siteQuery = require('./lib/middleware/site-query');
 
 
-const SessionStore = require('./lib/session-store');
 const db = require('./lib/db');
 const dataLayer = require('./lib/data-layer')(db);
 
@@ -31,7 +30,8 @@ const STATIC_ROOT = path.join(config.get('static_root'),
                                 config.get('static_dir'));
 const ROUTES_ROOT = path.join(__dirname, 'routes');
 
-SessionStore.create().then(function (sessionStore) {
+const SessionStore = require('./lib/session-store');
+SessionStore.create(db).then(function (sessionStore) {
   const app = common.app();
 
   templates.setup(app);
