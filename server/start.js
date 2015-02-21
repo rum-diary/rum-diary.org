@@ -19,7 +19,7 @@ const logger = common.logging(common.configAdapter(config, 'logging'));
 
 const csrf = common.middleware.csrf;
 const session = require('./lib/middleware/session');
-const errorHandler = require('./lib/middleware/error');
+const errorHandler = require('./lib/middleware/error')(logger);
 const siteQuery = require('./lib/middleware/site-query');
 
 

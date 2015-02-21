@@ -6,58 +6,19 @@ const moment = require('moment');
 
 // Create a database query object from the information in the request.
 module.exports = function(req, res, next) {
-  var query = {};
 
   if (req.query.start) {
-    query.start = moment(req.query.start).startOf('day');
+    req.start = moment(req.query.start).startOf('day');
   } else {
-    query.start = moment().subtract(30, 'days').startOf('day');
+    req.start = moment().subtract(30, 'days').startOf('day');
   }
 
   if (req.query.end) {
-    query.end = moment(req.query.end).endOf('day');
+    req.end = moment(req.query.end).endOf('day');
   } else {
-    query.end = moment().endOf('day');
+    req.end = moment().endOf('day');
   }
-
-  if (req.query.tags) {
-    var tags = req.query.tags.split(',');
-    query.tags = tagsToMongoSelector(tags);
-  }
-
-  if (req.query.referrer) {
-    query.referrer = req.query.referrer;
-  }
-
-  req.dbQuery = query;
-  req.start = query.start;
-  req.end = query.end;
 
   next();
 };
-
-function tagsToMongoSelector(tags) {
-  var $in = [];
-  var $nin = [];
-
-  tags.forEach(function (tag) {
-    if (isNotTag(tag)) return $nin.push(tag.replace(/^!/, ''));
-    $in.push(tag);
-  });
-
-  var selector = {};
-  if ($in.length) {
-    selector.$in = $in;
-  }
-
-  if ($nin.length) {
-    selector.$nin = $nin;
-  }
-
-  return selector;
-}
-
-function isNotTag(tag) {
-  return /^!/.test(tag);
-}
 
