@@ -4,17 +4,16 @@
 
 'use strict';
 
-var TOTAL_WIDTH = 650,
-    TOTAL_HEIGHT = 500,
-    MARGIN_TOP = 20,
-    MARGIN_RIGHT = 80,
-    MARGIN_BOTTOM = 30,
-    MARGIN_LEFT = 50;
+const TOTAL_WIDTH = 650;
+const TOTAL_HEIGHT = 500;
+const MARGIN_TOP = 20;
+const MARGIN_RIGHT = 80;
+const MARGIN_BOTTOM = 30;
+const MARGIN_LEFT = 50;
 
-var d3 = require('d3');
-var strformat = require('string-utils').format;
+const d3 = require('d3');
 
-var NAVIGATION_TIMING_SECTIONS = [
+const NAVIGATION_TIMING_SECTIONS = [
   {
     name: 'Redirect',
     start: 'redirectStart',
@@ -64,7 +63,7 @@ var NAVIGATION_TIMING_SECTIONS = [
   }
 ];
 
-var BACKGROUND_COLORS = [
+const BACKGROUND_COLORS = [
   'dodgerblue',
   'peachpuff',
   'tan',
@@ -75,12 +74,15 @@ var BACKGROUND_COLORS = [
   'green'
 ];
 
-var Module = {
-  create: function() {
-    return Object.create(this);
-  },
+class Module {
+  constructor () {
+  }
 
-  init: function(options) {
+  static create () {
+    return new this()
+  }
+
+  init (options) {
     options = options || {};
 
     this.data = options.data || [];
@@ -88,41 +90,40 @@ var Module = {
 
     this.total_width = options.width || TOTAL_WIDTH;
     this.total_height = options.height || TOTAL_HEIGHT;
-  },
-
-  render: function() {
-    var chartWidth = this.total_width - MARGIN_LEFT - MARGIN_RIGHT;
-    var chartHeight = this.total_height - MARGIN_TOP - MARGIN_BOTTOM;
-    var barWidth = (chartWidth / this.data.length) - 20;
-
-    var chartData = toChartData(this.data);
-
-    var svg = createSvgElement(this.root, chartWidth, chartHeight);
-    var x = createXAxis(svg, chartWidth, chartHeight, chartData);
-    var y = createYAxis(svg, chartWidth, chartHeight, chartData);
-    var z = d3.scale.ordinal().range(BACKGROUND_COLORS);
-    var tooltip = createTooltip();
-
-    var container = drawContainer(svg, chartData);
-    drawSeries(container, x, y, z, barWidth, tooltip);
   }
 
+  render () {
+    let chartWidth = this.total_width - MARGIN_LEFT - MARGIN_RIGHT;
+    let chartHeight = this.total_height - MARGIN_TOP - MARGIN_BOTTOM;
+    let barWidth = (chartWidth / this.data.length) - 20;
+
+    let chartData = toChartData(this.data);
+
+    let svg = createSvgElement(this.root, chartWidth, chartHeight);
+    let x = createXAxis(svg, chartWidth, chartHeight, chartData);
+    let y = createYAxis(svg, chartWidth, chartHeight, chartData);
+    let z = d3.scale.ordinal().range(BACKGROUND_COLORS);
+    let tooltip = createTooltip();
+
+    let container = drawContainer(svg, chartData);
+    drawSeries(container, x, y, z, barWidth, tooltip);
+  }
 };
 
 
 module.exports = Module;
 
 function toChartData(navigationTimingSeries) {
-  return navigationTimingSeries.map(toChartSeries).reduce(function(total, series) {
+  return navigationTimingSeries.map(toChartSeries).reduce((total, series) => {
     return total.concat(series);
   }, []);
 }
 
 function toChartSeries(navigationTimingData, x) {
-  var count = 0;
+  let count = 0;
 
-  var chartData = NAVIGATION_TIMING_SECTIONS.map(function(section) {
-    var data = {
+  let chartData = NAVIGATION_TIMING_SECTIONS.map((section) => {
+    let data = {
       x: x,
       z: count,
       end: section.end,
@@ -140,7 +141,7 @@ function toChartSeries(navigationTimingData, x) {
 }
 
 function createXAxis(svg, width, height, chartData) {
-  var x = d3.scale.linear()
+  let x = d3.scale.linear()
     .range([0, width]);
 
   setXDomain(x, chartData);
@@ -149,12 +150,12 @@ function createXAxis(svg, width, height, chartData) {
 }
 
 function createYAxis(svg, width, height, chartData) {
-  var y = d3.scale.linear()
+  let y = d3.scale.linear()
       .range([height, 0]);
 
   setYDomain(y, chartData);
 
-  var yAxis = d3.svg.axis()
+  let yAxis = d3.svg.axis()
       .scale(y)
       .orient('left');
 
@@ -168,31 +169,27 @@ function createYAxis(svg, width, height, chartData) {
 }
 
 function createSvgElement(root, width, height) {
-  var svg = d3.select(root).append('svg')
+  let svg = d3.select(root).append('svg')
       .attr('width', width + MARGIN_LEFT + MARGIN_RIGHT)
       .attr('height', height + MARGIN_TOP + MARGIN_BOTTOM)
     .append('g')
       .attr('class', 'svg-group')
-      .attr('transform', 'translate(' + MARGIN_LEFT + ',' + MARGIN_TOP + ')');
+      .attr('transform', `translate${MARGIN_LEFT},${MARGIN_TOP})`);
 
   return svg;
 }
 
 function setXDomain(x, chartData) {
-  x.domain([0, d3.max(chartData, function(d) {
-    return d.x;
-  })]);
+  x.domain([0, d3.max(chartData, d => d.x)]);
 }
 
 function setYDomain(y, chartData) {
-  y.domain([0, d3.max(chartData, function(d) {
-    return d.end_y;
-  })]);
+  y.domain([0, d3.max(chartData, d => d.end_y)]);
 }
 
 
 function createTooltip() {
-  var tooltip = require('../tooltip').create();
+  let tooltip = require('../tooltip').create();
   tooltip.init({
     appendTo: 'body'
   });
@@ -211,49 +208,32 @@ function drawContainer(svg, chartData) {
 function drawSeries(container, x, y, z, barWidth, tooltip) {
     // Add a rect for each field
     container.selectAll('rect')
-        .data(function(d) {
-          // data must be returned in an array or else no rects are added.
-          return [d];
-        })
+        // data must be returned in an array or else no rects are added.
+        .data(d => [d])
       .enter().append('rect')
-        .attr('x', function(d) {
-          return (1 + d.x) * 10 + (d.x * barWidth);
-        })
-        .attr('y', function(d) {
-          return y(d.end_y);
-        })
-        .attr('height', function(d) {
-          return y(d.start_y) - y(d.end_y);
-        })
-        .style('fill', function(d) {
-          return z(d.z);
-        })
-        .style('opacity', function() {
-          return 0.5;
-        })
+        .attr('x', d => (1 + d.x) * 10 + (d.x * barWidth))
+        .attr('y', d => y(d.end_y))
+        .attr('height', d => y(d.start_y) - y(d.end_y))
+        .style('fill', d => z(d.z))
+        .style('opacity', d => 0.5)
         .attr('width', '' + barWidth)
         .style('stroke', '#000000')
         .attr('rx', '5')
-        .on('mouseenter', function(d) {
-          var tooltipHTML = strformat(
-              '<h3 class="tooltip-title">%s</h3>' +
-              '<p class="tooltip-section">%s: %s</p>' +
-              '<p class="tooltip-section">%s: %s</p>',
-              d.name,
-              d.start,
-              d.start_y,
-              d.end,
-              d.end_y);
+        .on('mouseenter', d => {
+          let tooltipHTML = `
+              <h3 class="tooltip-title">${d.name}</h3>
+              <p class="tooltip-section">${d.start}: ${d.start_y}</p>
+              <p class="tooltip-section">${d.end}: ${d.end_y}</p>`;
 
           tooltip.html(tooltipHTML);
           tooltip.show();
         })
-        .on('mousemove', function() {
+        .on('mousemove', () => {
           tooltip.move(
-              (d3.event.pageX+10)+'px',
-              (d3.event.pageY-10)+'px');
+              `${d3.event.pageX+10}px`,
+              `${d3.event.pageY-10}px`);
         })
-        .on('mouseleave', function() {
+        .on('mouseleave', () => {
           tooltip.hide();
         });
 
