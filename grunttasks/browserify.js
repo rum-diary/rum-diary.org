@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const browserify = require('browserify');
+const babelify = require('babelify');
 const mold = require('mold-source-map');
 const fs = require('fs');
 const path = require('path');
@@ -67,6 +68,9 @@ function createBundleWithSourceMap(startPath, destPath, jsRoot, done) {
   console.error('Creating dev bundle: %s=>%s->%s', jsRoot, startPath, destPath);
 
   browserify()
+    .transform(babelify.configure({
+        ignore: /(bower_components|bundle)/
+    }))
     .require(path.join(jsRoot, 'bower_components', 'd3', 'd3.js'), { expose: 'd3'})
     .require(path.join(jsRoot, 'bower_components', 'dominator', 'dominator.js'), { expose: 'dominator'})
     .require(path.join(jsRoot, 'bower_components', 'pikaday', 'pikaday.js'), { expose: 'pikaday'})

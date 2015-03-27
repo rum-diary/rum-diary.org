@@ -77,6 +77,7 @@
     "grunt-zopfli": "0.3.2",
     "mocha": "2.1.0",
     "request": "2.51.0",
-    "sinon": "1.12.2"
+    "sinon": "1.12.2",
+    "babelify": "~5.0.4"
   }
 }

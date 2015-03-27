@@ -4,18 +4,21 @@
 
 'use strict';
 
-var DOM = require('dominator');
+const DOM = require('dominator');
 
 function stopPropagation(event) {
   event.stopPropagation();
 }
 
-module.exports = {
-  create: function() {
-    return Object.create(this);
-  },
+class Module {
+  constructor () {
+  }
 
-  init: function(options) {
+  static create () {
+    return new this();
+  }
+
+  init (options = {}) {
     options = options || {};
 
     this.appendTo = options.appendTo || 'body';
@@ -25,39 +28,42 @@ module.exports = {
     this.html(options.html);
 
     return this;
-  },
+  }
 
-  render: function() {
+  render () {
     this.tooltip = DOM('<div>').addClass('tooltip').appendTo('body');
 
-    if (this.id) this.tooltip.attr('id', this.id);
-  },
+    if (this.id) {
+      this.tooltip.attr('id', this.id);
+    }
+  }
 
-  root: function() {
+  root () {
     return this.tooltip;
-  },
+  }
 
-  html: function(html) {
+  html (html) {
     this.tooltip.html(html);
-  },
+  }
 
-  show: function() {
+  show () {
     this.tooltip.show();
-    var self = this;
-    DOM(self.tooltip).on('click', stopPropagation);
+    DOM(this.tooltip).on('click', stopPropagation);
 
-    DOM('body').once('click', function hide() {
-      DOM(self.tooltip).off('click', stopPropagation);
-      self.hide();
+    DOM('body').once('click', () => {
+      DOM(this.tooltip).off('click', stopPropagation);
+      this.hide();
     });
-  },
+  }
 
-  hide: function() {
+  hide () {
     this.tooltip.hide();
-  },
+  }
 
-  move: function(x, y) {
+  move (x, y) {
     this.tooltip.style('left', x).style('top', y);
   }
-};
+}
+
+module.exports = Module;
 

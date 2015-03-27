@@ -3,10 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 (function() {
-  var DOM = require('dominator');
-  var Pikaday = require('pikaday');
+  const DOM = require('dominator');
+  const Pikaday = require('pikaday');
 
-  window.addEventListener('load', function() {
+  window.addEventListener('load', () => {
 
     hitsGraph();
     createEnterAnnotationWidget();
@@ -20,25 +20,25 @@
   }, false);
 
   function createEnterAnnotationWidget() {
-    var enterAnnotationWidget = require('./enter-annotation.js').create();
+    const enterAnnotationWidget = require('./enter-annotation.js').create();
     enterAnnotationWidget.init();
     /*enterAnnotationWidget.render();*/
   }
 
   function datePicker() {
-    var startEl = DOM('[name=start]').nth(0);
-    var startPicker = new Pikaday({
+    let startEl = DOM('[name=start]').nth(0);
+    let startPicker = new Pikaday({
       field: startEl,
-      onSelect: function() {
+      onSelect: () => {
         startEl.value = startPicker.toString();
       },
       maxDate: new Date()
     });
 
-    var endEl = DOM('[name=end]').nth(0);
-    var endPicker = new Pikaday({
+    let endEl = DOM('[name=end]').nth(0);
+    let endPicker = new Pikaday({
       field: endEl,
-      onSelect: function() {
+      onSelect: () => {
         endEl.value = endPicker.toString();
       },
       maxDate: new Date()
@@ -46,11 +46,11 @@
   }
 
   function hitsGraph() {
-    var data = getHits();
-    var markers = getAnnotations();
+    let data = getHits();
+    let markers = getAnnotations();
 
     // Graph the data!
-    var graph = require('./graphs/hits.js').create();
+    let graph = require('./graphs/hits.js').create();
     graph.init({
       data: data,
       markers: markers
@@ -62,33 +62,25 @@
 
   function getHits() {
     // Get data from the HTML
-    var dayEls = [].slice.call(document.querySelectorAll('.hits-data-day'), 0);
+    let dayEls = [].slice.call(document.querySelectorAll('.hits-data-day'), 0);
     if (! dayEls.length) return;
 
-    var data = dayEls.map(function(dayEl) {
-      var dateEl = dayEl.querySelector('.hits-data-date');
-      var hitsEl = dayEl.querySelector('.hits-data-hits');
-
+    return dayEls.map(dayEl => {
       return {
-        date: dateEl.textContent,
-        hits: parseInt(hitsEl.textContent, 10)
+        date: dayEl.querySelector('.hits-data-date').textContent,
+        hits: parseInt(dayEl.querySelector('.hits-data-hits').textContent, 10)
       };
     });
-
-    return data;
   }
 
   function getAnnotations() {
-    var annotationEls = [].slice.call(document.querySelectorAll('.annotation'), 0);
+    let annotationEls = [].slice.call(document.querySelectorAll('.annotation'), 0);
     if (! annotationEls.length) return [];
 
-    var data = annotationEls.map(function(dayEl) {
-      var dateEl = dayEl.querySelector('.annotation-date');
-      var titleEl = dayEl.querySelector('.annotation-title');
-
+    let data = annotationEls.map((dayEl) => {
       return {
-        date: dateEl.textContent,
-        label: titleEl.textContent
+        date: dayEl.querySelector('.annotation-date').textContent,
+        label: dayEl.querySelector('.annotation-title').textContent
       };
     });
 
@@ -96,16 +88,16 @@
   }
 
   function navigationTimingGraph() {
-    var navigationTimingEls = [].slice.call(document.querySelectorAll('.navigation-timing-row'));
+    let navigationTimingEls = [].slice.call(document.querySelectorAll('.navigation-timing-row'));
     if (! navigationTimingEls.length) return;
 
-    var navigationTiming1QData = {};
-    var navigationTiming2QData = {};
-    var navigationTiming3QData = {};
-    navigationTimingEls.forEach(function(navigationTimingEl) {
-      var keyEl = navigationTimingEl.querySelector('.navigation-timing-key');
+    let navigationTiming1QData = {};
+    let navigationTiming2QData = {};
+    let navigationTiming3QData = {};
+    navigationTimingEls.forEach((navigationTimingEl) => {
+      let keyEl = navigationTimingEl.querySelector('.navigation-timing-key');
 
-      var valueEl = navigationTimingEl.querySelector('.navigation-timing-first_q_value');
+      let valueEl = navigationTimingEl.querySelector('.navigation-timing-first_q_value');
       navigationTiming1QData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
 
       valueEl = navigationTimingEl.querySelector('.navigation-timing-second_q_value');
@@ -115,7 +107,7 @@
       navigationTiming3QData[keyEl.textContent] = parseInt(valueEl.textContent, 10);
     });
 
-    var graph = require('./graphs/navigation-timing.js').create();
+    let graph = require('./graphs/navigation-timing.js').create();
     graph.init({
       root: '#navigation-timing-graph',
       data: [
@@ -133,18 +125,18 @@
   }
 
   function histogramGraph() {
-    var histogramDataEls = DOM('#histogram-data li');
+    let histogramDataEls = DOM('#histogram-data li');
     if (! histogramDataEls.length) return;
-    var histogramData = [];
+    let histogramData = [];
 
-    var min, max;
+    let min, max;
 
-    histogramDataEls.forEach(function(el) {
-      var text = DOM(el).html().trim();
+    histogramDataEls.forEach(el => {
+      let text = DOM(el).html().trim();
       if (! text.length) return;
       if (isNaN(text)) return;
 
-      var value = parseInt(text, 10);
+      let value = parseInt(text, 10);
       if (typeof min === 'undefined') min = value;
       min = Math.min(min, value);
 
@@ -154,7 +146,7 @@
       histogramData.push(value);
     });
 
-    var histogram = require('./graphs/histogram.js').create();
+    let histogram = require('./graphs/histogram.js').create();
     histogram.init({
       root: '#histogram-graph',
       data: histogramData,
@@ -167,22 +159,21 @@
     DOM('#histogram-data').hide();
   }
 
-
   function cdfGraph() {
-    var cdfDataEls = DOM('#cdf-data tr');
+    let cdfDataEls = DOM('#cdf-data tr');
     if (! cdfDataEls.length) return;
-    var cdfData = [];
+    let cdfData = [];
 
-    cdfDataEls.forEach(function(rowEl) {
-      var x = DOM(rowEl).find('.elapsed-time').html().trim();
+    cdfDataEls.forEach(rowEl => {
+      let x = DOM(rowEl).find('.elapsed-time').html().trim();
       if (! x.length) return;
       if (isNaN(x)) return;
 
-      var y = DOM(rowEl).find('.cdf').html().trim();
+      let y = DOM(rowEl).find('.cdf').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
-      var yVal = parseFloat(y);
+      let yVal = parseFloat(y);
       // cut off at 98%, going all the way to 100% results in often very
       // skewed graphs.
       if (yVal > 0.98) return;
@@ -193,7 +184,7 @@
       });
     });
 
-    var cdf = require('./graphs/cdf.js').create();
+    let cdf = require('./graphs/cdf.js').create();
     cdf.init({
       root: '#cdf-graph',
       data: cdfData,
@@ -206,15 +197,15 @@
   }
 
   function browsersGraph() {
-    var browsersDataEls = DOM('.browsers-data-item');
+    let browsersDataEls = DOM('.browsers-data-item');
     if (! browsersDataEls.length) return;
-    var browsersData = [];
+    let browsersData = [];
 
-    browsersDataEls.forEach(function(rowEl) {
-      var x = DOM(rowEl).find('.browsers-data-browser').html().trim();
+    browsersDataEls.forEach(rowEl => {
+      let x = DOM(rowEl).find('.browsers-data-browser').html().trim();
       if (! x.length) return;
 
-      var y = DOM(rowEl).find('.browsers-data-count').html().trim();
+      let y = DOM(rowEl).find('.browsers-data-count').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -224,7 +215,7 @@
       });
     });
 
-    var browsers = require('./graphs/horizontal-bar.js').create();
+    let browsers = require('./graphs/horizontal-bar.js').create();
     browsers.init({
       root: '#browsers-graph',
       data: browsersData
@@ -235,15 +226,15 @@
   }
 
   function osGraph() {
-    var osDataEls = DOM('.os-data-item');
+    let osDataEls = DOM('.os-data-item');
     if (! osDataEls.length) return;
-    var osData = [];
+    let osData = [];
 
-    osDataEls.forEach(function(rowEl) {
-      var x = DOM(rowEl).find('.os-data-name').html().trim();
+    osDataEls.forEach(rowEl => {
+      let x = DOM(rowEl).find('.os-data-name').html().trim();
       if (! x.length) return;
 
-      var y = DOM(rowEl).find('.os-data-count').html().trim();
+      let y = DOM(rowEl).find('.os-data-count').html().trim();
       if (! y.length) return;
       if (isNaN(y)) return;
 
@@ -253,7 +244,7 @@
       });
     });
 
-    var os = require('./graphs/horizontal-bar.js').create();
+    let os = require('./graphs/horizontal-bar.js').create();
     os.init({
       root: '#os-graph',
       data: osData
@@ -264,10 +255,10 @@
   }
 
   function deviceTypeGraph() {
-    var rootEl = DOM('#device-type-graph');
+    let rootEl = DOM('#device-type-graph');
     if (! rootEl.length) return;
 
-    var deviceTypeData = {
+    let deviceTypeData = {
       mobile: 0,
       desktop: 0
     };
@@ -275,14 +266,14 @@
     countDeviceType('mobile');
     countDeviceType('desktop');
 
-    var deviceTypeArray = Object.keys(deviceTypeData).map(function(key) {
+    let deviceTypeArray = Object.keys(deviceTypeData).map(key => {
       return {
         title: key,
         value: deviceTypeData[key]
       };
     });
 
-    var deviceType = require('./graphs/horizontal-bar.js').create();
+    let deviceType = require('./graphs/horizontal-bar.js').create();
     deviceType.init({
       root: '#device-type-graph',
       data: deviceTypeArray
@@ -293,20 +284,17 @@
     DOM('#os-data-desktop').hide();
 
     function countDeviceType(type) {
-      var osDataEls = DOM('.os-data-item-' + type);
+      let osDataEls = DOM('.os-data-item-' + type);
       if (! osDataEls.length) return;
 
-      osDataEls.forEach(function(rowEl) {
-        var y = DOM(rowEl).find('.os-data-count').html().trim();
+      osDataEls.forEach(rowEl => {
+        let y = DOM(rowEl).find('.os-data-count').html().trim();
         if (! y.length) return;
         if (isNaN(y)) return;
 
         deviceTypeData[type] += parseInt(y, 10);
       });
     }
-
   }
-
-
 }());
 

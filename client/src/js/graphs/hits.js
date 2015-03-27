@@ -2,40 +2,43 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-var d3 = require('d3');
-var DOM = require('dominator');
-var Events = require('events');
+const d3 = require('d3');
+const DOM = require('dominator');
+const Events = require('events');
 
 'use strict';
 
-var Module = {
-  create: function () {
-    return Object.create(this);
-  },
+class Module {
+  constructor () {
+  }
 
-  init: function(options) {
+  static create () {
+    return new this();
+  }
+
+  init (options = {}) {
     this.root = options.root || '#hits-graph';
     this.containerEl = DOM(this.root).nth(0);
     this.data = options.data;
     this.markers = options.markers;
     this.height = options.height || 200;
-  },
+  }
 
-  render: function () {
-    var containerEl = this.containerEl;
+  render () {
+    let containerEl = this.containerEl;
     if (! containerEl) {
       return;
     }
-    var containerWidth = containerEl.clientWidth;
+    let containerWidth = containerEl.clientWidth;
 
-    var data = MG.convert.date(this.data, 'date');
-    var markers = MG.convert.date(this.markers, 'date');
+    let data = MG.convert.date(this.data, 'date');
+    let markers = MG.convert.date(this.markers, 'date');
 
-    var lastIndex;
+    let lastIndex;
 
-    DOM(this.root).on('click', function (event) {
+    DOM(this.root).on('click', event => {
       if (typeof lastIndex !== 'undefined') {
-        var eventData = {
+        let eventData = {
           data: data[lastIndex],
           x: event.screenX + 'px',
           y: event.screenY + 'px'
@@ -60,10 +63,10 @@ var Module = {
       y_axis: false,
       interpolate: 'line',
       show_rollover_text: true,
-      mouseover: function (data, i) {
+      mouseover: (data, i) => {
         lastIndex = i;
       },
-      mouseout: function (data, i) {
+      mouseout: (data, i) => {
         lastIndex = void 0;
       }
     });
